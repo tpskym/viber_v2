@@ -62,15 +62,22 @@ class StartedAction:
 
 class JobItilium:
 
-    def not_exist(self, sender ):
+    def not_exist(self, sender, Login = "", Password = "", Adress = "" ):
+        if(Login == ""):
+            Login = LoginItilium
+        if Password == "":
+            Password = PasswordItilium
+        if Adress == "":
+            Adress = AddressApiItilium
         try:
-            response = requests.post(AddressApiItilium, data = """{
+            quote = "\""
+            response = requests.post(Adress, data = """{
                                                                   "data": {
                                                                     "action": "non_exist",
-                                                                    "sender": "sender_id"
+                                                                    "sender": """ + quote + sender + quote+ """, 
                                                                   }
                                                                 }""",
-                                                        auth=(LoginItilium,PasswordItilium))
+                                                        auth=(Login,Password))
             code = response.status_code
             description = response.text
 
@@ -91,19 +98,25 @@ class JobItilium:
             return answer
 
 
-    def register(self, sender, message):
+    def register(self, sender, message,  Login = "", Password = "", Adress = ""):
+        if (Login == ""):
+            Login = LoginItilium
+        if Password == "":
+            Password = PasswordItilium
+        if Adress == "":
+            Adress = AddressApiItilium
         text = GetTextCommand(message)
 
         try:
             quote = "\""
-            response = requests.post(AddressApiItilium, data="""{
+            response = requests.post(Adress, data="""{
                                                                 "data": {
                                                                 "action": "register",
                                                                 "sender": """ + quote + sender + quote + """,
                                                                 "phone":  """ + quote + text  + quote + """,
                                                                 }
                                                             }""",
-                                 auth=(LoginItilium, PasswordItilium))
+                                 auth=(Login, Password))
             code = response.status_code
             description = response.text
             answer = Answer()
@@ -156,8 +169,24 @@ class JobItilium:
         return answer
 
     def register_new_incident(self, message: str, sender: str):
+        quote = "\""
+        response = requests.post(AddressApiItilium, data="""{
+                                                                       "data": {
+                                                                       "action": "registrations",
+                                                                       "sender": """ + quote + sender + quote + """,
+                                                                       "phone":  """ + quote + message + quote + """,
+                                                                       }
+                                                                   }""",
+                                 auth=(LoginItilium, PasswordItilium))
+        code = response.status_code
+        description = response.text
         answer = Answer()
-        answer.description = "Обращение 123 от 45645"
+        if (code == 200):
+            answer.status = True
+            answer.result = description
+        else:
+            answer.status = False
+            answer.description = description + " ERROR CODE:" + str(code)
         return answer
 
     def add_conversation(self, sender: str, reference_incident: str, text: str):
@@ -832,7 +861,7 @@ class JobMessage:
             return [TextMessage(text="Не реализовано "), TemplatesKeyboards.get_keyboard_start_message()]
 
     def get_text_comand(self, message):
-        return GetTextComand(message)
+        return GetTextCommand(message)
 
     def first_level_comand(self, message, sender: str):
         text = self.get_text_comand(message)
@@ -879,6 +908,39 @@ def GetIsRegistration():
 def SetIsRegistration(state:bool):
     is_registration[0] = state
 
+
+def VerifyRegistration(senderid, message ):
+    job_itilium = JobItilium()
+    if GetIsRegistration() == False:
+        answer = job_itilium.not_exist(senderid)
+        if answer.status:
+            if (answer.result == str(1)):
+                ret = TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")
+                SetIsRegistration(True)
+                return True, ret
+            else:
+                return False, None
+        else:
+            ret = TextMessage(text=answer.description)
+            return True, ret
+    elif GetIsRegistration() == True:
+        answer = job_itilium.register(senderid, message)
+        if answer.status == True:
+            if (answer.result == str(1)):
+                SetIsRegistration(False)
+                return False, None
+            else:
+                ret = [TextMessage(text=answer.result),
+                       TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")]
+                return True, ret
+
+        else:
+            ret = TextMessage(text=answer.description)
+            return True, ret
+    else:
+        return False, None
+
+
 @app.route('/', methods=['POST'])
 def incoming():
     logger.debug("received request. post data: {0}".format(request.get_data()))
@@ -892,34 +954,13 @@ def incoming():
     integration = Integration()
 
     if isinstance(viber_request, ViberMessageRequest):
-        job_itilium = JobItilium()
-        if GetIsRegistration() == False:
-            answer = job_itilium.not_exist(viber_request.sender.id)
-            if answer.status:
-                if (answer.result == str(1)):
-                    ret = TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")
-                    SetIsRegistration(True)
-                else:
-                    ret = integration.on_new_message(viber_request.message, viber_request.sender.id)
-            else:
-                ret = TextMessage(text=answer.description)
 
-        elif GetIsRegistration() == True:
-            answer = job_itilium.register(viber_request.sender.id, TextMessage(text="293"))
-            if answer.status == True:
-                if (answer.result == str(1)):
-                    SetIsRegistration(False)
-                    ret = integration.on_new_message(viber_request.message, viber_request.sender.id)
-                else:
-                    ret = [TextMessage(text=answer.result),
-                           TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")]
-
-            else:
-                ret = TextMessage(text=answer.description)
+        isReg, mess = VerifyRegistration(viber_request.sender.id, viber_request.message)
+        if isReg:
+            viber.send_messages(viber_request.sender.id, mess)
         else:
-            ret = integration.on_new_message(viber_request.message, viber_request.sender.id)
+            viber.send_messages(viber_request.sender.id, integration.on_new_message(viber_request.message, viber_request.sender.id))
 
-        viber.send_messages(viber_request.sender.id, ret)
     elif isinstance(viber_request, ViberSubscribedRequest):
         viber.send_messages(viber_request.sender.id, integration.on_subscribe(viber_request.sender.id))
     elif isinstance(viber_request, ViberFailedRequest):
@@ -929,5 +970,116 @@ def incoming():
 
 # integration = Integration()
 # senderid = "RH2xtdiCKsztWpOkGlMxZQ=="
+########################################################################################################################
+##          TESTS                                                            ###########################################
+########################################################################################################################
 
+_AddressApiItilium = "http://demo.desnol.ru/suhov_itil/hs/viberapi/action"
+_LoginItilium = "admin"
+_PasswordItilium = "1Q2w3e4r5t"
 
+def test_non_exist():
+    job_itilium = JobItilium()
+
+    print_value("test non exist begin")
+
+    answer = job_itilium.not_exist("sddsdddddd", _LoginItilium, _PasswordItilium, _AddressApiItilium )
+    if answer.status == True and answer.result == str(1):
+        print_value("ok")
+    else:
+        print_value("false non exist 1")
+
+    answer = job_itilium.not_exist("222", _LoginItilium, _PasswordItilium, _AddressApiItilium) #для теста завести в Итиилиум в регистр ИдентификаторыВМессенджерах запись, где идентификатор = 222
+    if answer.status == True and answer.result == str(0):
+        print_value("ok")
+    else:
+        print_value("false non exist 2")
+
+    answer = job_itilium.not_exist("293", _LoginItilium + "ddd", _PasswordItilium, _AddressApiItilium)
+    if answer.status == False:
+        print_value("ok")
+    else:
+        print_value("false non exist 3")
+
+    answer = job_itilium.not_exist("293", _LoginItilium, _PasswordItilium + "f", _AddressApiItilium)
+    if answer.status == False:
+        print_value("ok")
+    else:
+        print_value("false non exist 4")
+
+    answer = job_itilium.not_exist("293", _LoginItilium, _PasswordItilium , _AddressApiItilium + "ff")
+    if answer.status == False:
+        print_value("ok")
+    else:
+        print_value("false non exist 4")
+
+    print_value("test non exist end")
+
+def test_register():
+
+    job_itilium = JobItilium()
+
+    print_value("test registr begin")
+
+    answer = job_itilium.register("222","-----",_LoginItilium,_PasswordItilium,_AddressApiItilium)
+    if answer.status == True and answer.result != str(1):
+        print_value("ok")
+    else:
+        print_value("false in register 1")
+
+    answer = job_itilium.register("222", "293", _LoginItilium, _PasswordItilium, _AddressApiItilium) #надо вподключенном итилиум добавить в регистр контактная информация физлицо с телефоном 293
+    if answer.status == True and answer.result == str(1):
+        print_value("ok")
+    else:
+        print_value("false in register 2")
+
+    answer = job_itilium.register("222", "293", _LoginItilium + "s", _PasswordItilium,
+                                  _AddressApiItilium)  # надо вподключенном итилиум добавить в регистр контактная информация физлицо с телефоном 293
+    if answer.status == False :
+        print_value("ok")
+    else:
+        print_value("false in register 3")
+
+    answer = job_itilium.register("222", "293", _LoginItilium , _PasswordItilium + "d",
+                                  _AddressApiItilium)  # надо вподключенном итилиум добавить в регистр контактная информация физлицо с телефоном 293
+    if answer.status == False:
+        print_value("ok")
+    else:
+        print_value("false in register 4")
+
+    answer = job_itilium.register("222", "293", _LoginItilium, _PasswordItilium,
+                                  _AddressApiItilium + "d")  # надо вподключенном итилиум добавить в регистр контактная информация физлицо с телефоном 293
+    if answer.status == False:
+        print_value("ok")
+    else:
+        print_value("false in register 5")
+    print_value("test registr end")
+
+def test_VerifyRegistration():
+    print_value("VerifyRegistration begin")
+    isReg, mess = VerifyRegistration("111","Hello")
+    if isReg :
+        print_value("ok")
+    else:
+        print_value("false VerifyRegistration 1")
+        return
+    isReg, mess = VerifyRegistration("111", "-----")
+    if isReg :
+        print_value("ok")
+        isReg, mess = VerifyRegistration("111", "293") # надо вподключенном итилиум добавить в регистр контактная информация физлицо с телефоном 293
+        if(isReg == False):
+            print_value("ok")
+        else:
+            print_value("false VerifyRegistration 3")
+    else:
+        print_value("false VerifyRegistration 2")
+        return
+
+    print_value("VerifyRegistration end")
+
+def tests():
+    test_non_exist()
+    test_register()
+    test_VerifyRegistration()
+
+tests()
