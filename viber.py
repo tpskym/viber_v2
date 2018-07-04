@@ -15,7 +15,8 @@ from viberbot.api.viber_requests import ViberUnsubscribedRequest
 import json
 
 
-AddressApiItilium = "http://demo.desnol.ru/suhov_itil/hs/viberapi/action"
+# AddressApiItilium =  "http://demo.desnol.ru/suhov_itil/hs/viberapi/action"
+AddressApiItilium = os.environ['AddressApiItilium']
 LoginItilium = "admin"
 PasswordItilium = "1Q2w3e4r5t"
 
