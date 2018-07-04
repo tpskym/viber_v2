@@ -17,7 +17,7 @@ import json
 
 AddressApiItilium = os.environ['AddressApiItilium']
 LoginItilium = os.environ['AddressApiItilium']
-os.environ["PasswordItilium"] = 'ghghghghgh'
+# os.environ["PasswordItilium"] = 'ghghghghgh'
 PasswordItilium = os.environ["PasswordItilium"]
 
 
