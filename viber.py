@@ -787,8 +787,10 @@ class JobMessage:
 
     def get_started_action(self, sender: str):
         print_debug("get_started_action")
+        print_debug("-sender" + sender)
         for i in list_actions_senders:
             if (isinstance(i, StartedAction)):
+                print_debug("-cur sender" + i.sender )
                 if (i.sender == sender):
                     return i
         return None
@@ -1141,10 +1143,10 @@ class JobMessage:
     def process(self, message, sender: str):
         print_debug("process")
         if (self.sender_has_started_actions(sender) == False):
-            print_debug("has started action")
+            print_debug("NO started action")
             return self.first_level_comand(message, sender)
         else:
-            print_debug("NO started action")
+            print_debug("has started action")
             return self.continue_started_process(message, sender)
 
 
