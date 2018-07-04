@@ -1189,33 +1189,52 @@ viber = Api(BotConfiguration(
 
 
 is_registration = [False]
-def GetIsRegistration():
-    return os.environ["is_registration"] == True
+def GetIsRegistration(sender):
+    data = os.environ["registration_fields"]
+    if data == "":
+        return False
+    list = json.loads(data)
+    for senderid in list:
+        if senderid.get("sender") == sender:
+            return senderid.get("state")
+    return False
 
-def SetIsRegistration(state:bool):
-    os.environ["is_registration"] = state
+
+def SetIsRegistration(state:bool, sender):
+    data = os.environ["registration_fields"]
+    if data == "":
+        os.environ["registration_fields"] = json.dumps([{"senderid":sender,"state":state}])
+        return
+    else:
+        for senderid in data:
+            if senderid.get("sender") == sender:
+                senderid.set("state", state)
+                os.environ["registration_fields"] = json.dumps(data)
+                return
+        data.append({{"senderid":sender,"state":state}})
+        os.environ["registration_fields"] = json.dumps(data)
 
 
 def VerifyRegistration(senderid, message ):
     print_debug("Verify registration")
     job_itilium = JobItilium()
-    if GetIsRegistration() == False:
+    if GetIsRegistration(senderid) == False:
         answer = job_itilium.not_exist(senderid)
         if answer.status:
             if (answer.result == str(1)):
                 ret = TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")
-                SetIsRegistration(True)
+                SetIsRegistration(True, senderid)
                 return True, ret
             else:
                 return False, None
         else:
             ret = TextMessage(text=answer.description)
             return True, ret
-    elif GetIsRegistration() == True:
+    elif GetIsRegistration(senderid) == True:
         answer = job_itilium.register(senderid, message)
         if answer.status == True:
             if (answer.result == str(1)):
-                SetIsRegistration(False)
+                SetIsRegistration(False, senderid)
                 return False, None
             else:
                 ret = [TextMessage(text=answer.result),
