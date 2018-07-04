@@ -695,6 +695,8 @@ class JobMessage:
         print_debug("start_registration")
         started_action = StartedAction(sender, "Registration", "")
         list_actions_senders.append(started_action)
+        print_debug("add started action")
+        print_debug("count:" + str(len(list_actions_senders)))
         return [TextMessage(text="Опишите вашу проблему."), TemplatesKeyboards.get_keyboard_cancel()]
 
     def start_itilium_modification(self, sender: str):
@@ -1219,6 +1221,7 @@ def VerifyRegistration(senderid, message ):
 @app.route('/', methods=['POST'])
 def incoming():
     print_debug("incoming message")
+    print_debug("count started actions:" + str(len(list_actions_senders)))
     logger.debug("received request. post data: {0}".format(request.get_data()))
     # every viber message is signed, you can verify the signature using this method
 
