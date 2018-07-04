@@ -702,22 +702,28 @@ class JobMessage:
     def start_itilium_modification(self, sender: str):
         print_debug("start_itilium_modification")
         job_itilium = JobItilium()
-        list = job_itilium.get_list_open_incidents(sender)
-        if len(list) == 0:
-            return [TextMessage(text="У вас нет зарегистрированных открытых обращений"),
-                    TemplatesKeyboards.get_keyboard_start_message()]
-        elif len(list) == 1:
-            started_action = StartedAction(sender, "AddConversationsInputText", list[0].id)
-            list_actions_senders.append(started_action)
-            return [TextMessage(text="Введите уточнение:"), TextMessage(text=list[0].detail_view),
-                    TemplatesKeyboards.get_keyboard_cancel_modify()]
+        answer = job_itilium.get_list_open_incidents(sender)
+        if answer.status:
+            list = answer.result
+            if len(list) == 0:
+                return [TextMessage(text="У вас нет зарегистрированных открытых обращений"),
+                        TemplatesKeyboards.get_keyboard_start_message()]
+            elif len(list) == 1:
+                started_action = StartedAction(sender, "AddConversationsInputText", list[0].id)
+                list_actions_senders.append(started_action)
+                return [TextMessage(text="Введите уточнение:"), TextMessage(text=list[0].detail_view),
+                        TemplatesKeyboards.get_keyboard_cancel_modify()]
+            else:
+                started_action = StartedAction(sender, "AddConversationsSelectIncident", {"number": 1, "list": list})
+                list_actions_senders.append(started_action)
+                list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(
+                    keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
+                                                                                  started_action.additional.get("number"),2))]
+                return list_answer
         else:
-            started_action = StartedAction(sender, "AddConversationsSelectIncident", {"number": 1, "list": list})
-            list_actions_senders.append(started_action)
-            list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(
-                keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
-                                                                              started_action.additional.get("number"),2))]
-            return list_answer
+            return [TextMessage(text="Ошибка." + answer.description),
+                    TemplatesKeyboards.get_keyboard_start_message()]
+
 
     def start_get_state(self, sender: str):
         print_debug("start_get_state")
