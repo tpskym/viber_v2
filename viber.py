@@ -1172,6 +1172,7 @@ def VerifyRegistration(senderid, message ):
 def incoming():
     logger.debug("received request. post data: {0}".format(request.get_data()))
     # every viber message is signed, you can verify the signature using this method
+
     if not viber.verify_signature(request.get_data(), request.headers.get('X-Viber-Content-Signature')):
         return Response(status=403)
 
@@ -1460,3 +1461,4 @@ def tests():
     test_getLastConversations()
 
 # tests()
+viber.set_webhook("https://botitilium.herokuapp.com/")
