@@ -13,3 +13,4 @@ pip==10.0.1
 requests==2.19.1
 setuptools==39.1.0
 urllib3==1.23
+gunicorn==19.0.0
