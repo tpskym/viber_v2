@@ -1250,9 +1250,13 @@ def incoming():
             viber.send_messages(viber_request.sender.id, integration.on_new_message(viber_request.message, viber_request.sender.id))
 
     elif isinstance(viber_request, ViberSubscribedRequest):
+        print_debug("subscribe message")
         viber.send_messages(viber_request.sender.id, integration.on_subscribe(viber_request.sender.id))
     elif isinstance(viber_request, ViberFailedRequest):
+        print_debug("failed request")
         integration.on_failed_message(viber_request.message, viber_request.sender.id)
+    else:
+        print_debug("others")
 
     return Response(status=200)
 
