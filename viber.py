@@ -12,7 +12,7 @@ from viberbot.api.viber_requests import ViberFailedRequest
 from viberbot.api.viber_requests import ViberMessageRequest
 from viberbot.api.viber_requests import ViberSubscribedRequest
 from viberbot.api.viber_requests import ViberUnsubscribedRequest
-
+import json
 
 
 AddressApiItilium = "http://demo.desnol.ru/suhov_itil/hs/viberapi/action"
@@ -135,49 +135,203 @@ class JobItilium:
 
 
     def get_last_conversations(self, sender):
-        print(sender)
-        list = []
-        for i in range(50):
-            list.append(WrapperView(
-                "00000000" + str(i) + " от 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починить<br> <B>Иванов Петр васильевич:</B><br>  Что именно не работает?<br><b>Cидоров Иван:</b> Все не работает ?",
-                "Иванов Петр васильевич: \r Детальное описание с ссобщениями,от 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 "
-                "Сидоров Иван Николаевич:\r Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починить",
-                "referenceInItilium" + str(i)))
-        return list
+        quote = "\""
+        data_to_send = """{
+                                                "data": {
+                                                "action": "get_last_conversations",
+                                                "sender": """ + quote + sender + quote + """,                                  
+                                                }
+                                             }"""
+
+        headers = {'Content-Type': 'text/xml; charset=utf-8', }
+        req = requests.Request('POST', AddressApiItilium,
+                               headers=headers,
+                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+        prepped_requ = req.prepare()
+        s = requests.Session()
+        response = s.send(prepped_requ)
+
+        code = response.status_code
+        description = response.text
+        answer = Answer()
+        # print_value(description)
+
+        # print_value(list)
+        if (code == 200):
+            answer.status = True
+            list = json.loads(description)
+            list_ret = []
+            for incident in list:
+                list_ret.append(WrapperView(incident.get('view'), incident.get('detail_view'), incident.get('id')))
+            answer.result = list_ret
+        else:
+            answer.status = False
+            answer.description = description + " ERROR CODE:" + str(code)
+        return answer
 
     def confirm_incident(self, sender, reference_incident, rating, comment):
+        quote = "\""
+        data_to_send = """{
+                                          "data": {
+                                          "action": "confirm_incident",
+                                          "sender": """ + quote + sender + quote + """,
+                                          "incident": """ + quote + reference_incident + quote + """,
+                                          "rating": """ + quote + str(rating) + quote + """,
+                                          "comment": """ + quote + comment + quote + """,                                  
+                                          }
+                                       }"""
+        # print_value(data_to_send)
+
+        headers = {'Content-Type': 'text/xml; charset=utf-8', }
+        req = requests.Request('POST', AddressApiItilium,
+                               headers=headers,
+                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+        prepped_requ = req.prepare()
+        s = requests.Session()
+        response = s.send(prepped_requ)
+
+        # response = requests.post(AddressApiItilium, data=data_to_send,
+        #                          auth=(LoginItilium, PasswordItilium))
+        code = response.status_code
+        description = response.text
         answer = Answer()
-        answer.description = "Обращение подтверждено"
+        if (code == 200):
+            answer.status = True
+            answer.result = description
+        else:
+            answer.status = False
+            answer.description = description + " ERROR CODE:" + str(code)
         return answer
 
     def get_rating_for_incidents_confirmation(self, sender, incident_ref):
-        return RatingIncidents
+        quote = "\""
+        data_to_send = """{
+                                                  "data": {
+                                                  "action": "get_rating_for_incidents_confirmation",
+                                                  "incident": """ + quote + incident_ref + quote + """,
+                                                  "sender": """ + quote + sender + quote + """,                                  
+                                                  }
+                                               }"""
+
+        headers = {'Content-Type': 'text/xml; charset=utf-8', }
+        req = requests.Request('POST', AddressApiItilium,
+                               headers=headers,
+                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+        prepped_requ = req.prepare()
+        s = requests.Session()
+        response = s.send(prepped_requ)
+
+        code = response.status_code
+        description = response.text
+        answer = Answer()
+        if (code == 200):
+            answer.status = True
+            rating = RatingIncidents()
+            dictionary = json.loads(description)
+            rating.five_need_comment = dictionary.get('five_need_comment')
+            rating.four_need_comment = dictionary.get('four_need_comment')
+            rating.three_need_comment = dictionary.get('three_need_comment')
+            rating.two_need_comment = dictionary.get('two_need_comment')
+            rating.one_need_comment = dictionary.get('one_need_comment')
+            rating.need_rating = dictionary.get('need_rating')
+            rating.rating_exist = dictionary.get('rating_exist')
+            answer.result = rating
+        else:
+            answer.status = False
+            answer.description = description + " ERROR CODE:" + str(code)
+        return answer
+
 
     def get_list_need_confirmed_incidents(self, sender):
-        list = []
-        for i in range(50):
-            list.append(WrapperView(
-                "00000000" + str(i) + " от 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починить",
-                "Иванов Петр васильевич: \r Детальное описание с ссобщениями,от 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 \r\r"
-                "Сидоров Иван Николаевич: \r Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починить",
-                "referenceInItilium" + str(i)))
-        return list
+        quote = "\""
+        data_to_send = """{
+                                          "data": {
+                                          "action": "list_need_confirmed_incidents",
+                                          "sender": """ + quote + sender + quote + """,                                  
+                                          }
+                                       }"""
 
-    def decline_incident(self, sender, command):
+        headers = {'Content-Type': 'text/xml; charset=utf-8', }
+        req = requests.Request('POST', AddressApiItilium,
+                               headers=headers,
+                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+        prepped_requ = req.prepare()
+        s = requests.Session()
+        response = s.send(prepped_requ)
+
+        code = response.status_code
+        description = response.text
         answer = Answer()
-        answer.description = "Результат обращения отклонен"
+        # print_value(description)
+
+        # print_value(list)
+        if (code == 200):
+            answer.status = True
+            list = json.loads(description)
+            list_ret = []
+            for incident in list:
+                list_ret.append(WrapperView(incident.get('view'), incident.get('detail_view'), incident.get('id')))
+            answer.result = list_ret
+        else:
+            answer.status = False
+            answer.description = description + " ERROR CODE:" + str(code)
+        return answer
+
+    def decline_incident(self, sender, reference_incident, comment):
+        quote = "\""
+        data_to_send = """{
+                                  "data": {
+                                  "action": "decline_incident",
+                                  "sender": """ + quote + sender + quote + """,
+                                  "incident": """ + quote + reference_incident + quote + """,
+                                  "comment": """ + quote + comment + quote + """,                                  
+                                  }
+                               }"""
+        # print_value(data_to_send)
+
+        headers = {'Content-Type': 'text/xml; charset=utf-8', }
+        req = requests.Request('POST', AddressApiItilium,
+                               headers=headers,
+                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+        prepped_requ = req.prepare()
+        s = requests.Session()
+        response = s.send(prepped_requ)
+
+        # response = requests.post(AddressApiItilium, data=data_to_send,
+        #                          auth=(LoginItilium, PasswordItilium))
+        code = response.status_code
+        description = response.text
+        answer = Answer()
+        if (code == 200):
+            answer.status = True
+            answer.result = description
+        else:
+            answer.status = False
+            answer.description = description + " ERROR CODE:" + str(code)
         return answer
 
     def register_new_incident(self, message: str, sender: str):
         quote = "\""
-        response = requests.post(AddressApiItilium, data="""{
-                                                                       "data": {
-                                                                       "action": "registrations",
-                                                                       "sender": """ + quote + sender + quote + """,
-                                                                       "phone":  """ + quote + message + quote + """,
-                                                                       }
-                                                                   }""",
-                                 auth=(LoginItilium, PasswordItilium))
+        message = message
+        data_to_send = """{
+                           "data": {
+                           "action": "registration",
+                           "sender": """ + quote + sender + quote + """,
+                           "text":  """ + quote + message + quote + """,
+                           }
+                        }"""
+        # print_value(data_to_send)
+
+        headers = {'Content-Type': 'text/xml; charset=utf-8', }
+        req = requests.Request('POST', AddressApiItilium,
+                               headers=headers,
+                               data=data_to_send.encode('utf-8'),auth=(LoginItilium, PasswordItilium))
+        prepped_requ = req.prepare()
+        s = requests.Session()
+        response = s.send(prepped_requ)
+
+        # response = requests.post(AddressApiItilium, data=data_to_send,
+        #                          auth=(LoginItilium, PasswordItilium))
         code = response.status_code
         description = response.text
         answer = Answer()
@@ -190,20 +344,72 @@ class JobItilium:
         return answer
 
     def add_conversation(self, sender: str, reference_incident: str, text: str):
+        quote = "\""
+        data_to_send = """{
+                                          "data": {
+                                          "action": "add_converstaion",
+                                          "sender": """ + quote + sender + quote + """,
+                                          "text": """ + quote + text + quote + """,
+                                          "incident": """ + quote + reference_incident + quote + """,                                  
+                                          }
+                                       }"""
+
+        headers = {'Content-Type': 'text/xml; charset=utf-8', }
+        req = requests.Request('POST', AddressApiItilium,
+                               headers=headers,
+                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+        prepped_requ = req.prepare()
+        s = requests.Session()
+        response = s.send(prepped_requ)
+
+        code = response.status_code
+        description = response.text
         answer = Answer()
-        answer.description = "Уточнения внесены"
+        # print_value(description)
+
+        if (code == 200):
+            answer.status = True
+            answer.result = description
+        else:
+            answer.status = False
+            answer.description = description + " ERROR CODE:" + str(code)
         return answer
 
     def get_list_open_incidents(self, sender):
-        list = []
-        for i in range(2):
-            list.append(WrapperView(
-                "00000000" + str(i) + " от 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починить",
-                "Детальное описание с ссобщениями,от 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починитьот 12/06/2018 Не работает принтер уже вторую неделю, надо срочно починить",
-                "referenceInItilium" + str(i)))
-        return list
 
-        # return ["000000002 от 12/06/2018","000000001 от 12/06/2018", "000000003 от 12/06/2018"]
+        quote = "\""
+        data_to_send = """{
+                                  "data": {
+                                  "action": "list_open_incidents",
+                                  "sender": """ + quote + sender + quote + """,                                  
+                                  }
+                               }"""
+
+        headers = {'Content-Type': 'text/xml; charset=utf-8', }
+        req = requests.Request('POST', AddressApiItilium,
+                               headers=headers,
+                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+        prepped_requ = req.prepare()
+        s = requests.Session()
+        response = s.send(prepped_requ)
+
+        code = response.status_code
+        description = response.text
+        answer = Answer()
+        # print_value(description)
+
+        # print_value(list)
+        if (code == 200):
+            answer.status = True
+            list = json.loads(description)
+            list_ret = []
+            for incident in list:
+                list_ret.append(WrapperView(incident.get('view'), incident.get('detail_view'), incident.get('id')))
+            answer.result = list_ret
+        else:
+            answer.status = False
+            answer.description = description + " ERROR CODE:" + str(code)
+        return answer
 
 
 class WrapperView:
@@ -660,34 +866,37 @@ class JobMessage:
         self.remove_started_action(sender)
         if (command == "_Itilium_bot_Confirm"):
             job_itilium = JobItilium()
-            rating_state = job_itilium.get_rating_for_incidents_confirmation(sender, reference_incident)
-            print_value(rating_state.need_rating)
-            if rating_state.need_rating:
-                started_action = StartedAction(sender, "Get_Comfirmed_select_rating",
-                                               {"ref": reference_incident, "rating_state": rating_state})
-                list_actions_senders.append(started_action)
-                return [ TextMessage(text="Оцените выполнение обращения"), TemplatesKeyboards.get_keyboard_rating()]
-            elif rating_state.rating_exist:
-                started_action = StartedAction(sender, "Get_Comfirmed_select_rating",
-                                               {"ref": reference_incident, "rating_state": rating_state})
-                list_actions_senders.append(started_action)
-                return [TextMessage(text="Оцените выполнение обращения"), TemplatesKeyboards.get_keyboard_rating_with_continue()]
-            else:
-                job_itilium = JobItilium()
-                answer = job_itilium.confirm_incident(sender, reference_incident, -1, "")
-                if (answer == False):
-                    return [TextMessage(text="Не удалось подтвердить обращение по причине:" + answer.description)]
+            answer = job_itilium.get_rating_for_incidents_confirmation(sender, reference_incident)
+            if answer.status:
+                rating_state = answer.result
+                # print_value(rating_state.need_rating)
+                if rating_state.need_rating:
+                    started_action = StartedAction(sender, "Get_Comfirmed_select_rating",
+                                                   {"ref": reference_incident, "rating_state": rating_state})
+                    list_actions_senders.append(started_action)
+                    return [ TextMessage(text="Оцените выполнение обращения"), TemplatesKeyboards.get_keyboard_rating()]
+                elif rating_state.rating_exist:
+                    started_action = StartedAction(sender, "Get_Comfirmed_select_rating",
+                                                   {"ref": reference_incident, "rating_state": rating_state})
+                    list_actions_senders.append(started_action)
+                    return [TextMessage(text="Оцените выполнение обращения"), TemplatesKeyboards.get_keyboard_rating_with_continue()]
                 else:
-                    return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
-
-        elif command == "_Itilium_bot_Decline":
-            job_itilium = JobItilium()
-            answer = job_itilium.decline_incident(sender, command)
-            if (answer == False):
-                return [TextMessage(text="Не удалось отклонить обращение по причине:" + answer.description),
-                        TemplatesKeyboards.get_keyboard_start_message()]
+                    job_itilium = JobItilium()
+                    answer = job_itilium.confirm_incident(sender, reference_incident, -1, "")
+                    if (answer == False):
+                        return [TextMessage(text="Не удалось подтвердить обращение по причине:" + answer.description)]
+                    else:
+                        return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
             else:
                 return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
+        elif command == "_Itilium_bot_Decline":
+
+            started_action = StartedAction(sender, "Get_decline_input_comment",
+                                           {"ref": reference_incident})
+            list_actions_senders.append(started_action)
+            return [TextMessage(text="Укажите причину отклонения"),
+                    TemplatesKeyboards.get_keyboard_cancel()]
+
 
         else:  # cancel
             return [TextMessage(text="Подтверждение не выполнено:"), TemplatesKeyboards.get_keyboard_start_message()]
@@ -835,6 +1044,21 @@ class JobMessage:
         else:
             return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
 
+    def continue_decline_incident_input_text(self, message, sender, started_action):
+        command = self.get_text_comand(message)
+        reference = started_action.additional.get("ref")
+        self.remove_started_action(sender)
+        if (command == "_Itilium_bot_cancel"):
+            return [TextMessage(text="Обращение не отклонено"), TemplatesKeyboards.get_keyboard_start_message()]
+        else:
+            job_itilium = JobItilium()
+            answer = job_itilium.decline_incident(sender, reference, command)
+            if (answer == False):
+                return [TextMessage(text="Не удалось отклонить обращение по причине:" + answer.description),
+                        TemplatesKeyboards.get_keyboard_start_message()]
+            else:
+                return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
+
     def continue_started_process(self, message, sender: str):
         started_action = self.get_started_action(sender)
         if (started_action.name == "Registration"):
@@ -857,6 +1081,9 @@ class JobMessage:
             return self.continue_add_conversations_select_incident(message, sender, started_action)
         elif started_action.name == "AddConversationsInputText":
             return self.continue_add_conversations_input_text(message, sender, started_action)
+        elif started_action.name == "Get_decline_input_comment":
+            return self.continue_decline_incident_input_text(message, sender, started_action)
+
         else:
             return [TextMessage(text="Не реализовано "), TemplatesKeyboards.get_keyboard_start_message()]
 
@@ -1056,7 +1283,7 @@ def test_register():
     print_value("test registr end")
 
 def test_VerifyRegistration():
-    print_value("VerifyRegistration begin")
+    print_value("VerifyRegistration begin") #НАДО УДАЛИТЬ В ИТИЛИУМ ИЗ РЕГИСТРА ИдентификаторыПодписчиков запись, с ИДентификатором 111
     isReg, mess = VerifyRegistration("111","Hello")
     if isReg :
         print_value("ok")
@@ -1077,9 +1304,159 @@ def test_VerifyRegistration():
 
     print_value("VerifyRegistration end")
 
+def test_Registration():
+    print_value("Registration begin")
+    integration = Integration()
+    value = integration.on_new_message("hello", "111") #пользователь 111 должен быть в регистре ИдентификаторыПодписчиков. В тестах выше по сценарию он добавлен
+    job_message = JobMessage()
+    try:
+        if isinstance(value[0],TextMessage) and isinstance(value[1], KeyboardMessage):
+            print_value("ok")
+            if value[1].keyboard == TemplatesKeyboards.get_keyboard_start_message().keyboard:
+                print_value("ok")
+            else:
+                print_value("false 2")
+        else:
+            print_value("false 1")
+    except:
+        print_value("false 1")
+    print_value("Registration end")
+
+def test_registerNewIncident():
+    print_value("registerNewIncident begin")
+    job_itilium = JobItilium()
+    answer = job_itilium.register_new_incident("новое Обращение","111")
+    if answer.status:
+        print_value("ok " + answer.result)
+    else:
+        print_value("false 1")
+    print_value("registerNewIncident end")
+
+def test_GetListOpenIncidents():
+    print_value("GetListOpenIncidents end")
+    job_itilium = JobItilium()
+    answer = job_itilium.get_list_open_incidents( "111")
+    if answer.status:
+        print_value("ok " )
+    else:
+        print_value("false 1")
+    print_value("GetListOpenIncidents end")
+
+def test_AddConversation():
+    print_value("AddConversation begin")
+    job_itilium = JobItilium()
+    answer = job_itilium.get_list_open_incidents("111")
+    if answer.status:
+        if len(answer.result) == 0:
+            print_value("false no incidents in base")
+        else:
+            incident_id = answer.result[0].id
+            answer = job_itilium.add_conversation("111",incident_id, "новое сообщение через add conversation")
+            if answer.status:
+                print_value("ok " + answer.result)
+            else:
+                print_value("false 1 " + answer.description)
+    else:
+        print_value("false see test get_list_open_incidents")
+
+
+    print_value("AddConversation end")
+
+def  test_DeclineIncident():
+    print_value("DeclineIncident begin")
+
+    job_itilium = JobItilium()
+    answer = job_itilium.get_list_need_confirmed_incidents("111")
+    if answer.status:
+        if len(answer.result) == 0:
+            print_value("false no incidents in base")
+        else:
+            incident_id = answer.result[0].id
+            answer = job_itilium.decline_incident("111", incident_id, "не нравится, как сделано, переделайте")
+            if answer.status:
+                print_value("ok " + answer.result)
+            else:
+                print_value("false 1 " + answer.description)
+    else:
+        print_value("false see test get_list_open_incidents")
+
+    print_value("DeclineIncident end")
+
+def test_GetNeedConfirmed():
+    print_value("test_GetNeedConfirmed begin")
+    job_itilium = JobItilium()
+    answer = job_itilium.get_list_need_confirmed_incidents("111")
+    if answer.status:
+        print_value("ok ")
+    else:
+        print_value("false 1" + answer.description)
+    print_value("test_GetNeedConfirmed end")
+
+
+def test_getRatingConfirmation():
+    print_value("test_getRatingConfirmation begin")
+    job_itilium = JobItilium()
+    answer = job_itilium.get_list_need_confirmed_incidents("111")
+    if answer.status:
+        if len(answer.result) == 0:
+            print_value("false no incidents in base")
+        else:
+            incident_id = answer.result[0].id
+            answer = job_itilium.get_rating_for_incidents_confirmation("111", incident_id)
+            if answer.status:
+                print_value("ok " + answer.result)
+            else:
+                print_value("false 1 " + answer.description)
+
+    else:
+        print_value("false 1" + answer.description)
+    print_value("test_getRatingConfirmation end")
+
+def test_ConfirmIncident():
+    print_value("test_ConfirmIncident begin")
+    job_itilium = JobItilium()
+    answer = job_itilium.get_list_need_confirmed_incidents("111")
+    if answer.status:
+        if len(answer.result) == 0:
+            print_value("false no incidents in base")
+        else:
+            incident_id = answer.result[0].id
+            answer = job_itilium.confirm_incident("111", incident_id, 3, "Слабенько")
+            if answer.status:
+                print_value("ok " + answer.result)
+            else:
+                print_value("false 1 " + answer.description)
+    else:
+        print_value("false see test get_list_open_incidents")
+
+    print_value("test_ConfirmIncident end")
+
+def test_getLastConversations():
+    print_value("test_ConfirmIncident begin")
+    job_itilium = JobItilium()
+    answer = job_itilium.get_last_conversations("111")
+    if answer.status:
+        print_value("ok")
+        for i in answer.result:
+            print_value(i.view)
+            print_value(i.detail_view)
+            print_value(i.id)
+    else:
+        print_value("false " + answer.description)
+    print_value("test_ConfirmIncident end")
+
 def tests():
     test_non_exist()
     test_register()
     test_VerifyRegistration()
+    test_Registration()
+    test_registerNewIncident()
+    test_GetListOpenIncidents()
+    test_AddConversation()
+    test_GetNeedConfirmed()
+    test_DeclineIncident()
+    test_getRatingConfirmation()
+    test_ConfirmIncident()
+    test_getLastConversations()
 
 tests()
