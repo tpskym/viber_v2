@@ -15,12 +15,11 @@ from viberbot.api.viber_requests import ViberUnsubscribedRequest
 import json
 
 
-# AddressApiItilium =  "http://demo.desnol.ru/suhov_itil/hs/viberapi/action"
 AddressApiItilium = os.environ['AddressApiItilium']
 LoginItilium = os.environ['AddressApiItilium']
 PasswordItilium = os.environ["PasswordItilium"]
 
-os.environ["PasswordItilium"] = 'ddddd'
+
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -37,6 +36,11 @@ isDebug = [True]
 def print_debug(value):
     if isDebug[0] == True:
         print_value(value)
+
+print_debug(PasswordItilium)
+os.environ["PasswordItilium"] = 'ddddd'
+PasswordItilium = os.environ["PasswordItilium"]
+print_debug(PasswordItilium)
 
 def GetTextCommand(message):
     text = ""
