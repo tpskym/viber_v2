@@ -1540,7 +1540,6 @@ def test_getLastConversations():
     print_value("test_ConfirmIncident end")
 
 def test_GetSetRegistrations():
-    os.environ.update('registration_fields')
     state_reg = GetIsRegistration("111")
     if state_reg == False:
         print_value("ok")
