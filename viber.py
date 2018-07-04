@@ -819,7 +819,7 @@ class JobMessage:
         if (command == "_Itilium_bot_cancel"):
             return [TextMessage(text="Регистрация отменена"), TemplatesKeyboards.get_keyboard_start_message()]
         else:
-            return self.register_incident(job_itilium, message, sender)
+            return self.register_incident(job_itilium, command, sender)
 
     def continue_confirmed_input_comment(self, message, sender: str, started_action: StartedAction):
         print_debug("continue_confirmed_input_comment")
