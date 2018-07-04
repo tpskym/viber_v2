@@ -17,6 +17,7 @@ import json
 
 AddressApiItilium = os.environ['AddressApiItilium']
 LoginItilium = os.environ['AddressApiItilium']
+os.environ["PasswordItilium"] = 'ghghghghgh'
 PasswordItilium = os.environ["PasswordItilium"]
 
 
@@ -50,11 +51,6 @@ def GetTextCommand(message):
 
 def print_value(object_to_print, value: str = "-----------------------------"):
     print(value + "{}".format(object_to_print))
-
-print_debug(PasswordItilium)
-os.environ["PasswordItilium"] = 'ddddd'
-PasswordItilium = os.environ["PasswordItilium"]
-print_debug(PasswordItilium)
 
 
 class RatingIncidents:
@@ -1236,6 +1232,8 @@ def VerifyRegistration(senderid, message ):
 def incoming():
     print_debug("incoming message")
 
+
+
     print_debug("count started actions:" + str(len(list_actions_senders)))
     logger.debug("received request. post data: {0}".format(request.get_data()))
     # every viber message is signed, you can verify the signature using this method
@@ -1274,9 +1272,9 @@ def incoming():
 ##          TESTS                                                            ###########################################
 ########################################################################################################################
 
-_AddressApiItilium = "http://demo.desnol.ru/suhov_itil/hs/viberapi/action"
-_LoginItilium = "admin"
-_PasswordItilium = "1Q2w3e4r5t"
+_AddressApiItilium = AddressApiItilium
+_LoginItilium = LoginItilium
+_PasswordItilium = PasswordItilium
 
 def test_non_exist():
     job_itilium = JobItilium()
