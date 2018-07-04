@@ -1235,6 +1235,7 @@ def incoming():
 
     if isinstance(viber_request, ViberMessageRequest):
 
+        print_debug("incoming message:" + viber_request.message)
         isReg, mess = VerifyRegistration(viber_request.sender.id, viber_request.message)
         if isReg:
             viber.send_messages(viber_request.sender.id, mess)
