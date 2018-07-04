@@ -69,6 +69,7 @@ class StartedAction:
 class JobItilium:
 
     def not_exist(self, sender, Login = "", Password = "", Adress = "" ):
+        print_debug("not_exist(self, sender, Login = "", Password = "", Adress = "" )")
         if(Login == ""):
             Login = LoginItilium
         if Password == "":
@@ -105,6 +106,7 @@ class JobItilium:
 
 
     def register(self, sender, message,  Login = "", Password = "", Adress = ""):
+        print_debug("def register")
         if (Login == ""):
             Login = LoginItilium
         if Password == "":
@@ -141,6 +143,7 @@ class JobItilium:
 
 
     def get_last_conversations(self, sender):
+        print_debug("def get_last_conversations")
         quote = "\""
         data_to_send = """{
                                                 "data": {
@@ -176,6 +179,7 @@ class JobItilium:
         return answer
 
     def confirm_incident(self, sender, reference_incident, rating, comment):
+        print_debug("def confirm_incident")
         quote = "\""
         data_to_send = """{
                                           "data": {
@@ -210,6 +214,7 @@ class JobItilium:
         return answer
 
     def get_rating_for_incidents_confirmation(self, sender, incident_ref):
+        print_debug("def get_rating_for_incidents_confirmation")
         quote = "\""
         data_to_send = """{
                                                   "data": {
@@ -249,6 +254,7 @@ class JobItilium:
 
 
     def get_list_need_confirmed_incidents(self, sender):
+        print_debug("def get_list_need_confirmed_incidents")
         quote = "\""
         data_to_send = """{
                                           "data": {
@@ -284,6 +290,7 @@ class JobItilium:
         return answer
 
     def decline_incident(self, sender, reference_incident, comment):
+        print_debug("def decline_incident")
         quote = "\""
         data_to_send = """{
                                   "data": {
@@ -317,6 +324,7 @@ class JobItilium:
         return answer
 
     def register_new_incident(self, message: str, sender: str):
+        print_debug("def register_new_incident")
         quote = "\""
         message = message
         data_to_send = """{
@@ -350,6 +358,7 @@ class JobItilium:
         return answer
 
     def add_conversation(self, sender: str, reference_incident: str, text: str):
+        print_debug("def add_conversation")
         quote = "\""
         data_to_send = """{
                                           "data": {
@@ -382,7 +391,7 @@ class JobItilium:
         return answer
 
     def get_list_open_incidents(self, sender):
-
+        print_debug("def get_list_open_incidents")
         quote = "\""
         data_to_send = """{
                                   "data": {
