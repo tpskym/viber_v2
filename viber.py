@@ -1226,7 +1226,6 @@ def VerifyRegistration(senderid, message ):
                 print_debug("-Verify registration non exist")
                 ret = TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")
                 SetIsRegistration(True, senderid)
-                print_value("is registration:{}".format(GetIsRegistration(senderid) == False))
                 return True, ret
             else:
                 print_debug("-Verify registration exist")
@@ -1540,6 +1539,43 @@ def test_getLastConversations():
         print_value("false " + answer.description)
     print_value("test_ConfirmIncident end")
 
+def test_GetSetRegistrations():
+    os.environ.update('registration_fields')
+    state_reg = GetIsRegistration("111")
+    if state_reg == False:
+        print_value("ok")
+        SetIsRegistration("111", True)
+        state_reg = GetIsRegistration("111")
+        if state_reg == True:
+            print_value("ok")
+            state_reg = GetIsRegistration("222")
+            if state_reg == False:
+                print_value("ok")
+                SetIsRegistration("111", False)
+                state_reg = GetIsRegistration("222")
+                if state_reg == False:
+                    print_value("ok")
+                    SetIsRegistration("222", True)
+                    state_reg = GetIsRegistration("222")
+                    if state_reg == True:
+                        print_value("ok")
+                        state_reg = GetIsRegistration("111")
+                        if state_reg == False:
+                            print_value("ok")
+                        else:
+                            print_value("false 6")
+                    else:
+                        print_value("false 5")
+                else:
+                    print_value("false 4")
+            else:
+                print_value("false 3")
+        else:
+            print_value("false 2")
+    else:
+        print_value("false 1")
+
+
 def tests():
     # test_non_exist()
     # test_register()
@@ -1553,9 +1589,10 @@ def tests():
     # test_getRatingConfirmation()
     # test_ConfirmIncident()
     # test_getLastConversations()
+    test_GetSetRegistrations()
     pass
-# tests()
+tests()
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+# if __name__ == '__main__':
+#     port = int(os.environ.get('PORT', 5000))
+#     app.run(host='0.0.0.0', port=port, debug=True)
