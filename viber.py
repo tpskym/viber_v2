@@ -28,6 +28,12 @@ logger.addHandler(handler)
 
 list_actions_senders = []
 
+isDebug = [True]
+
+
+def print_debug(value):
+    if isDebug[0] == True:
+        print_value(value)
 
 def GetTextCommand(message):
     text = ""
@@ -666,8 +672,8 @@ class JobMessage:
 
     def register_incident(self, job_itilium: JobItilium, message: str, sender: str):
         answer = job_itilium.register_new_incident(message, sender)
-        if (answer.status):
-            return [TextMessage(text="Зарегистрировано обращение:" + answer.description),
+        if answer.status:
+            return [TextMessage(text="Зарегистрировано обращение:" + answer.result),
                     TemplatesKeyboards.get_keyboard_start_message()]
         else:
             return [TextMessage(text="Не удалось зарегистировать обращение по причине:" + answer.description),
@@ -781,6 +787,7 @@ class JobMessage:
                     list_actions_senders.remove(i)
 
     def continue_registration(self, message, sender: str):
+
         job_itilium = JobItilium()
         self.remove_started_action(sender)
         command = self.get_text_comand(message)
@@ -1099,8 +1106,10 @@ class JobMessage:
 
     def process(self, message, sender: str):
         if (self.sender_has_started_actions(sender) == False):
+            print_debug("has started action")
             return self.first_level_comand(message, sender)
         else:
+            print_debug("NO started action")
             return self.continue_started_process(message, sender)
 
 
@@ -1326,11 +1335,11 @@ def test_Registration():
 def test_registerNewIncident():
     print_value("registerNewIncident begin")
     job_itilium = JobItilium()
-    answer = job_itilium.register_new_incident("новое Обращение","111")
+    answer = job_itilium.register_new_incident("новое Обращение","RH2xtdiCKsztWpOkGlMxZQ")
     if answer.status:
         print_value("ok " + answer.result)
     else:
-        print_value("false 1")
+        print_value("false 1" + answer.description)
     print_value("registerNewIncident end")
 
 def test_GetListOpenIncidents():
@@ -1447,19 +1456,19 @@ def test_getLastConversations():
     print_value("test_ConfirmIncident end")
 
 def tests():
-    test_non_exist()
-    test_register()
-    test_VerifyRegistration()
-    test_Registration()
-    test_registerNewIncident()
-    test_GetListOpenIncidents()
-    test_AddConversation()
-    test_GetNeedConfirmed()
-    test_DeclineIncident()
-    test_getRatingConfirmation()
-    test_ConfirmIncident()
-    test_getLastConversations()
-
+    # test_non_exist()
+    # test_register()
+    # test_VerifyRegistration()
+    # test_Registration()
+    # test_registerNewIncident()
+    # test_GetListOpenIncidents()
+    # test_AddConversation()
+    # test_GetNeedConfirmed()
+    # test_DeclineIncident()
+    # test_getRatingConfirmation()
+    # test_ConfirmIncident()
+    # test_getLastConversations()
+    pass
 # tests()
 
 if __name__ == '__main__':
