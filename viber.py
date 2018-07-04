@@ -17,8 +17,10 @@ import json
 
 # AddressApiItilium =  "http://demo.desnol.ru/suhov_itil/hs/viberapi/action"
 AddressApiItilium = os.environ['AddressApiItilium']
-LoginItilium = "admin"
-PasswordItilium = "1Q2w3e4r5t"
+LoginItilium = os.environ['AddressApiItilium']
+PasswordItilium = os.environ["PasswordItilium"]
+
+os.environ["PasswordItilium"] = 'ddddd'
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
