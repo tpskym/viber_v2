@@ -1170,6 +1170,7 @@ def VerifyRegistration(senderid, message ):
 
 @app.route('/', methods=['POST'])
 def incoming():
+    return
     logger.debug("received request. post data: {0}".format(request.get_data()))
     # every viber message is signed, you can verify the signature using this method
 
