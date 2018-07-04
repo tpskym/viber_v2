@@ -37,10 +37,6 @@ def print_debug(value):
     if isDebug[0] == True:
         print_value(value)
 
-print_debug(PasswordItilium)
-os.environ["PasswordItilium"] = 'ddddd'
-PasswordItilium = os.environ["PasswordItilium"]
-print_debug(PasswordItilium)
 
 def GetTextCommand(message):
     text = ""
@@ -54,6 +50,11 @@ def GetTextCommand(message):
 
 def print_value(object_to_print, value: str = "-----------------------------"):
     print(value + "{}".format(object_to_print))
+
+print_debug(PasswordItilium)
+os.environ["PasswordItilium"] = 'ddddd'
+PasswordItilium = os.environ["PasswordItilium"]
+print_debug(PasswordItilium)
 
 
 class RatingIncidents:
