@@ -1218,7 +1218,7 @@ def VerifyRegistration(senderid, message ):
         return False, None
 
 
-@app.route('/', methods=['POST'])
+@app.route('/',  methods=['POST'])
 def incoming():
     print_debug("incoming message")
     print_debug("count started actions:" + str(len(list_actions_senders)))
