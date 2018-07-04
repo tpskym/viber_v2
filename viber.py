@@ -668,18 +668,21 @@ class TemplatesKeyboards:
 class JobMessage:
 
     def is_start_message(self, message: str):
+        print_debug("is_start_message")
         if (message.startswith("_Itilium_bot_")):
             return False
         else:
             return True
 
     def get_start_message_answer(self):
+        print_debug("get_start_message_answer")
         return [
             TextMessage(text="Добрый день! выберите интересующее вас действие."),
             TemplatesKeyboards.get_keyboard_start_message()
         ]
 
     def register_incident(self, job_itilium: JobItilium, message: str, sender: str):
+        print_debug("register_incident")
         answer = job_itilium.register_new_incident(message, sender)
         if answer.status:
             return [TextMessage(text="Зарегистрировано обращение:" + answer.result),
@@ -689,11 +692,13 @@ class JobMessage:
                     TemplatesKeyboards.get_keyboard_start_message()]
 
     def start_registration(self, sender: str):
+        print_debug("start_registration")
         started_action = StartedAction(sender, "Registration", "")
         list_actions_senders.append(started_action)
         return [TextMessage(text="Опишите вашу проблему."), TemplatesKeyboards.get_keyboard_cancel()]
 
     def start_itilium_modification(self, sender: str):
+        print_debug("start_itilium_modification")
         job_itilium = JobItilium()
         list = job_itilium.get_list_open_incidents(sender)
         if len(list) == 0:
@@ -713,6 +718,7 @@ class JobMessage:
             return list_answer
 
     def start_get_state(self, sender: str):
+        print_debug("start_get_state")
         job_itilium = JobItilium()
         list = job_itilium.get_list_open_incidents(sender)
         if len(list) == 0:
@@ -730,6 +736,7 @@ class JobMessage:
             return list_answer
 
     def start_get_need_confirmed(self, sender: str):
+        print_debug("start_get_need_confirmed")
         job_itilium = JobItilium()
         list = job_itilium.get_list_need_confirmed_incidents(sender)
         if len(list) == 0:
@@ -747,6 +754,7 @@ class JobMessage:
             return list_answer
 
     def start_get_last_conversations(self, sender):
+        print_debug("start_get_last_conversations")
         job_itilium = JobItilium()
         list = job_itilium.get_last_conversations(sender)
 
@@ -763,6 +771,7 @@ class JobMessage:
 
 
     def on_command_select(self, message: str, sender: str):
+        print_debug("on_command_select")
         if (message == "_Itilium_bot_new_incident"):
             return self.start_registration(sender)
         elif (message == "_Itilium_bot_Modify"):
@@ -777,6 +786,7 @@ class JobMessage:
             return TextMessage(text="Не реализовано, обратитесь к разработчику")
 
     def get_started_action(self, sender: str):
+        print_debug("get_started_action")
         for i in list_actions_senders:
             if (isinstance(i, StartedAction)):
                 if (i.sender == sender):
@@ -784,19 +794,21 @@ class JobMessage:
         return None
 
     def sender_has_started_actions(self, sender: str):
+        print_debug("sender_has_started_actions")
         if (self.get_started_action(sender) == None):
             return False
         else:
             return True
 
     def remove_started_action(self, sender: str):
+        print_debug("remove_started_action")
         for i in list_actions_senders:
             if (isinstance(i, StartedAction)):
                 if (i.sender == sender):
                     list_actions_senders.remove(i)
 
     def continue_registration(self, message, sender: str):
-
+        print_debug("continue_registration")
         job_itilium = JobItilium()
         self.remove_started_action(sender)
         command = self.get_text_comand(message)
@@ -806,6 +818,7 @@ class JobMessage:
             return self.register_incident(job_itilium, message, sender)
 
     def continue_confirmed_input_comment(self, message, sender: str, started_action: StartedAction):
+        print_debug("continue_confirmed_input_comment")
         command = self.get_text_comand(message)
         reference_incident = started_action.additional.get("ref")
         rating = started_action.additional.get("rating")
@@ -828,6 +841,7 @@ class JobMessage:
                 return [TextMessage(text=answer.description),TemplatesKeyboards.get_keyboard_start_message()]
 
     def continue_confirmed_select_rating(self, message, sender: str, started_action: StartedAction):
+        print_debug("continue_confirmed_select_rating")
         command = self.get_text_comand(message)
         reference_incident = started_action.additional.get("ref")
         rating_state: RatingIncidents = started_action.additional.get("rating_state")
@@ -877,6 +891,7 @@ class JobMessage:
                         TemplatesKeyboards.get_keyboard_cancel_or_continue_withont_comment()]
 
     def continue_confirmed_select_buttons(self, message, sender: str, started_action: StartedAction):
+        print_debug("continue_confirmed_select_buttons")
         command = self.get_text_comand(message)
         reference_incident = started_action.additional
         self.remove_started_action(sender)
@@ -918,6 +933,7 @@ class JobMessage:
             return [TextMessage(text="Подтверждение не выполнено:"), TemplatesKeyboards.get_keyboard_start_message()]
 
     def continue_get_last_conversations_select_actions(self, message, sender: str, started_action: StartedAction):
+        print_debug("continue_get_last_conversations_select_actions")
         reference = started_action.additional
         self.remove_started_action(sender)
         command = self.get_text_comand(message)
@@ -933,6 +949,7 @@ class JobMessage:
 
 
     def continue_get_last_conversations(self, message, sender: str, started_action: StartedAction):
+        print_debug("continue_get_last_conversations")
         list = started_action.additional.get("list")
         number_page = started_action.additional.get("number")
         self.remove_started_action(sender)
@@ -963,6 +980,7 @@ class JobMessage:
 
 
     def continue_get_confirmed_select_incident(self, message, sender: str, started_action: StartedAction):
+        print_debug("continue_get_confirmed_select_incident")
         list = started_action.additional.get("list")
         number_page = started_action.additional.get("number")
         self.remove_started_action(sender)
@@ -990,6 +1008,7 @@ class JobMessage:
                     TemplatesKeyboards.get_keyboard_confirm()]
 
     def continue_get_state_select_incident(self, message, sender, started_action: StartedAction):
+        print_debug("continue_get_state_select_incident")
         list = started_action.additional.get("list")
         number_page = started_action.additional.get("number")
         self.remove_started_action(sender)
@@ -1013,6 +1032,7 @@ class JobMessage:
             return [TextMessage(text=detail_view), TemplatesKeyboards.get_keyboard_start_message()]
 
     def continue_add_conversations_select_incident(self, message, sender: str, started_action: StartedAction):
+        print_debug("continue_add_conversations_select_incident")
         list = started_action.additional.get("list")
         number_page = started_action.additional.get("number")
         command = self.get_text_comand(message)
@@ -1047,6 +1067,7 @@ class JobMessage:
             return self.get_start_message_answer()  # Не то ввел пользователь. Сначала
 
     def continue_add_conversations_input_text(self, message, sender: str, started_action: StartedAction):
+        print_debug("continue_add_conversations_input_text")
         command = self.get_text_comand(message)
         reference = started_action.additional
         self.remove_started_action(sender)
@@ -1061,6 +1082,7 @@ class JobMessage:
             return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
 
     def continue_decline_incident_input_text(self, message, sender, started_action):
+        print_debug("continue_decline_incident_input_text")
         command = self.get_text_comand(message)
         reference = started_action.additional.get("ref")
         self.remove_started_action(sender)
@@ -1076,6 +1098,7 @@ class JobMessage:
                 return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
 
     def continue_started_process(self, message, sender: str):
+        print_debug("continue started process")
         started_action = self.get_started_action(sender)
         if (started_action.name == "Registration"):
             return self.continue_registration(message, sender)
@@ -1104,9 +1127,11 @@ class JobMessage:
             return [TextMessage(text="Не реализовано "), TemplatesKeyboards.get_keyboard_start_message()]
 
     def get_text_comand(self, message):
+        print_debug("get_text_comand")
         return GetTextCommand(message)
 
     def first_level_comand(self, message, sender: str):
+        print_debug("first level comand")
         text = self.get_text_comand(message)
         if (self.is_start_message(text)):
             return self.get_start_message_answer()
@@ -1114,6 +1139,7 @@ class JobMessage:
             return self.on_command_select(text, sender)
 
     def process(self, message, sender: str):
+        print_debug("process")
         if (self.sender_has_started_actions(sender) == False):
             print_debug("has started action")
             return self.first_level_comand(message, sender)
@@ -1124,6 +1150,7 @@ class JobMessage:
 
 class Integration:
     def on_new_message(self, message, sender: str):
+        print_debug("on_new_message")
         job = JobMessage()
         retMessage = job.process(message, sender)
         return retMessage
@@ -1155,6 +1182,7 @@ def SetIsRegistration(state:bool):
 
 
 def VerifyRegistration(senderid, message ):
+    print_debug("Verify registration")
     job_itilium = JobItilium()
     if GetIsRegistration() == False:
         answer = job_itilium.not_exist(senderid)
@@ -1188,6 +1216,7 @@ def VerifyRegistration(senderid, message ):
 
 @app.route('/', methods=['POST'])
 def incoming():
+    print_debug("incoming message")
     logger.debug("received request. post data: {0}".format(request.get_data()))
     # every viber message is signed, you can verify the signature using this method
 
