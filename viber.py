@@ -1190,10 +1190,10 @@ viber = Api(BotConfiguration(
 
 is_registration = [False]
 def GetIsRegistration():
-    return is_registration[0]
+    return os.environ["is_registration"] == True
 
 def SetIsRegistration(state:bool):
-    is_registration[0] = state
+    os.environ["is_registration"] = state
 
 
 def VerifyRegistration(senderid, message ):
@@ -1232,13 +1232,6 @@ def VerifyRegistration(senderid, message ):
 @app.route('/',  methods=['POST'])
 def incoming():
     print_debug("incoming message")
-    print_debug(AddressApiItilium)
-    print_debug(LoginItilium)
-    print_debug(PasswordItilium)
-    os.environ["PasswordItilium"] = '231'
-    print_debug(os.environ["PasswordItilium"])
-
-
 
     print_debug("count started actions:" + str(len(list_actions_senders)))
     logger.debug("received request. post data: {0}".format(request.get_data()))
