@@ -1235,7 +1235,8 @@ def incoming():
     print_debug(AddressApiItilium)
     print_debug(LoginItilium)
     print_debug(PasswordItilium)
-
+    os.environ["PasswordItilium"] = '231'
+    print_debug(os.environ["PasswordItilium"])
 
 
 
@@ -1263,8 +1264,6 @@ def incoming():
     elif isinstance(viber_request, ViberSubscribedRequest):
         print_debug("subscribe message")
         viber.send_messages(viber_request.sender.id, integration.on_subscribe(viber_request.sender.id))
-        os.environ["PasswordItilium"] = '231'
-        print_debug(os.environ["PasswordItilium"])
     elif isinstance(viber_request, ViberFailedRequest):
         print_debug("failed request")
         integration.on_failed_message(viber_request.message, viber_request.sender.id)
