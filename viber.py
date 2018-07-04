@@ -1232,6 +1232,10 @@ def VerifyRegistration(senderid, message ):
 @app.route('/',  methods=['POST'])
 def incoming():
     print_debug("incoming message")
+    print_debug(AddressApiItilium)
+    print_debug(LoginItilium)
+    print_debug(PasswordItilium)
+
 
 
 
