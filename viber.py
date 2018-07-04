@@ -1219,21 +1219,26 @@ def VerifyRegistration(senderid, message ):
     print_debug("Verify registration")
     job_itilium = JobItilium()
     if GetIsRegistration(senderid) == False:
+        print_debug("-Verify registration false")
         answer = job_itilium.not_exist(senderid)
         if answer.status:
             if (answer.result == str(1)):
+                print_debug("-Verify registration non exist")
                 ret = TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")
                 SetIsRegistration(True, senderid)
                 return True, ret
             else:
+                print_debug("-Verify registration exist")
                 return False, None
         else:
             ret = TextMessage(text=answer.description)
             return True, ret
     elif GetIsRegistration(senderid) == True:
+        print_debug("-Verify registration true")
         answer = job_itilium.register(senderid, message)
         if answer.status == True:
             if (answer.result == str(1)):
+                print_debug("-Verify registration register")
                 SetIsRegistration(False, senderid)
                 return False, None
             else:
