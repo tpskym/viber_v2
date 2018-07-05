@@ -1479,7 +1479,7 @@ def incoming():
 
     if isinstance(viber_request, ViberMessageRequest):
 
-        print_debug("before test variable{}".format(w[0]))
+        # print_debug("before test variable{}".format(w[0]))
 
 
         print_debug("incoming message:" + viber_request.message.text)
