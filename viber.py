@@ -1220,14 +1220,14 @@ def SaveState(started_action, sender):
 
 def GetState(sender):
     value = LoadValueFromEnviron("temp_data_fields", sender)
-    return json.loads(value).get("value")
+    return value
 
 def GetIsRegistration(sender):
     value = LoadValueFromEnviron("registration_fields", sender)
     if value == "":
         return False
     else:
-        if json.loads(value).get("value"):
+        if value.get("value"):
             return True
         else:
             return False
