@@ -1236,15 +1236,15 @@ def SetIsRegistration(sender, state:bool ):
     SaveValueToEnviron(json.dumps({"value":state}), "registration_fields", sender)
 
 def VerifyRegistration(senderid, message ):
-    print_debug("test begin registration")
-    job_itilium = JobItilium()
-    if GetIsRegistration("555") == False:
-        SetIsRegistration("555", True)
-        if GetIsRegistration("555") == True:
-            print_debug("OK")
-        else:
-            print_debug("Error")
-    print_debug("test end registration")
+    # print_debug("test begin registration")
+    # job_itilium = JobItilium()
+    # if GetIsRegistration("555") == False:
+    #     SetIsRegistration("555", True)
+    #     if GetIsRegistration("555") == True:
+    #         print_debug("OK")
+    #     else:
+    #         print_debug("Error")
+    # print_debug("test end registration")
 
     print_debug("Verify registration")
     job_itilium = JobItilium()
@@ -1255,7 +1255,7 @@ def VerifyRegistration(senderid, message ):
             if (answer.result == str(1)):
                 print_debug("-Verify registration non exist")
                 ret = TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")
-                SetIsRegistration(True, senderid)
+                SetIsRegistration( senderid, True)
                 print_value("is registrations {}".format(GetIsRegistration(senderid)))
                 return True, ret
             else:
@@ -1270,7 +1270,7 @@ def VerifyRegistration(senderid, message ):
         if answer.status == True:
             if (answer.result == str(1)):
                 print_debug("-Verify registration register")
-                SetIsRegistration(False, senderid)
+                SetIsRegistration(senderid, False)
                 return False, None
             else:
                 ret = [TextMessage(text=answer.result),
