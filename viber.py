@@ -1,5 +1,7 @@
+
+
 import os
-import threading
+
 from viberbot import Api
 from viberbot.api.bot_configuration import BotConfiguration
 from viberbot.api.messages import VideoMessage
@@ -8,6 +10,7 @@ from viberbot.api.messages.keyboard_message import KeyboardMessage
 import requests
 import logging
 from flask import Flask, request, Response
+
 from viberbot.api.viber_requests import ViberConversationStartedRequest
 from viberbot.api.viber_requests import ViberFailedRequest
 from viberbot.api.viber_requests import ViberMessageRequest
@@ -16,10 +19,11 @@ from viberbot.api.viber_requests import ViberUnsubscribedRequest
 import json
 
 
+
+
+
 AddressApiItilium = os.environ['AddressApiItilium']
 LoginItilium = os.environ['LoginItilium']
-
-# os.environ["PasswordItilium"] = 'ghghghghgh'
 PasswordItilium = os.environ["PasswordItilium"]
 
 
@@ -73,6 +77,74 @@ class StartedAction:
         return json.dumps({"name": self.name, "additional": self.additional})
 
 class JobItilium:
+
+    def get_state(self, sender):
+        print_debug("def get_state")
+        quote = "\""
+        data_to_send = """{
+                                                        "data": {
+                                                        "action": "get_state",
+                                                        "sender": """ + quote + sender + quote + """,                                  
+                                                        }
+                                                     }"""
+
+        headers = {'Content-Type': 'text/xml; charset=utf-8', }
+        req = requests.Request('POST', AddressApiItilium,
+                               headers=headers,
+                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+        prepped_requ = req.prepare()
+        s = requests.Session()
+        response = s.send(prepped_requ)
+
+        code = response.status_code
+        description = response.text
+        answer = Answer()
+        # print_value(description)
+
+        # print_value(list)
+        if (code == 200):
+            answer.status = True
+            if description == "":
+                answer.result = ""
+            else:
+                answer.result = json.loads(description)
+        else:
+            answer.status = False
+            answer.description = description + " ERROR CODE:" + str(code)
+        return answer
+
+    def set_state(self, sender, state):
+        print_debug("def get_state")
+        quote = "\""
+        data_to_send = """{
+                                                           "data": {
+                                                           "action": "set_state",
+                                                           "sender": """ + quote + sender + quote + """,
+                                                           "state": """ + quote + state + quote + """,                                  
+                                                           }
+                                                        }"""
+
+        headers = {'Content-Type': 'text/xml; charset=utf-8', }
+        req = requests.Request('POST', AddressApiItilium,
+                               headers=headers,
+                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+        prepped_requ = req.prepare()
+        s = requests.Session()
+        response = s.send(prepped_requ)
+
+        code = response.status_code
+        description = response.text
+        answer = Answer()
+        # print_value(description)
+
+        # print_value(list)
+        if (code == 200):
+            answer.status = True
+            answer.result = ""
+        else:
+            answer.status = False
+            answer.description = description + " ERROR CODE:" + str(code)
+        return answer
 
     def not_exist(self, sender, Login = "", Password = "", Adress = "" ):
         print_debug("not_exist(self, sender, Login = "", Password = "", Adress = "" )")
@@ -700,7 +772,9 @@ class JobMessage:
     def start_registration(self, sender: str):
         print_debug("start_registration")
         started_action = StartedAction("Registration", "")
-        SaveState(started_action,sender)
+        request_ok, description = SaveState(started_action,sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         print_debug("add started action")
         # print_debug("count:" + str(len(list_actions_senders)))
         return [TextMessage(text="Опишите вашу проблему."), TemplatesKeyboards.get_keyboard_cancel()]
@@ -716,12 +790,16 @@ class JobMessage:
                         TemplatesKeyboards.get_keyboard_start_message()]
             elif len(list) == 1:
                 started_action = StartedAction("AddConversationsInputText", list[0].id)
-                SaveState(started_action, sender)
+                request_ok, description = SaveState(started_action, sender)
+                if request_ok == False:
+                    return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
                 return [TextMessage(text="Введите уточнение:"), TextMessage(text=list[0].detail_view),
                         TemplatesKeyboards.get_keyboard_cancel_modify()]
             else:
                 started_action = StartedAction("AddConversationsSelectIncident", {"number": 1, "list": list})
-                SaveState(started_action, sender)
+                request_ok, description = SaveState(started_action, sender)
+                if request_ok == False:
+                    return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
                 list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(
                     keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
                                                                                   started_action.additional.get("number"),2))]
@@ -743,7 +821,9 @@ class JobMessage:
                     TemplatesKeyboards.get_keyboard_start_message()]
         else:
             started_action = StartedAction("GetStateSelectIncident", {"number": 1, "list": list})
-            SaveState(started_action,sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(
                 keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
                                                                               started_action.additional.get("number"),2))]
@@ -761,7 +841,9 @@ class JobMessage:
                     TemplatesKeyboards.get_keyboard_confirm()]
         else:
             started_action = StartedAction( "GetConfirmedSelectIncident", {"number": 1, "list": list})
-            SaveState(started_action,sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(
                 keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
                                                                               started_action.additional.get("number"),2))]
@@ -776,7 +858,9 @@ class JobMessage:
             return [TextMessage(text="Нет сообщений за последние 5 дней"), TemplatesKeyboards.get_keyboard_start_message()]
         else:
             started_action = StartedAction("GetLastConversations", {"number": 1, "list": list})
-            SaveState(started_action, sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             list_answer = [TextMessage(text="Выберите сообщение для уточнения или просмотра"), KeyboardMessage(
                 keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
                                                                               started_action.additional.get("number"), 2))]
@@ -800,25 +884,39 @@ class JobMessage:
             return TextMessage(text="Не реализовано, обратитесь к разработчику")
 
     def get_started_action(self, sender: str):
-        value = GetState(sender)
-        if value == "":
-            return None
-        elif value.get("value") == "" :
-            return None
+        request_ok, value = GetState(sender)
+        if request_ok:
+            if value == "":
+                return True, None
+            elif value.get("value") == "" :
+                return True, None
+            else:
+                return True, StartedAction(value["name"], value["additional"])
         else:
-            return StartedAction(value["name"], value["additional"])
+            return False, value
 
     def sender_has_started_actions(self, sender: str):
-        return self.get_started_action(sender) != None
+        request_ok, value = self.get_started_action(sender)
+        if request_ok:
+            return True, value != None
+        else:
+            return False, value
+
 
     def remove_started_action(self, sender: str):
         print_debug("remove_started_action")
-        SaveState("", sender)
+        request_ok, description = SaveState("", sender)
+        if request_ok == False:
+            return False, [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
+        else:
+            return True, ""
 
     def continue_registration(self, message, sender: str):
         print_debug("continue_registration")
         job_itilium = JobItilium()
-        self.remove_started_action(sender)
+        request_ok, description = self.remove_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         command = self.get_text_comand(message)
         if (command == "_Itilium_bot_cancel"):
             return [TextMessage(text="Регистрация отменена"), TemplatesKeyboards.get_keyboard_start_message()]
@@ -830,7 +928,9 @@ class JobMessage:
         command = self.get_text_comand(message)
         reference_incident = started_action.additional.get("ref")
         rating = started_action.additional.get("rating")
-        self.remove_started_action(sender)
+        request_ok, description = self.remove_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         if (command == "_Itilium_bot_cancel"):
             return [TextMessage(text="Подтверждение не выполнено"), TemplatesKeyboards.get_keyboard_start_message()]
         elif command == "_Itilium_bot_continue":  # Пользователю эта кнопка недоступна может быть, но он может ввести эту команду. На самом деле, если пользователь не хочет комментировать, то и не надо его заставлять
@@ -853,7 +953,9 @@ class JobMessage:
         command = self.get_text_comand(message)
         reference_incident = started_action.additional.get("ref")
         rating_state: RatingIncidents = started_action.additional.get("rating_state")
-        self.remove_started_action(sender)
+        request_ok, description = self.remove_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         if (command == "_Itilium_bot_Confirm_rating_cancel"):
             return [TextMessage(text="Подтверждение не выполнено:"), TemplatesKeyboards.get_keyboard_start_message()]
         elif command == "_Itilium_bot_Confirm_continue":
@@ -890,7 +992,9 @@ class JobMessage:
 
             started_action = StartedAction( "Get_Comfirmed_input_comment",
                                            {"ref": reference_incident, "rating": rating})
-            SaveState(started_action, sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             if need_comment:
                 return [TextMessage(text="Данная оценка требует комментарий:"),
                         TemplatesKeyboards.get_keyboard_cancel_confirm()]
@@ -902,7 +1006,9 @@ class JobMessage:
         print_debug("continue_confirmed_select_buttons")
         command = self.get_text_comand(message)
         reference_incident = started_action.additional
-        self.remove_started_action(sender)
+        request_ok, description = self.remove_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         if (command == "_Itilium_bot_Confirm"):
             job_itilium = JobItilium()
             answer = job_itilium.get_rating_for_incidents_confirmation(sender, reference_incident)
@@ -912,12 +1018,16 @@ class JobMessage:
                 if rating_state.need_rating:
                     started_action = StartedAction( "Get_Comfirmed_select_rating",
                                                    {"ref": reference_incident, "rating_state": rating_state})
-                    SaveState(started_action, sender)
+                    request_ok, description = SaveState(started_action, sender)
+                    if request_ok == False:
+                        return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
                     return [ TextMessage(text="Оцените выполнение обращения"), TemplatesKeyboards.get_keyboard_rating()]
                 elif rating_state.rating_exist:
                     started_action = StartedAction( "Get_Comfirmed_select_rating",
                                                    {"ref": reference_incident, "rating_state": rating_state})
-                    SaveState(started_action, sender)
+                    request_ok, description = SaveState(started_action, sender)
+                    if request_ok == False:
+                        return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
                     return [TextMessage(text="Оцените выполнение обращения"), TemplatesKeyboards.get_keyboard_rating_with_continue()]
                 else:
                     job_itilium = JobItilium()
@@ -932,7 +1042,9 @@ class JobMessage:
 
             started_action = StartedAction( "Get_decline_input_comment",
                                            {"ref": reference_incident})
-            SaveState(started_action, sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             return [TextMessage(text="Укажите причину отклонения"),
                     TemplatesKeyboards.get_keyboard_cancel()]
 
@@ -943,11 +1055,15 @@ class JobMessage:
     def continue_get_last_conversations_select_actions(self, message, sender: str, started_action: StartedAction):
         print_debug("continue_get_last_conversations_select_actions")
         reference = started_action.additional
-        self.remove_started_action(sender)
+        request_ok, description = self.remove_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         command = self.get_text_comand(message)
         if command == "_Itilium_bot_get_conversations_modify":
             started_action = StartedAction( "AddConversationsInputText", reference)
-            SaveState(started_action, sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             return [TextMessage(text="Введите уточнение"),
                     TemplatesKeyboards.get_keyboard_cancel_modify()]
 
@@ -960,7 +1076,9 @@ class JobMessage:
         print_debug("continue_get_last_conversations")
         list = started_action.additional.get("list")
         number_page = started_action.additional.get("number")
-        self.remove_started_action(sender)
+        request_ok, description = self.remove_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
         command = self.get_text_comand(message)
 
@@ -969,14 +1087,18 @@ class JobMessage:
         elif command == "_Itilium_bot_more_incidents":
             started_action = StartedAction( "GetLastConversations",
                                            {"number": number_page + 1, "list": list})
-            SaveState(started_action,sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             list_answer = [KeyboardMessage(
                 keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list, number_page + 1, 2))]
 
             return list_answer
         else:
             started_action = StartedAction("GetLastConversation_select_action", command)
-            SaveState(started_action,sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             detail_view = ""
             for wrapper in list:
                 if (wrapper.id == command):
@@ -991,7 +1113,9 @@ class JobMessage:
         print_debug("continue_get_confirmed_select_incident")
         list = started_action.additional.get("list")
         number_page = started_action.additional.get("number")
-        self.remove_started_action(sender)
+        request_ok, description = self.remove_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
         command = self.get_text_comand(message)
         if (command == "_Itilium_bot_cancel_confirmation"):
@@ -999,14 +1123,18 @@ class JobMessage:
         elif command == "_Itilium_bot_more_incidents":
             started_action = StartedAction( "GetConfirmedSelectIncident",
                                            {"number": number_page + 1, "list": list})
-            SaveState(started_action, sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             list_answer = [KeyboardMessage(
                 keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list, number_page + 1,2))]
 
             return list_answer
         else:
             started_action = StartedAction( "GetConfirmed_SelectButtonsConfirmDecline", command)
-            SaveState(started_action,sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             detail_view = ""
             for wrapper in list:
                 if (wrapper.id == command):
@@ -1019,7 +1147,9 @@ class JobMessage:
         print_debug("continue_get_state_select_incident")
         list = started_action.additional.get("list")
         number_page = started_action.additional.get("number")
-        self.remove_started_action(sender)
+        request_ok, description = self.remove_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
         command = self.get_text_comand(message)
         if (command == "_Itilium_bot_cancel_modify"):
@@ -1027,7 +1157,9 @@ class JobMessage:
         elif command == "_Itilium_bot_more_incidents":
             started_action = StartedAction( "GetStateSelectIncident",
                                            {"number": number_page + 1, "list": list})
-            SaveState(started_action,sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             list_answer = [KeyboardMessage(
                 keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list, number_page + 1,2))]
 
@@ -1046,19 +1178,27 @@ class JobMessage:
         command = self.get_text_comand(message)
 
         if (command == "_Itilium_bot_cancel_modify"):
-            self.remove_started_action(sender)
+            request_ok, description = self.remove_started_action(sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             return [TextMessage(text="Уточнения не внесены"), TemplatesKeyboards.get_keyboard_start_message()]
         elif command == "_Itilium_bot_more_incidents":
-            self.remove_started_action(sender)
+            request_ok, description = self.remove_started_action(sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             started_action = StartedAction("AddConversationsSelectIncident",
                                            {"number": number_page + 1, "list": list})
-            SaveState(started_action,sender)
+            request_ok, description = SaveState(started_action, sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             list_answer = [KeyboardMessage(
                 keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list, number_page + 1,2))]
 
             return list_answer
         else:
-            self.remove_started_action(sender)
+            request_ok, description = self.remove_started_action(sender)
+            if request_ok == False:
+                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             started_action = StartedAction("AddConversationsInputText", command)
 
             detail_view = ""
@@ -1069,7 +1209,9 @@ class JobMessage:
                     found = 1
                     break
             if (found == 1):
-                SaveState(started_action,sender)
+                request_ok, description = SaveState(started_action, sender)
+                if request_ok == False:
+                    return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
                 return [TextMessage(text="Введите уточнение:"), TextMessage(text=detail_view),
                         TemplatesKeyboards.get_keyboard_cancel_modify()]
             return self.get_start_message_answer()  # Не то ввел пользователь. Сначала
@@ -1078,7 +1220,9 @@ class JobMessage:
         print_debug("continue_add_conversations_input_text")
         command = self.get_text_comand(message)
         reference = started_action.additional
-        self.remove_started_action(sender)
+        request_ok, description = self.remove_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         if (command == "_Itilium_bot_cancel_modify"):
             return [TextMessage(text="Уточнения не внесены"), TemplatesKeyboards.get_keyboard_start_message()]
         job_itilium = JobItilium()
@@ -1093,7 +1237,9 @@ class JobMessage:
         print_debug("continue_decline_incident_input_text")
         command = self.get_text_comand(message)
         reference = started_action.additional.get("ref")
-        self.remove_started_action(sender)
+        request_ok, description = self.remove_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         if (command == "_Itilium_bot_cancel"):
             return [TextMessage(text="Обращение не отклонено"), TemplatesKeyboards.get_keyboard_start_message()]
         else:
@@ -1107,7 +1253,10 @@ class JobMessage:
 
     def continue_started_process(self, message, sender: str):
         print_debug("continue started process")
-        started_action = self.get_started_action(sender)
+        request_ok, started_action = self.get_started_action(sender)
+        if request_ok == False:
+            return [TextMessage(text=started_action), TemplatesKeyboards.get_keyboard_start_message()]
+
         if (started_action.name == "Registration"):
             return self.continue_registration(message, sender)
         elif started_action.name == "GetConfirmed_SelectButtonsConfirmDecline":
@@ -1148,7 +1297,10 @@ class JobMessage:
 
     def process(self, message, sender: str):
         print_debug("process")
-        if (self.sender_has_started_actions(sender) == False):
+        request_ok, has = self.sender_has_started_actions(sender)
+        if request_ok == False:
+            return [TextMessage(text=has), TemplatesKeyboards.get_keyboard_start_message()]
+        if (has == False):
             print_debug("NO started action")
             return self.first_level_comand(message, sender)
         else:
@@ -1180,112 +1332,135 @@ viber = Api(BotConfiguration(
 ))
 
 
+
 def SaveValueToEnviron(value, NameEnviron, sender):
-    lock = threading.Lock()
-    lock.acquire()
-    try:
-        data = os.environ[NameEnviron]
+    job = JobItilium()
+    answer = job.get_state(sender)
+    if answer.status:
+        data = answer.result
         if data == "":
-            os.environ[NameEnviron] = json.dumps([{"sender":sender,"state":value}])
-            return
+            answer = job.set_state(sender, json.dumps([{"type": NameEnviron, "state":value}]))
+            if  answer.status:
+                return True, ""
+            else:
+                return False, answer.description
         else:
             data = json.loads(data)
-            for senderid in data:
-                if senderid.get("sender") == sender:
-                    senderid["state"] = value
-                    os.environ[NameEnviron] = json.dumps(data)
+            for cur in data:
+                if cur.get("type") == NameEnviron:
+                    cur["state"] = value
+                    answer = job.set_state( sender ,json.dumps(data) )
+                    if answer.status:
+                        return True, ""
+                    else:
+                        return False, answer.description
                     return
-            data.append({"sender":sender,"state": value})
-            os.environ[NameEnviron] = json.dumps(data)
-    finally:
-        lock.release()
+            data.append({"type":NameEnviron,"state": value})
+            answer = job.set_state(sender, json.dumps(data))
+            if answer.status:
+                return True, ""
+            else:
+                return False, answer.description
+    else:
+        return False, answer.description
+
+
 
 def LoadValueFromEnviron(NameEnviron, sender):
-    data = os.environ[NameEnviron]
-    if data == "":
-        return ""
-    list = json.loads(data)
-    for senderid in list:
-        if senderid.get("sender") == sender:
-            data_ret = senderid.get("state")
-            if data_ret == "":
-                return data_ret
-            else:
-                return json.loads(data_ret)
-    return ""
+    job = JobItilium()
+    answer = job.get_state(sender)
+    if answer.status:
+        data = answer.result
+        if data == "":
+            return True, ""
+        list = json.loads(data)
+        for typedata in list:
+            if typedata.get("type") == NameEnviron:
+                data_ret = typedata.get("state")
+                if data_ret == "":
+                    return True, data_ret
+                else:
+                    return True, json.loads(data_ret)
+        return True, ""
+    else:
+        return False, answer.description
 
 def SaveState(started_action, sender):
     if isinstance(started_action,StartedAction):
-        SaveValueToEnviron(started_action.get_json(), "temp_data_fields", sender)
+        return SaveValueToEnviron(started_action.get_json(), "temp_data_fields", sender)
     else:
-        SaveValueToEnviron(json.dumps({"value":started_action}), "temp_data_fields", sender)
+        return SaveValueToEnviron(json.dumps({"value":started_action}), "temp_data_fields", sender)
 
 def GetState(sender):
-    value = LoadValueFromEnviron("temp_data_fields", sender)
-    return value
+    return LoadValueFromEnviron("temp_data_fields", sender)
+
 
 def GetIsRegistration(sender):
-    value = LoadValueFromEnviron("registration_fields", sender)
-    if value == "":
-        return False
-    else:
-        if value.get("value"):
-            return True
+    loadet, value = LoadValueFromEnviron("registration_fields", sender)
+    if loadet:
+        if value == "":
+            return True, False
         else:
-            return False
+            if value.get("value"):
+                return True, True
+            else:
+                return True,False
+    else:
+        False, value
+
 
 def SetIsRegistration(sender, state:bool ):
-    SaveValueToEnviron(json.dumps({"value":state}), "registration_fields", sender)
+    return SaveValueToEnviron(json.dumps({"value":state}), "registration_fields", sender)
 
 def VerifyRegistration(senderid, message ):
-    # print_debug("test begin registration")
-    # job_itilium = JobItilium()
-    # if GetIsRegistration("555") == False:
-    #     SetIsRegistration("555", True)
-    #     if GetIsRegistration("555") == True:
-    #         print_debug("OK")
-    #     else:
-    #         print_debug("Error")
-    # print_debug("test end registration")
 
     print_debug("Verify registration")
     job_itilium = JobItilium()
-    if GetIsRegistration(senderid) == False:
-        print_debug("-Verify registration false")
-        answer = job_itilium.not_exist(senderid)
-        if answer.status:
-            if (answer.result == str(1)):
-                print_debug("-Verify registration non exist")
-                ret = TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")
-                SetIsRegistration( senderid, True)
-                print_value("is registrations {}".format(GetIsRegistration(senderid)))
-                return True, ret
+    request_ok, state = GetIsRegistration(senderid)
+    if request_ok:
+        if state == False:
+            print_debug("-Verify registration false")
+            answer = job_itilium.not_exist(senderid)
+            if answer.status:
+                if (answer.result == str(1)):
+                    print_debug("-Verify registration non exist")
+                    ret = TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")
+                    request_ok, description = SetIsRegistration( senderid, True)
+                    if request_ok == False:
+                        return True, TextMessage(text=description)
+                    print_value("is registrations {}".format(GetIsRegistration(senderid)))
+                    return True, ret
+                else:
+                    print_debug("-Verify registration exist")
+                    return False, None
             else:
-                print_debug("-Verify registration exist")
-                return False, None
-        else:
-            ret = TextMessage(text=answer.description)
-            return True, ret
-    elif GetIsRegistration(senderid) == True:
-        print_debug("-Verify registration true")
-        answer = job_itilium.register(senderid, message)
-        if answer.status == True:
-            if (answer.result == str(1)):
-                print_debug("-Verify registration register")
-                SetIsRegistration(senderid, False)
-                return False, None
-            else:
-                ret = [TextMessage(text=answer.result),
-                       TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")]
+                ret = TextMessage(text=answer.description)
                 return True, ret
+        elif state == True:
+            print_debug("-Verify registration true")
+            answer = job_itilium.register(senderid, message)
+            if answer.status == True:
+                if (answer.result == str(1)):
+                    print_debug("-Verify registration register")
+                    request_ok, description = SetIsRegistration(senderid, False)
+                    if request_ok == False:
+                        return True, TextMessage(text=description)
+                    return False, None
+                else:
+                    ret = [TextMessage(text=answer.result),
+                           TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")]
+                    return True, ret
 
+            else:
+                ret = TextMessage(text=answer.description)
+                return True, ret
         else:
-            ret = TextMessage(text=answer.description)
-            return True, ret
+            return False, None
     else:
-        return False, None
+        ret = TextMessage(text=state)
+        return True, ret
 
-w = [1]
+
 @app.route('/',  methods=['POST'])
 def incoming():
     print_debug("incoming message")
@@ -1306,13 +1481,13 @@ def incoming():
 
         print_debug("before test variable{}".format(w[0]))
 
-        w[0] = w[0] + 1
+
         print_debug("incoming message:" + viber_request.message.text)
         # print_debug("before test variable{}".format(os.environ["test"]))
         # os.environ["test"] = os.environ["test"] + '1'
         job = JobMessage()
         # print_debug("before sender_has_started_actions(sender) {}".format(job.sender_has_started_actions(viber_request.sender.id)))
-        print_debug("before sender_has_started_actions(sender) {}".format(os.environ["temp_data_fields"]))
+        # print_debug("before sender_has_started_actions(sender) {}".format(os.environ["temp_data_fields"]))
         isReg, mess = VerifyRegistration(viber_request.sender.id, viber_request.message)
         if isReg:
             viber.send_messages(viber_request.sender.id, mess)
@@ -1321,7 +1496,7 @@ def incoming():
             viber.send_messages(viber_request.sender.id, integration.on_new_message(viber_request.message, viber_request.sender.id))
 
         # print_debug("after sender_has_started_actions(sender) {}".format(job.sender_has_started_actions(viber_request.sender.id)))
-        print_debug("after sender_has_started_actions(sender) {}".format(os.environ["temp_data_fields"]))
+        # print_debug("after sender_has_started_actions(sender) {}".format(os.environ["temp_data_fields"]))
 
     elif isinstance(viber_request, ViberSubscribedRequest):
         print_debug("subscribe message")
