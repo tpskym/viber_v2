@@ -1233,6 +1233,16 @@ def SetIsRegistration(sender, state:bool ):
     SaveValueToEnviron(state, "registration_fields", sender)
 
 def VerifyRegistration(senderid, message ):
+    print_debug("test begin registration")
+    job_itilium = JobItilium()
+    if GetIsRegistration("555") == False:
+        SetIsRegistration("555", True)
+        if GetIsRegistration("555") == True:
+            print_debug("OK")
+        else
+            print_debug("Error")
+    print_debug("test end registration")
+
     print_debug("Verify registration")
     job_itilium = JobItilium()
     if GetIsRegistration(senderid) == False:
