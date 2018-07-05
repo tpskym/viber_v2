@@ -803,8 +803,8 @@ class JobMessage:
         value = GetState(sender)
         if value == "":
             return None
-        elif value.get("value") != None:
-            return value["value"]
+        elif value.get("value") == "" :
+            return None
         else:
             return StartedAction(value["name"], value["additional"])
 
