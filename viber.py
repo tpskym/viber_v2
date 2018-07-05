@@ -804,7 +804,7 @@ class JobMessage:
         if value == "":
             return None
         else:
-            return StartedAction(value["Name"], value["additional"])
+            return StartedAction(value["name"], value["additional"])
 
     def sender_has_started_actions(self, sender: str):
         return self.get_started_action(sender) != None
