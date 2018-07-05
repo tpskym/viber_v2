@@ -1227,10 +1227,13 @@ def GetIsRegistration(sender):
     if value == "":
         return False
     else:
-        return value
+        if json.loads(value).get("value"):
+            return True
+        else:
+            return False
 
 def SetIsRegistration(sender, state:bool ):
-    SaveValueToEnviron(state, "registration_fields", sender)
+    SaveValueToEnviron(json.dumps({"value":state}), "registration_fields", sender)
 
 def VerifyRegistration(senderid, message ):
     print_debug("test begin registration")
