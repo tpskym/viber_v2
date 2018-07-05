@@ -1239,7 +1239,7 @@ def VerifyRegistration(senderid, message ):
         SetIsRegistration("555", True)
         if GetIsRegistration("555") == True:
             print_debug("OK")
-        else
+        else:
             print_debug("Error")
     print_debug("test end registration")
 
