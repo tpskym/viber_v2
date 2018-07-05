@@ -1307,15 +1307,16 @@ def incoming():
         print_debug("incoming message:" + viber_request.message.text)
 
         job = JobMessage()
-        print_debug("before sender_has_started_actions(sender) {}".format(job.sender_has_started_actions(viber_request.sender.id)))
-
+        # print_debug("before sender_has_started_actions(sender) {}".format(job.sender_has_started_actions(viber_request.sender.id)))
+        print_debug("before sender_has_started_actions(sender) {}".format(os.environ["temp_data_fields"]))
         isReg, mess = VerifyRegistration(viber_request.sender.id, viber_request.message)
         if isReg:
             viber.send_messages(viber_request.sender.id, mess)
         else:
             viber.send_messages(viber_request.sender.id, integration.on_new_message(viber_request.message, viber_request.sender.id))
 
-        print_debug("after sender_has_started_actions(sender) {}".format(job.sender_has_started_actions(viber_request.sender.id)))
+        # print_debug("after sender_has_started_actions(sender) {}".format(job.sender_has_started_actions(viber_request.sender.id)))
+        print_debug("after sender_has_started_actions(sender) {}".format(os.environ["temp_data_fields"]))
 
     elif isinstance(viber_request, ViberSubscribedRequest):
         print_debug("subscribe message")
