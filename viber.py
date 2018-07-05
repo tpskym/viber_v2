@@ -1285,7 +1285,7 @@ def VerifyRegistration(senderid, message ):
     else:
         return False, None
 
-
+w = 1
 @app.route('/',  methods=['POST'])
 def incoming():
     print_debug("incoming message")
@@ -1304,9 +1304,12 @@ def incoming():
 
     if isinstance(viber_request, ViberMessageRequest):
 
+        print_debug("before test variable{}".format(w))
+        global w
+        w = w + 1
         print_debug("incoming message:" + viber_request.message.text)
-        print_debug("before test variable{}".format(os.environ["test"]))
-        os.environ["test"] = os.environ["test"] + '1'
+        # print_debug("before test variable{}".format(os.environ["test"]))
+        # os.environ["test"] = os.environ["test"] + '1'
         job = JobMessage()
         # print_debug("before sender_has_started_actions(sender) {}".format(job.sender_has_started_actions(viber_request.sender.id)))
         print_debug("before sender_has_started_actions(sender) {}".format(os.environ["temp_data_fields"]))
