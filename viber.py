@@ -1304,7 +1304,7 @@ def incoming():
 
         print_debug("incoming message:" + viber_request.message.text)
 
-        job = JobItilium()
+        job = JobMessage()
         print_debug("sender_has_started_actions(sender) {}".format(job.sender_has_started_actions(viber_request.sender.id)))
 
         isReg, mess = VerifyRegistration(viber_request.sender.id, viber_request.message)
