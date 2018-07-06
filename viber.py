@@ -118,13 +118,18 @@ class JobItilium:
     def set_state(self, sender, state):
         print_debug("def get_state")
         quote = "\""
-        data_to_send = """{
-                                                           "data": {
-                                                           "action": "set_state",
-                                                           "sender": """ + quote + sender + quote + """,
-                                                           "state": """ + quote + state + quote + """,                                  
-                                                           }
-                                                        }"""
+        data_to_send = json.dumps({ "data" : {
+            "action" : "set_state",
+            "sender" : sender,
+            "state" : state
+        }})
+            # """{
+            #                                                "data": {
+            #                                                "action": "set_state",
+            #                                                "sender": """ + quote + sender + quote + """,
+            #                                                "state": """ + quote + state + quote + """,
+            #                                                }
+            #                                             }"""
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
         req = requests.Request('POST', AddressApiItilium,
