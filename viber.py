@@ -80,15 +80,16 @@ class StartedAction:
 
 class JobItilium:
 
-    def get_state(self, sender):
+    def get_state(self, environ, sender):
         print_debug("def get_state")
         quote = "\""
         data_to_send = """{
-                                                        "data": {
-                                                        "action": "get_state",
-                                                        "sender": """ + quote + sender + quote + """,                                  
-                                                        }
-                                                     }"""
+                                                           "data": {
+                                                           "action": "get_state",
+                                                           "type": """ + quote + environ + quote + """,
+                                                           "sender": """ + quote + sender + quote + """,                                  
+                                                           }
+                                                        }"""
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
         req = requests.Request('POST', AddressApiItilium,
@@ -101,7 +102,7 @@ class JobItilium:
         code = response.status_code
         description = response.text
         answer = Answer()
-        print_value(description)
+        # print_value(description)
 
         # print_value(list)
         if (code == 200):
@@ -115,23 +116,15 @@ class JobItilium:
             answer.description = description + " ERROR CODE:" + str(code)
         return answer
 
-    def set_state(self, sender, state):
+    def set_state(self, sender, environ,  state):
         print_debug("def get_state")
         quote = "\""
         data_to_send = json.dumps({ "data" : {
             "action" : "set_state",
             "sender" : sender,
+            "type": environ,
             "state" : state
         }})
-
-
-            # """{
-            #                                                "data": {
-            #                                                "action": "set_state",
-            #                                                "sender": """ + quote + sender + quote + """,
-            #                                                "state": """ + quote + state + quote + """,
-            #                                                }
-            #                                             }"""
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
         req = requests.Request('POST', AddressApiItilium,
@@ -1347,32 +1340,9 @@ viber = Api(BotConfiguration(
 
 def SaveValueToEnviron(value, NameEnviron, sender):
     job = JobItilium()
-    answer = job.get_state(sender)
+    answer = job.set_state(sender, NameEnviron, value)
     if answer.status:
-        data = answer.result
-        if data == "":
-            answer = job.set_state(sender, [{'type': NameEnviron, 'state':value}])
-            if  answer.status:
-                return True, ""
-            else:
-                return False, answer.description
-        else:
-            data = data
-            for cur in data:
-                if cur.get("type") == NameEnviron:
-                    cur["state"] = value
-                    answer = job.set_state( sender ,data )
-                    if answer.status:
-                        return True, ""
-                    else:
-                        return False, answer.description
-                    return
-            data.append({'type':NameEnviron,'state': value})
-            answer = job.set_state(sender, data)
-            if answer.status:
-                return True, ""
-            else:
-                return False, answer.description
+        return True, ""
     else:
         return False, answer.description
 
@@ -1380,17 +1350,13 @@ def SaveValueToEnviron(value, NameEnviron, sender):
 
 def LoadValueFromEnviron(NameEnviron, sender):
     job = JobItilium()
-    answer = job.get_state(sender)
+    answer = job.get_state(NameEnviron, sender)
     if answer.status:
         data = answer.result
         if data == "":
             return True, EmptyValue()
-        list = data
-        for typedata in list:
-            if typedata.get("type") == NameEnviron:
-                data_ret = typedata.get("state")
-                return True, data_ret
-        return True, EmptyValue()
+        else:
+            return True, data
     else:
         return False, answer.description
 
