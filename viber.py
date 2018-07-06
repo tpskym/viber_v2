@@ -75,6 +75,7 @@ class StartedAction:
     def __init__(self, name: str, additional):
         self.name = name
         self.additional = additional
+
     def get_dict(self):
         return {"name": self.name, "additional": self.additional}
 
@@ -508,6 +509,10 @@ class JobItilium:
 
 
 class WrapperView:
+
+    def toJSON(self):
+        return json.dumps({"view": self.view, "detail_view": self.detail_view,"id":self.id})
+
     def __init__(self, view: str, detail_view: str, id: str):
         self.view = view
         self.id = id
@@ -1105,8 +1110,8 @@ class JobMessage:
                 return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             detail_view = ""
             for wrapper in list:
-                if (wrapper.id == command):
-                    detail_view = wrapper.detail_view
+                if (wrapper['id'] == command):
+                    detail_view = wrapper['detail_view']
                     break
             return [TextMessage(text="Детальная информация:"), TextMessage(text=detail_view),
                     TemplatesKeyboards.get_keyboard_on_show_conversation()]
@@ -1141,8 +1146,8 @@ class JobMessage:
                 return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             detail_view = ""
             for wrapper in list:
-                if (wrapper.id == command):
-                    detail_view = wrapper.detail_view
+                if (wrapper['id'] == command):
+                    detail_view = wrapper['detail_view']
                     break
             return [TextMessage(text="Подтвердите или отклоните выполнение обращения:"), TextMessage(text=detail_view),
                     TemplatesKeyboards.get_keyboard_confirm()]
@@ -1170,8 +1175,8 @@ class JobMessage:
             return list_answer
         else:
             for wrapper in list:
-                if (wrapper.id == command):
-                    detail_view = wrapper.detail_view
+                if (wrapper['id'] == command):
+                    detail_view = wrapper['detail_view']
                     break
             return [TextMessage(text=detail_view), TemplatesKeyboards.get_keyboard_start_message()]
 
@@ -1208,8 +1213,8 @@ class JobMessage:
             detail_view = ""
             found = 0
             for wrapper in list:
-                if (wrapper.id == command):
-                    detail_view = wrapper.detail_view
+                if (wrapper['id'] == command):
+                    detail_view = wrapper['detail_view']
                     found = 1
                     break
             if (found == 1):
