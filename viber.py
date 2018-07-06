@@ -890,19 +890,23 @@ class JobMessage:
     def start_get_last_conversations(self, sender):
         print_debug("start_get_last_conversations")
         job_itilium = JobItilium()
-        list = job_itilium.get_last_conversations(sender)
+        answer = job_itilium.get_last_conversations(sender)
+        if answer.status:
+            list = answer.result
 
-        if len(list) == 0:
-            return [TextMessage(text="Нет сообщений за последние 5 дней"), TemplatesKeyboards.get_keyboard_start_message()]
+            if len(list) == 0:
+                return [TextMessage(text="Нет сообщений за последние 5 дней"), TemplatesKeyboards.get_keyboard_start_message()]
+            else:
+                started_action = StartedAction("GetLastConversations", {"number": 1, "list": list})
+                request_ok, description = SaveState(started_action, sender)
+                if request_ok == False:
+                    return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
+                list_answer = [TextMessage(text="Выберите сообщение для уточнения или просмотра"), KeyboardMessage(
+                    keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
+                                                                                  started_action.additional.get("number"), 2))]
+                return list_answer
         else:
-            started_action = StartedAction("GetLastConversations", {"number": 1, "list": list})
-            request_ok, description = SaveState(started_action, sender)
-            if request_ok == False:
-                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
-            list_answer = [TextMessage(text="Выберите сообщение для уточнения или просмотра"), KeyboardMessage(
-                keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
-                                                                              started_action.additional.get("number"), 2))]
-            return list_answer
+            return [TextMessage(text="ошибка" + answer.description), TemplatesKeyboards.get_keyboard_start_message()]
 
 
 
