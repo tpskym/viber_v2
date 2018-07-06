@@ -79,12 +79,18 @@ class StartedAction:
     def get_additional_for_JSON(self):
         print_debug(self.additional)
         if isinstance(self.additional, list):
+            print_debug("1")
             temp = []
             for item in self.additional:
+                print_debug("2")
                 if isinstance(item, WrapperView):
+                    print_debug("3")
                     temp.append(item.__dict__)
                 else:
+                    print_debug("4")
                     temp.append(item)
+                print_debug("5")
+            print_debug("6")
             return temp
         else:
             return self.additional
