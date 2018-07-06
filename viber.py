@@ -101,7 +101,7 @@ class JobItilium:
         code = response.status_code
         description = response.text
         answer = Answer()
-        # print_value(description)
+        print_value(description)
 
         # print_value(list)
         if (code == 200):
@@ -123,6 +123,8 @@ class JobItilium:
             "sender" : sender,
             "state" : state
         }})
+
+
             # """{
             #                                                "data": {
             #                                                "action": "set_state",
