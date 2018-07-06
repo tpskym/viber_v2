@@ -1270,7 +1270,7 @@ class JobMessage:
             return [TextMessage(text="Не удалось внести уточнения по причине:{}".format(answer.description)),
                     TemplatesKeyboards.get_keyboard_start_message()]
         else:
-            return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
+            return [TextMessage(text=answer.result), TemplatesKeyboards.get_keyboard_start_message()]
 
     def continue_decline_incident_input_text(self, message, sender, started_action):
         print_debug("continue_decline_incident_input_text")
