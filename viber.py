@@ -729,6 +729,7 @@ class TemplatesKeyboards:
             buttons = []
             isEnd = True
             for wrapper in list:
+                print_debug(wrapper)
                 if (index > last_number):
                     isEnd = False
                     break
