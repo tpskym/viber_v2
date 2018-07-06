@@ -76,8 +76,19 @@ class StartedAction:
         self.name = name
         self.additional = additional
 
+    def get_additional_for_JSON(self):
+        if isinstance(self.additional, list):
+            temp = []
+            for item in self.additional:
+                if isinstance(item, WrapperView):
+                    temp.append(item.__dict__)
+                else:
+                    temp.append(item)
+            return temp
+        else:
+            return self.additional
     def get_dict(self):
-        return {"name": self.name, "additional": self.additional}
+        return {"name": self.name, "additional": self.get_additional_for_JSON()}
 
 class JobItilium:
 
@@ -509,10 +520,6 @@ class JobItilium:
 
 
 class WrapperView:
-
-    def toJSON(self):
-        return json.dumps({"view": self.view, "detail_view": self.detail_view,"id":self.id})
-
     def __init__(self, view: str, detail_view: str, id: str):
         self.view = view
         self.id = id
