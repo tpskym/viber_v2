@@ -741,6 +741,7 @@ class TemplatesKeyboards:
             buttons.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_cancel_modify", "Text": "Отменить"})
             text_keyboard = {"Type": "keyboard", "Buttons": buttons}
             return text_keyboard
+
         else:
             text_keyboard = {"Type": "keyboard"}
             buttons = []
