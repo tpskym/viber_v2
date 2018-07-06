@@ -75,8 +75,8 @@ class StartedAction:
     def __init__(self, name: str, additional):
         self.name = name
         self.additional = additional
-    def get_json(self):
-        return json.dumps({"name": self.name, "additional": self.additional})
+    def get_dict(self):
+        return {"name": self.name, "additional": self.additional}
 
 class JobItilium:
 
@@ -1392,9 +1392,9 @@ def LoadValueFromEnviron(NameEnviron, sender):
 
 def SaveState(started_action, sender):
     if isinstance(started_action,StartedAction):
-        return SaveValueToEnviron(started_action.get_json(), "temp_data_fields", sender)
+        return SaveValueToEnviron(started_action.get_dict(), "temp_data_fields", sender)
     else:
-        return SaveValueToEnviron(json.dumps({"value":started_action}), "temp_data_fields", sender)
+        return SaveValueToEnviron({"value":started_action}, "temp_data_fields", sender)
 
 def GetState(sender):
     return LoadValueFromEnviron("temp_data_fields", sender)
@@ -1415,7 +1415,7 @@ def GetIsRegistration(sender):
 
 
 def SetIsRegistration(sender, state:bool ):
-    return SaveValueToEnviron(json.dumps({"value":state}), "registration_fields", sender)
+    return SaveValueToEnviron({"value":state}, "registration_fields", sender)
 
 def VerifyRegistration(senderid, message ):
 
@@ -1804,7 +1804,7 @@ def test_load_save_environ():
     state_reg = LoadValueFromEnviron("state_users","111")
     if state_reg == "":
         print_value("ok")
-        SaveValueToEnviron(StartedAction("test action", {"param": "1", "reference": "dddddfdfdfdfdfdf"}).get_json(),
+        SaveValueToEnviron(StartedAction("test action", {"param": "1", "reference": "dddddfdfdfdfdfdf"}).get_dict(),
                            "state_users", "111")
         state_reg = LoadValueFromEnviron("state_users", "111")
         if state_reg["name"] == "test action" and state_reg["additional"]["param"] == "1":
@@ -1816,7 +1816,7 @@ def test_load_save_environ():
                 state_reg = LoadValueFromEnviron("state_users","222")
                 if state_reg == "":
                     print_value("ok")
-                    SaveValueToEnviron(StartedAction("test action 2", {"param": "2", "reference": "dddddfdfdfdfdfdf"}).get_json(),
+                    SaveValueToEnviron(StartedAction("test action 2", {"param": "2", "reference": "dddddfdfdfdfdfdf"}).get_dict(),
                                        "state_users", "222")
                     state_reg = LoadValueFromEnviron("state_users", "222")
                     if state_reg["name"] == "test action 2" and state_reg["additional"]["param"] == "2":

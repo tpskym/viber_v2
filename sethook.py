@@ -10,22 +10,9 @@
 # viber.unset_webhook()
 # viber.set_webhook("https://botitilium.herokuapp.com/")
 
+import json
 
-class WrapperView:
-    def __init__(self, view: str, detail_view: str, id: str):
-        self.view = view
-        self.id = id
-        self.detail_view = detail_view
-
-class Answer:
-    def __init__(self, status = True, result = "", description = ""):
-        self.status = status
-        self.result = result
-        self.description = description
-    status: bool = True
-    result = ""
-    description: str = ""
-
-
-answer = Answer(True, WrapperView("1","1","1"))
-print(answer)
+value = json.dumps([{'type': "jfjfjfjj", 'state': {'name': "aaaa"} }])
+print (value)
+obj = json.loads(value)
+print(obj[0].get('state'))
