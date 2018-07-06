@@ -39,6 +39,8 @@ logger.addHandler(handler)
 
 isDebug = [True]
 
+class EmptyValue:
+    empty = True
 
 def print_debug(value):
     if isDebug[0] == True:
@@ -886,7 +888,7 @@ class JobMessage:
     def get_started_action(self, sender: str):
         request_ok, value = GetState(sender)
         if request_ok:
-            if value == "":
+            if isinstance(value, EmptyValue):
                 return True, None
             elif value.get("value") == "" :
                 return True, None
@@ -1308,6 +1310,7 @@ class JobMessage:
             return self.continue_started_process(message, sender)
 
 
+
 class Integration:
     def on_new_message(self, message, sender: str):
         print_debug("on_new_message")
@@ -1372,7 +1375,7 @@ def LoadValueFromEnviron(NameEnviron, sender):
     if answer.status:
         data = answer.result
         if data == "":
-            return True, ""
+            return True, EmptyValue()
         list = json.loads(data)
         for typedata in list:
             if typedata.get("type") == NameEnviron:
@@ -1381,7 +1384,7 @@ def LoadValueFromEnviron(NameEnviron, sender):
                     return True, data_ret
                 else:
                     return True, json.loads(data_ret)
-        return True, ""
+        return True, EmptyValue()
     else:
         return False, answer.description
 
@@ -1398,7 +1401,7 @@ def GetState(sender):
 def GetIsRegistration(sender):
     loadet, value = LoadValueFromEnviron("registration_fields", sender)
     if loadet:
-        if value == "":
+        if isinstance(value, EmptyValue):
             return True, False
         else:
             if value.get("value"):
