@@ -77,6 +77,7 @@ class StartedAction:
         self.additional = additional
 
     def get_additional_for_JSON(self):
+        print_debug(self.additional)
         if isinstance(self.additional, list):
             temp = []
             for item in self.additional:
