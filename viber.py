@@ -1385,7 +1385,7 @@ def LoadValueFromEnviron(NameEnviron, sender):
         data = answer.result
         if data == "":
             return True, EmptyValue()
-        list = json.loads(data)
+        list = data
         for typedata in list:
             if typedata.get("type") == NameEnviron:
                 data_ret = typedata.get("state")
