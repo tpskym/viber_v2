@@ -99,6 +99,7 @@ class StartedAction:
 
 class JobItilium:
 
+
     def get_state(self, environ, sender):
         print_debug("def get_state")
         quote = "\""
