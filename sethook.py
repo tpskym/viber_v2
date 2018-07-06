@@ -11,45 +11,21 @@
 # viber.set_webhook("https://botitilium.herokuapp.com/")
 
 
+class WrapperView:
+    def __init__(self, view: str, detail_view: str, id: str):
+        self.view = view
+        self.id = id
+        self.detail_view = detail_view
 
-import json
-
-osenviron = {"state_users":""}
-
-class StartedAction:
-    def __init__(self, name: str, additional):
-        self.name = name
-        self.additional = additional
-    def get_json(self):
-        return json.dumps({"name": self.name, "additional": self.additional})
-
-def SaveValueToEnviron(value, NameEnviron, sender):
-    data = osenviron[NameEnviron]
-    if data == "":
-        osenviron[NameEnviron] = json.dumps([{"sender":sender,"state":value}])
-        return
-    else:
-        data = json.loads(data)
-        for senderid in data:
-            if senderid.get("sender") == sender:
-                senderid["state"] = value
-                osenviron[NameEnviron] = json.dumps(data)
-                return
-        data.append({"sender":sender,"state": value})
-        osenviron[NameEnviron] = json.dumps(data)
+class Answer:
+    def __init__(self, status = True, result = "", description = ""):
+        self.status = status
+        self.result = result
+        self.description = description
+    status: bool = True
+    result = ""
+    description: str = ""
 
 
-def LoadValueFromEnviron(NameEnviron, sender):
-    data = osenviron[NameEnviron]
-    if data == "":
-        return ""
-    list = json.loads(data)
-    for senderid in list:
-        if senderid.get("sender") == sender:
-            data_ret = senderid.get("state")
-            if data_ret == "":
-                return data_ret
-            else:
-                return json.loads(data_ret)
-    return ""
-
+answer = Answer(True, WrapperView("1","1","1"))
+print(answer)

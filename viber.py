@@ -514,7 +514,9 @@ class WrapperView:
         self.detail_view = detail_view
 
 
+
 class Answer:
+
     status: bool = True
     result = ""
     description: str = ""
@@ -1409,7 +1411,7 @@ def GetIsRegistration(sender):
             else:
                 return True, False
     else:
-        False, value
+        return False, value
 
 
 def SetIsRegistration(sender, state:bool ):
