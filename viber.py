@@ -1404,7 +1404,7 @@ def GetIsRegistration(sender):
             if value.get("value"):
                 return True, True
             else:
-                return True,False
+                return True, False
     else:
         False, value
 
@@ -1428,11 +1428,11 @@ def VerifyRegistration(senderid, message ):
                     request_ok, description = SetIsRegistration( senderid, True)
                     if request_ok == False:
                         return True, TextMessage(text=description)
-                    print_value("is registrations {}".format(GetIsRegistration(senderid)))
+                    # print_value("is registrations {}".format(GetIsRegistration(senderid)))
                     return True, ret
                 else:
                     print_debug("-Verify registration exist")
-                    return False, None
+                    return False, ""
             else:
                 ret = TextMessage(text=answer.description)
                 return True, ret
@@ -1445,7 +1445,7 @@ def VerifyRegistration(senderid, message ):
                     request_ok, description = SetIsRegistration(senderid, False)
                     if request_ok == False:
                         return True, TextMessage(text=description)
-                    return False, None
+                    return False, ""
                 else:
                     ret = [TextMessage(text=answer.result),
                            TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")]
@@ -1455,7 +1455,7 @@ def VerifyRegistration(senderid, message ):
                 ret = TextMessage(text=answer.description)
                 return True, ret
         else:
-            return False, None
+            return False, ""
     else:
         ret = TextMessage(text=state)
         return True, ret
