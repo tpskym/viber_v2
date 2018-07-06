@@ -729,12 +729,18 @@ class TemplatesKeyboards:
             buttons = []
             isEnd = True
             for wrapper in list:
-                print_debug(wrapper)
+                if isinstance(wrapper, WrapperView):
+                    id = wrapper.id
+                    view = wrapper.view
+                else:
+                    id = wrapper['id']
+                    view = wrapper['view']
+
                 if (index > last_number):
                     isEnd = False
                     break
                 elif index >= first_number:
-                    buttons.append({"Columns": 6, "TextHAlign": "left", "Rows": height_one_string, "ActionBody": wrapper.id, "Text": wrapper.view})
+                    buttons.append({"Columns": 6, "TextHAlign": "left", "Rows": height_one_string, "ActionBody": id, "Text": view})
                 index += 1
 
             if (isEnd == False):
@@ -747,7 +753,13 @@ class TemplatesKeyboards:
             text_keyboard = {"Type": "keyboard"}
             buttons = []
             for wrapper in list:
-                buttons.append({"Columns": 6, "TextHAlign": "left", "Rows": height_one_string, "ActionBody": wrapper.id, "Text": wrapper.view})
+                if isinstance(wrapper, WrapperView):
+                    id = wrapper.id
+                    view = wrapper.view
+                else:
+                    id = wrapper['id']
+                    view = wrapper['view']
+                buttons.append({"Columns": 6, "TextHAlign": "left", "Rows": height_one_string, "ActionBody": id, "Text": view})
             buttons.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_cancel_modify", "Text": "Отменить"})
             text_keyboard.update({"Buttons": buttons})
             return text_keyboard
