@@ -911,7 +911,7 @@ class JobMessage:
         if request_ok == False:
             return False, [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         else:
-            return True, ""
+            return True, EmptyValue()
 
     def continue_registration(self, message, sender: str):
         print_debug("continue_registration")
@@ -1435,7 +1435,7 @@ def VerifyRegistration(senderid, message ):
                     return True, ret
                 else:
                     print_debug("-Verify registration exist")
-                    return False, ""
+                    return False, EmptyValue()
             else:
                 ret = TextMessage(text=answer.description)
                 return True, ret
@@ -1448,7 +1448,7 @@ def VerifyRegistration(senderid, message ):
                     request_ok, description = SetIsRegistration(senderid, False)
                     if request_ok == False:
                         return True, TextMessage(text=description)
-                    return False, ""
+                    return False, EmptyValue()
                 else:
                     ret = [TextMessage(text=answer.result),
                            TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")]
@@ -1458,7 +1458,7 @@ def VerifyRegistration(senderid, message ):
                 ret = TextMessage(text=answer.description)
                 return True, ret
         else:
-            return False, ""
+            return False, EmptyValue()
     else:
         ret = TextMessage(text=state)
         return True, ret
