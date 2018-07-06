@@ -1389,10 +1389,7 @@ def LoadValueFromEnviron(NameEnviron, sender):
         for typedata in list:
             if typedata.get("type") == NameEnviron:
                 data_ret = typedata.get("state")
-                if data_ret == "":
-                    return True, data_ret
-                else:
-                    return True, json.loads(data_ret)
+                return True, data_ret
         return True, EmptyValue()
     else:
         return False, answer.description
