@@ -516,6 +516,7 @@ class WrapperView:
     def __init__(self, view: str, detail_view: str, id: str):
         self.view = view
         self.id = id
+
         self.detail_view = detail_view
 
 
