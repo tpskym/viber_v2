@@ -1265,6 +1265,7 @@ class JobMessage:
             return [TextMessage(text="Уточнения не внесены"), TemplatesKeyboards.get_keyboard_start_message()]
         job_itilium = JobItilium()
         answer = job_itilium.add_conversation(sender, reference, command)
+        print_debug("yttttttttttttttttttttttt:" + answer.description)
         if (answer.status == False):
             return [TextMessage(text="Не удалось внести уточнения по причине:{}".format(answer.description)),
                     TemplatesKeyboards.get_keyboard_start_message()]
