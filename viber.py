@@ -1344,7 +1344,7 @@ def SaveValueToEnviron(value, NameEnviron, sender):
     if answer.status:
         data = answer.result
         if data == "":
-            answer = job.set_state(sender, json.dumps([{"type": NameEnviron, "state":value}]))
+            answer = job.set_state(sender, json.dumps([{'type': NameEnviron, 'state':value}]))
             if  answer.status:
                 return True, ""
             else:
@@ -1360,7 +1360,7 @@ def SaveValueToEnviron(value, NameEnviron, sender):
                     else:
                         return False, answer.description
                     return
-            data.append({"type":NameEnviron,"state": value})
+            data.append({'type':NameEnviron,'state': value})
             answer = job.set_state(sender, json.dumps(data))
             if answer.status:
                 return True, ""
