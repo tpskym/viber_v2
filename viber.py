@@ -850,23 +850,27 @@ class JobMessage:
     def start_get_state(self, sender: str):
         print_debug("start_get_state")
         job_itilium = JobItilium()
-        list = job_itilium.get_list_open_incidents(sender)
-        if len(list) == 0:
-            return [TextMessage(text="У вас нет зарегистрированных открытых обращений"),
-                    TemplatesKeyboards.get_keyboard_start_message()]
-        elif len(list) == 1:
-            return [TextMessage(text="Детальная информация:"), TextMessage(text=list[0].detail_view),
-                    TemplatesKeyboards.get_keyboard_start_message()]
+        answer = job_itilium.get_list_open_incidents(sender)
+        if answer.status:
+            list = answer.result
+            if len(list) == 0:
+                return [TextMessage(text="У вас нет зарегистрированных открытых обращений"),
+                        TemplatesKeyboards.get_keyboard_start_message()]
+            elif len(list) == 1:
+                return [TextMessage(text="Детальная информация:"), TextMessage(text=list[0].detail_view),
+                        TemplatesKeyboards.get_keyboard_start_message()]
+            else:
+                started_action = StartedAction("GetStateSelectIncident", {"number": 1, "list": list})
+                request_ok, description = SaveState(started_action, sender)
+                if request_ok == False:
+                    return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
+                list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(
+                    keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
+                                                                                  started_action.additional.get("number"),2))]
+                return list_answer
         else:
-            started_action = StartedAction("GetStateSelectIncident", {"number": 1, "list": list})
-            request_ok, description = SaveState(started_action, sender)
-            if request_ok == False:
-                return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
-            list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(
-                keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
-                                                                              started_action.additional.get("number"),2))]
-            return list_answer
-
+            return [TextMessage(text="ошибка" + answer.description),
+                    TemplatesKeyboards.get_keyboard_start_message()]
     def start_get_need_confirmed(self, sender: str):
         print_debug("start_get_need_confirmed")
         job_itilium = JobItilium()
