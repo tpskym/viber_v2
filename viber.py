@@ -734,7 +734,7 @@ class TemplatesKeyboards:
                     isEnd = False
                     break
                 elif index >= first_number:
-                    buttons.append({"Columns": 6, "TextHAlign": "left", "Rows": height_one_string, "ActionBody": wrapper.get('id'), "Text": wrapper.get('view')})
+                    buttons.append({"Columns": 6, "TextHAlign": "left", "Rows": height_one_string, "ActionBody": wrapper.id, "Text": wrapper.view})
                 index += 1
 
             if (isEnd == False):
@@ -747,7 +747,7 @@ class TemplatesKeyboards:
             text_keyboard = {"Type": "keyboard"}
             buttons = []
             for wrapper in list:
-                buttons.append({"Columns": 6, "TextHAlign": "left", "Rows": height_one_string, "ActionBody": wrapper.get('id'), "Text": wrapper.get('view')})
+                buttons.append({"Columns": 6, "TextHAlign": "left", "Rows": height_one_string, "ActionBody": wrapper.id, "Text": wrapper.view})
             buttons.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_cancel_modify", "Text": "Отменить"})
             text_keyboard.update({"Buttons": buttons})
             return text_keyboard
