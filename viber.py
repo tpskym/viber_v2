@@ -1,7 +1,7 @@
 
 
 import os
-
+import unittest
 from viberbot import Api
 from viberbot.api.bot_configuration import BotConfiguration
 from viberbot.api.messages import VideoMessage
@@ -20,11 +20,18 @@ import json
 
 
 
+is_test = [True]
 
-
-AddressApiItilium = os.environ['AddressApiItilium']
-LoginItilium = os.environ['LoginItilium']
-PasswordItilium = os.environ["PasswordItilium"]
+if(is_test[0]):
+    AddressApiItilium = ""
+    LoginItilium = ""
+    PasswordItilium = ""
+    auth_token_out = '4807270b7ee7d14d-fa37d43de286a0ef-be81bbab61de274b'
+else:
+    AddressApiItilium = os.environ['AddressApiItilium']
+    LoginItilium = os.environ['LoginItilium']
+    PasswordItilium = os.environ["PasswordItilium"]
+    auth_token_out = os.environ["AuthToken"]
 
 
 
@@ -47,7 +54,7 @@ def print_debug(value):
         print_value(value)
 
 
-def GetTextCommand(message):
+def GetTextCommand(message): #+
     text = ""
     if (isinstance(message, str)):
         text = message
@@ -76,7 +83,7 @@ class StartedAction:
         self.name = name
         self.additional = additional
 
-    def get_additional_for_JSON(self):
+    def get_additional_for_JSON(self): #+
         print_debug(self.additional)
         if isinstance(self.additional, dict):
             temp_dict = {}
@@ -94,8 +101,10 @@ class StartedAction:
             return temp_dict
         else:
             return self.additional
-    def get_dict(self):
+
+    def get_dict(self):#+
         return {"name": self.name, "additional": self.get_additional_for_JSON()}
+
 
 class JobItilium:
 
@@ -112,29 +121,35 @@ class JobItilium:
                                                         }"""
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
-        req = requests.Request('POST', AddressApiItilium,
-                               headers=headers,
-                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
-        prepped_requ = req.prepare()
-        s = requests.Session()
-        response = s.send(prepped_requ)
+        try:
+            req = requests.Request('POST', AddressApiItilium,
+                                   headers=headers,
+                                   data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+            prepped_requ = req.prepare()
+            s = requests.Session()
+            response = s.send(prepped_requ)
 
-        code = response.status_code
-        description = response.text
-        answer = Answer()
-        # print_value(description)
+            code = response.status_code
+            description = response.text
+            answer = Answer()
+            # print_value(description)
 
-        # print_value(list)
-        if (code == 200):
-            answer.status = True
-            if description == "":
-                answer.result = ""
+            # print_value(list)
+            if (code == 200):
+                answer.status = True
+                if description == "":
+                    answer.result = ""
+                else:
+                    answer.result = json.loads(description)
             else:
-                answer.result = json.loads(description)
-        else:
+                answer.status = False
+                answer.description = description + " ERROR CODE:" + str(code)
+            return answer
+        except:
+            answer = Answer()
+            answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
-            answer.description = description + " ERROR CODE:" + str(code)
-        return answer
+            return answer
 
     def set_state(self, sender, environ,  state):
         print_debug("def get_state")
@@ -147,27 +162,32 @@ class JobItilium:
         }})
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
-        req = requests.Request('POST', AddressApiItilium,
-                               headers=headers,
-                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
-        prepped_requ = req.prepare()
-        s = requests.Session()
-        response = s.send(prepped_requ)
+        try:
+            req = requests.Request('POST', AddressApiItilium,
+                                   headers=headers,
+                                   data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+            prepped_requ = req.prepare()
+            s = requests.Session()
+            response = s.send(prepped_requ)
 
-        code = response.status_code
-        description = response.text
-        answer = Answer()
-        # print_value(description)
+            code = response.status_code
+            description = response.text
+            answer = Answer()
+            # print_value(description)
 
-        # print_value(list)
-        if (code == 200):
-            answer.status = True
-            answer.result = ""
-        else:
+            # print_value(list)
+            if (code == 200):
+                answer.status = True
+                answer.result = ""
+            else:
+                answer.status = False
+                answer.description = description + " ERROR CODE:" + str(code)
+            return answer
+        except:
+            answer = Answer()
+            answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
-            answer.description = description + " ERROR CODE:" + str(code)
-        return answer
-
+            return answer
     def not_exist(self, sender, Login = "", Password = "", Adress = "" ):
         print_debug("not_exist(self, sender, Login = "", Password = "", Adress = "" )")
         if(Login == ""):
@@ -253,30 +273,36 @@ class JobItilium:
                                              }"""
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
-        req = requests.Request('POST', AddressApiItilium,
-                               headers=headers,
-                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
-        prepped_requ = req.prepare()
-        s = requests.Session()
-        response = s.send(prepped_requ)
+        try:
+            req = requests.Request('POST', AddressApiItilium,
+                                   headers=headers,
+                                   data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+            prepped_requ = req.prepare()
+            s = requests.Session()
+            response = s.send(prepped_requ)
 
-        code = response.status_code
-        description = response.text
-        answer = Answer()
-        # print_value(description)
+            code = response.status_code
+            description = response.text
+            answer = Answer()
+            # print_value(description)
 
-        # print_value(list)
-        if (code == 200):
-            answer.status = True
-            list = json.loads(description)
-            list_ret = []
-            for incident in list:
-                list_ret.append(WrapperView(incident.get('view'), incident.get('detail_view'), incident.get('id')))
-            answer.result = list_ret
-        else:
+            # print_value(list)
+            if (code == 200):
+                answer.status = True
+                list = json.loads(description)
+                list_ret = []
+                for incident in list:
+                    list_ret.append(WrapperView(incident.get('view'), incident.get('detail_view'), incident.get('id')))
+                answer.result = list_ret
+            else:
+                answer.status = False
+                answer.description = description + " ERROR CODE:" + str(code)
+            return answer
+        except:
+            answer = Answer()
+            answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
-            answer.description = description + " ERROR CODE:" + str(code)
-        return answer
+            return answer
 
     def confirm_incident(self, sender, reference_incident, rating, comment):
         print_debug("def confirm_incident")
@@ -293,25 +319,31 @@ class JobItilium:
         # print_value(data_to_send)
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
-        req = requests.Request('POST', AddressApiItilium,
-                               headers=headers,
-                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
-        prepped_requ = req.prepare()
-        s = requests.Session()
-        response = s.send(prepped_requ)
+        try:
+            req = requests.Request('POST', AddressApiItilium,
+                                   headers=headers,
+                                   data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+            prepped_requ = req.prepare()
+            s = requests.Session()
+            response = s.send(prepped_requ)
 
-        # response = requests.post(AddressApiItilium, data=data_to_send,
-        #                          auth=(LoginItilium, PasswordItilium))
-        code = response.status_code
-        description = response.text
-        answer = Answer()
-        if (code == 200):
-            answer.status = True
-            answer.result = description
-        else:
+            # response = requests.post(AddressApiItilium, data=data_to_send,
+            #                          auth=(LoginItilium, PasswordItilium))
+            code = response.status_code
+            description = response.text
+            answer = Answer()
+            if (code == 200):
+                answer.status = True
+                answer.result = description
+            else:
+                answer.status = False
+                answer.description = description + " ERROR CODE:" + str(code)
+            return answer
+        except:
+            answer = Answer()
+            answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
-            answer.description = description + " ERROR CODE:" + str(code)
-        return answer
+            return answer
 
     def get_rating_for_incidents_confirmation(self, sender, incident_ref):
         print_debug("def get_rating_for_incidents_confirmation")
@@ -325,32 +357,38 @@ class JobItilium:
                                                }"""
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
-        req = requests.Request('POST', AddressApiItilium,
-                               headers=headers,
-                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
-        prepped_requ = req.prepare()
-        s = requests.Session()
-        response = s.send(prepped_requ)
+        try:
+            req = requests.Request('POST', AddressApiItilium,
+                                   headers=headers,
+                                   data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+            prepped_requ = req.prepare()
+            s = requests.Session()
+            response = s.send(prepped_requ)
 
-        code = response.status_code
-        description = response.text
-        answer = Answer()
-        if (code == 200):
-            answer.status = True
-            rating = RatingIncidents()
-            dictionary = json.loads(description)
-            rating.five_need_comment = dictionary.get('five_need_comment')
-            rating.four_need_comment = dictionary.get('four_need_comment')
-            rating.three_need_comment = dictionary.get('three_need_comment')
-            rating.two_need_comment = dictionary.get('two_need_comment')
-            rating.one_need_comment = dictionary.get('one_need_comment')
-            rating.need_rating = dictionary.get('need_rating')
-            rating.rating_exist = dictionary.get('rating_exist')
-            answer.result = rating
-        else:
+            code = response.status_code
+            description = response.text
+            answer = Answer()
+            if (code == 200):
+                answer.status = True
+                rating = RatingIncidents()
+                dictionary = json.loads(description)
+                rating.five_need_comment = dictionary.get('five_need_comment')
+                rating.four_need_comment = dictionary.get('four_need_comment')
+                rating.three_need_comment = dictionary.get('three_need_comment')
+                rating.two_need_comment = dictionary.get('two_need_comment')
+                rating.one_need_comment = dictionary.get('one_need_comment')
+                rating.need_rating = dictionary.get('need_rating')
+                rating.rating_exist = dictionary.get('rating_exist')
+                answer.result = rating
+            else:
+                answer.status = False
+                answer.description = description + " ERROR CODE:" + str(code)
+            return answer
+        except:
+            answer = Answer()
+            answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
-            answer.description = description + " ERROR CODE:" + str(code)
-        return answer
+            return answer
 
 
     def get_list_need_confirmed_incidents(self, sender):
@@ -364,30 +402,36 @@ class JobItilium:
                                        }"""
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
-        req = requests.Request('POST', AddressApiItilium,
-                               headers=headers,
-                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
-        prepped_requ = req.prepare()
-        s = requests.Session()
-        response = s.send(prepped_requ)
+        try:
+            req = requests.Request('POST', AddressApiItilium,
+                                   headers=headers,
+                                   data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+            prepped_requ = req.prepare()
+            s = requests.Session()
+            response = s.send(prepped_requ)
 
-        code = response.status_code
-        description = response.text
-        answer = Answer()
-        # print_value(description)
+            code = response.status_code
+            description = response.text
+            answer = Answer()
+            # print_value(description)
 
-        # print_value(list)
-        if (code == 200):
-            answer.status = True
-            list = json.loads(description)
-            list_ret = []
-            for incident in list:
-                list_ret.append(WrapperView(incident.get('view'), incident.get('detail_view'), incident.get('id')))
-            answer.result = list_ret
-        else:
+            # print_value(list)
+            if (code == 200):
+                answer.status = True
+                list = json.loads(description)
+                list_ret = []
+                for incident in list:
+                    list_ret.append(WrapperView(incident.get('view'), incident.get('detail_view'), incident.get('id')))
+                answer.result = list_ret
+            else:
+                answer.status = False
+                answer.description = description + " ERROR CODE:" + str(code)
+            return answer
+        except:
+            answer = Answer()
+            answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
-            answer.description = description + " ERROR CODE:" + str(code)
-        return answer
+            return answer
 
     def decline_incident(self, sender, reference_incident, comment):
         print_debug("def decline_incident")
@@ -403,25 +447,31 @@ class JobItilium:
         # print_value(data_to_send)
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
-        req = requests.Request('POST', AddressApiItilium,
-                               headers=headers,
-                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
-        prepped_requ = req.prepare()
-        s = requests.Session()
-        response = s.send(prepped_requ)
+        try:
+            req = requests.Request('POST', AddressApiItilium,
+                                   headers=headers,
+                                   data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+            prepped_requ = req.prepare()
+            s = requests.Session()
+            response = s.send(prepped_requ)
 
-        # response = requests.post(AddressApiItilium, data=data_to_send,
-        #                          auth=(LoginItilium, PasswordItilium))
-        code = response.status_code
-        description = response.text
-        answer = Answer()
-        if (code == 200):
-            answer.status = True
-            answer.result = description
-        else:
+            # response = requests.post(AddressApiItilium, data=data_to_send,
+            #                          auth=(LoginItilium, PasswordItilium))
+            code = response.status_code
+            description = response.text
+            answer = Answer()
+            if (code == 200):
+                answer.status = True
+                answer.result = description
+            else:
+                answer.status = False
+                answer.description = description + " ERROR CODE:" + str(code)
+            return answer
+        except:
+            answer = Answer()
+            answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
-            answer.description = description + " ERROR CODE:" + str(code)
-        return answer
+            return answer
 
     def register_new_incident(self, message: str, sender: str):
         print_debug("def register_new_incident")
@@ -437,25 +487,31 @@ class JobItilium:
         # print_value(data_to_send)
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
-        req = requests.Request('POST', AddressApiItilium,
-                               headers=headers,
-                               data=data_to_send.encode('utf-8'),auth=(LoginItilium, PasswordItilium))
-        prepped_requ = req.prepare()
-        s = requests.Session()
-        response = s.send(prepped_requ)
+        try:
+            req = requests.Request('POST', AddressApiItilium,
+                                   headers=headers,
+                                   data=data_to_send.encode('utf-8'),auth=(LoginItilium, PasswordItilium))
+            prepped_requ = req.prepare()
+            s = requests.Session()
+            response = s.send(prepped_requ)
 
-        # response = requests.post(AddressApiItilium, data=data_to_send,
-        #                          auth=(LoginItilium, PasswordItilium))
-        code = response.status_code
-        description = response.text
-        answer = Answer()
-        if (code == 200):
-            answer.status = True
-            answer.result = description
-        else:
+            # response = requests.post(AddressApiItilium, data=data_to_send,
+            #                          auth=(LoginItilium, PasswordItilium))
+            code = response.status_code
+            description = response.text
+            answer = Answer()
+            if (code == 200):
+                answer.status = True
+                answer.result = description
+            else:
+                answer.status = False
+                answer.description = description + " ERROR CODE:" + str(code)
+            return answer
+        except:
+            answer = Answer()
+            answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
-            answer.description = description + " ERROR CODE:" + str(code)
-        return answer
+            return answer
 
     def add_conversation(self, sender: str, reference_incident: str, text: str):
         print_debug("def add_conversation")
@@ -470,25 +526,31 @@ class JobItilium:
                                        }"""
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
-        req = requests.Request('POST', AddressApiItilium,
-                               headers=headers,
-                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
-        prepped_requ = req.prepare()
-        s = requests.Session()
-        response = s.send(prepped_requ)
+        try:
+            req = requests.Request('POST', AddressApiItilium,
+                                   headers=headers,
+                                   data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+            prepped_requ = req.prepare()
+            s = requests.Session()
+            response = s.send(prepped_requ)
 
-        code = response.status_code
-        description = response.text
-        answer = Answer()
-        # print_value(description)
+            code = response.status_code
+            description = response.text
+            answer = Answer()
+            # print_value(description)
 
-        if (code == 200):
-            answer.status = True
-            answer.result = description
-        else:
+            if (code == 200):
+                answer.status = True
+                answer.result = description
+            else:
+                answer.status = False
+                answer.description = description + " ERROR CODE:" + str(code)
+            return answer
+        except:
+            answer = Answer()
+            answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
-            answer.description = description + " ERROR CODE:" + str(code)
-        return answer
+            return answer
 
     def get_list_open_incidents(self, sender):
         print_debug("def get_list_open_incidents")
@@ -501,30 +563,36 @@ class JobItilium:
                                }"""
 
         headers = {'Content-Type': 'text/xml; charset=utf-8', }
-        req = requests.Request('POST', AddressApiItilium,
-                               headers=headers,
-                               data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
-        prepped_requ = req.prepare()
-        s = requests.Session()
-        response = s.send(prepped_requ)
+        try:
+            req = requests.Request('POST', AddressApiItilium,
+                                   headers=headers,
+                                   data=data_to_send.encode('utf-8'), auth=(LoginItilium, PasswordItilium))
+            prepped_requ = req.prepare()
+            s = requests.Session()
+            response = s.send(prepped_requ)
 
-        code = response.status_code
-        description = response.text
-        answer = Answer()
-        # print_value(description)
+            code = response.status_code
+            description = response.text
+            answer = Answer()
+            # print_value(description)
 
-        # print_value(list)
-        if (code == 200):
-            answer.status = True
-            list = json.loads(description)
-            list_ret = []
-            for incident in list:
-                list_ret.append(WrapperView(incident.get('view'), incident.get('detail_view'), incident.get('id')))
-            answer.result = list_ret
-        else:
+            # print_value(list)
+            if (code == 200):
+                answer.status = True
+                list = json.loads(description)
+                list_ret = []
+                for incident in list:
+                    list_ret.append(WrapperView(incident.get('view'), incident.get('detail_view'), incident.get('id')))
+                answer.result = list_ret
+            else:
+                answer.status = False
+                answer.description = description + " ERROR CODE:" + str(code)
+            return answer
+        except:
+            answer = Answer()
+            answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
-            answer.description = description + " ERROR CODE:" + str(code)
-        return answer
+            return answer
 
 
 class WrapperView:
@@ -533,8 +601,6 @@ class WrapperView:
         self.id = id
 
         self.detail_view = detail_view
-
-
 
 class Answer:
 
@@ -719,7 +785,7 @@ class TemplatesKeyboards:
         )
 
     @staticmethod
-    def get_keyboard_select_incident_text(list, number_parts, height_one_string = 1):
+    def get_keyboard_select_incident_text(list, number_parts, height_one_string = 1):#+
         max_buttons = 24 / height_one_string
         if (len(list) > max_buttons - 1):
             count_in_part = max_buttons - 2
@@ -783,7 +849,7 @@ class TemplatesKeyboards:
 
 class JobMessage:
 
-    def is_start_message(self, message: str):
+    def is_start_message(self, message: str):#+
         print_debug("is_start_message")
         if (message.startswith("_Itilium_bot_")):
             return False
@@ -871,6 +937,7 @@ class JobMessage:
         else:
             return [TextMessage(text="ошибка" + answer.description),
                     TemplatesKeyboards.get_keyboard_start_message()]
+
     def start_get_need_confirmed(self, sender: str):
         print_debug("start_get_need_confirmed")
         job_itilium = JobItilium()
@@ -1375,7 +1442,7 @@ class Integration:
         logger.warning("client failed receiving message. failure: {0}".format(message))
 
 
-auth_token_out = '4807270b7ee7d14d-fa37d43de286a0ef-be81bbab61de274b'
+
 app = Flask(__name__)
 
 viber = Api(BotConfiguration(
@@ -1539,340 +1606,222 @@ def incoming():
 ##          TESTS                                                            ###########################################
 ########################################################################################################################
 
-_AddressApiItilium = AddressApiItilium
-_LoginItilium = LoginItilium
-_PasswordItilium = PasswordItilium
+class TestsStartedAction(unittest.TestCase):
+    def test_StartedAction_getAdditional(self):
+        started_actions = StartedAction("test", 1)
+        left = started_actions.get_dict()
 
-def test_non_exist():
-    job_itilium = JobItilium()
+        self.assertEqual(left, {"name": "test", "additional": 1})
+        self.assertNotEqual(left,{"name": "test", "additional": 2})
+        self.assertNotEqual(left,{"name": "test2", "additional": 2})
+        self.assertNotEqual(left,{"1name": "test", "additional": 2})
+        self.assertNotEqual(left,{"name": "test", "1additional": 1})
+        self.assertNotEqual(left,{"name": "test", "1additional": "1"})
 
-    print_value("test non exist begin")
+        started_actions = StartedAction("test", "str")
+        left = started_actions.get_dict()
+        self.assertEqual(left, {"name": "test", "additional": "str"})
+        self.assertNotEqual(left, {"name": "test", "additional": "str1"})
+        self.assertNotEqual(left, {"name": "test2", "additional": "str"})
+        self.assertNotEqual(left, {"1name": "test", "additional": "str"})
+        self.assertNotEqual(left, {"name": "test", "1additional": "str"})
+        self.assertNotEqual(left, {"name": "test", "additional": 1})
 
-    answer = job_itilium.not_exist("sddsdddddd", _LoginItilium, _PasswordItilium, _AddressApiItilium )
-    if answer.status == True and answer.result == str(1):
-        print_value("ok")
-    else:
-        print_value("false non exist 1")
+        started_actions = StartedAction("test", {"data":[WrapperView("1","2","3")]})
+        left = started_actions.get_dict()
+        self.assertEqual(left, {"name": "test", "additional": {"data":[{"view":"1","id":"3", "detail_view": "2"}]}})
+        self.assertNotEqual(left, {"name": "test", "additional": "str"})
 
-    answer = job_itilium.not_exist("222", _LoginItilium, _PasswordItilium, _AddressApiItilium) #для теста завести в Итиилиум в регистр ИдентификаторыВМессенджерах запись, где идентификатор = 222
-    if answer.status == True and answer.result == str(0):
-        print_value("ok")
-    else:
-        print_value("false non exist 2")
+        started_actions = StartedAction("test", {"data": "123"})
+        left = started_actions.get_dict()
+        self.assertEqual(left, {"name": "test", "additional": {"data": "123"}})
+        self.assertNotEqual(left, {"name": "test", "additional": {"data":[{"view":"1","id":"3", "detail_view": "2"}]}})
 
-    answer = job_itilium.not_exist("293", _LoginItilium + "ddd", _PasswordItilium, _AddressApiItilium)
-    if answer.status == False:
-        print_value("ok")
-    else:
-        print_value("false non exist 3")
 
-    answer = job_itilium.not_exist("293", _LoginItilium, _PasswordItilium + "f", _AddressApiItilium)
-    if answer.status == False:
-        print_value("ok")
-    else:
-        print_value("false non exist 4")
+        started_actions = StartedAction("test", {"data": ["1",2, True]})
+        left = started_actions.get_dict()
+        self.assertEqual(left, {"name": "test", "additional": {"data": ["1", 2, True]}})
+        self.assertNotEqual(left,
+                            {"name": "test", "additional": {"data": [{"view": "1", "id": "3", "detail_view": "2"}]}})
 
-    answer = job_itilium.not_exist("293", _LoginItilium, _PasswordItilium , _AddressApiItilium + "ff")
-    if answer.status == False:
-        print_value("ok")
-    else:
-        print_value("false non exist 4")
-
-    print_value("test non exist end")
-
-def test_register():
-
-    job_itilium = JobItilium()
-
-    print_value("test registr begin")
-
-    answer = job_itilium.register("222","-----",_LoginItilium,_PasswordItilium,_AddressApiItilium)
-    if answer.status == True and answer.result != str(1):
-        print_value("ok")
-    else:
-        print_value("false in register 1")
-
-    answer = job_itilium.register("222", "293", _LoginItilium, _PasswordItilium, _AddressApiItilium) #надо вподключенном итилиум добавить в регистр контактная информация физлицо с телефоном 293
-    if answer.status == True and answer.result == str(1):
-        print_value("ok")
-    else:
-        print_value("false in register 2")
-
-    answer = job_itilium.register("222", "293", _LoginItilium + "s", _PasswordItilium,
-                                  _AddressApiItilium)  # надо вподключенном итилиум добавить в регистр контактная информация физлицо с телефоном 293
-    if answer.status == False :
-        print_value("ok")
-    else:
-        print_value("false in register 3")
-
-    answer = job_itilium.register("222", "293", _LoginItilium , _PasswordItilium + "d",
-                                  _AddressApiItilium)  # надо вподключенном итилиум добавить в регистр контактная информация физлицо с телефоном 293
-    if answer.status == False:
-        print_value("ok")
-    else:
-        print_value("false in register 4")
-
-    answer = job_itilium.register("222", "293", _LoginItilium, _PasswordItilium,
-                                  _AddressApiItilium + "d")  # надо вподключенном итилиум добавить в регистр контактная информация физлицо с телефоном 293
-    if answer.status == False:
-        print_value("ok")
-    else:
-        print_value("false in register 5")
-    print_value("test registr end")
-
-def test_VerifyRegistration():
-    print_value("VerifyRegistration begin") #НАДО УДАЛИТЬ В ИТИЛИУМ ИЗ РЕГИСТРА ИдентификаторыПодписчиков запись, с ИДентификатором 111
-    isReg, mess = VerifyRegistration("111","Hello")
-    if isReg :
-        print_value("ok")
-    else:
-        print_value("false VerifyRegistration 1")
-        return
-    isReg, mess = VerifyRegistration("111", "-----")
-    if isReg :
-        print_value("ok")
-        isReg, mess = VerifyRegistration("111", "293") # надо вподключенном итилиум добавить в регистр контактная информация физлицо с телефоном 293
-        if(isReg == False):
-            print_value("ok")
-        else:
-            print_value("false VerifyRegistration 3")
-    else:
-        print_value("false VerifyRegistration 2")
-        return
-
-    print_value("VerifyRegistration end")
-
-def test_Registration():
-    print_value("Registration begin")
-    integration = Integration()
-    value = integration.on_new_message("hello", "111") #пользователь 111 должен быть в регистре ИдентификаторыПодписчиков. В тестах выше по сценарию он добавлен
-    job_message = JobMessage()
-    try:
-        if isinstance(value[0],TextMessage) and isinstance(value[1], KeyboardMessage):
-            print_value("ok")
-            if value[1].keyboard == TemplatesKeyboards.get_keyboard_start_message().keyboard:
-                print_value("ok")
+class TestsTemplatesKeyboards(unittest.TestCase):
+    def test_get_keyboard_select_incident_text(self):
+        for i in range(2):
+            if i == 1:
+                list = [WrapperView("view_" + str(i), "detail_view_" + str(i), "id_" + str(i)) for i in range(5)]
             else:
-                print_value("false 2")
-        else:
-            print_value("false 1")
-    except:
-        print_value("false 1")
-    print_value("Registration end")
+                list = [{"view": "view_" + str(i), "detail_view": "detail_view_" + str(i), "id": "id_" + str(i)} for i in range(5)]
 
-def test_registerNewIncident():
-    print_value("registerNewIncident begin")
-    job_itilium = JobItilium()
-    answer = job_itilium.register_new_incident("новое Обращение","RH2xtdiCKsztWpOkGlMxZQ")
-    if answer.status:
-        print_value("ok " + answer.result)
-    else:
-        print_value("false 1" + answer.description)
-    print_value("registerNewIncident end")
+            list = [ WrapperView("view_" + str(i), "detail_view_" + str(i), "id_" + str(i)) for i in range(5)]
+            left = TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 1)
 
-def test_GetListOpenIncidents():
-    print_value("GetListOpenIncidents end")
-    job_itilium = JobItilium()
-    answer = job_itilium.get_list_open_incidents( "111")
-    if answer.status:
-        print_value("ok " )
-    else:
-        print_value("false 1")
-    print_value("GetListOpenIncidents end")
+            right = {'Type': 'keyboard',
+             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_0', 'Text': 'view_0'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_1', 'Text': 'view_1'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_2', 'Text': 'view_2'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_3', 'Text': 'view_3'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_4', 'Text': 'view_4'},
+                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
 
-def test_AddConversation():
-    print_value("AddConversation begin")
-    job_itilium = JobItilium()
-    answer = job_itilium.get_list_open_incidents("111")
-    if answer.status:
-        if len(answer.result) == 0:
-            print_value("false no incidents in base")
-        else:
-            incident_id = answer.result[0].id
-            answer = job_itilium.add_conversation("111",incident_id, "новое сообщение через add conversation")
-            if answer.status:
-                print_value("ok " + answer.result)
+
+            self.assertEqual(left, right)
+
+            if i == 1:
+                list = [WrapperView("view_" + str(i), "detail_view_" + str(i), "id_" + str(i)) for i in range(30)]
             else:
-                print_value("false 1 " + answer.description)
-    else:
-        print_value("false see test get_list_open_incidents")
+                list = [{"view": "view_" + str(i), "detail_view": "detail_view_" + str(i), "id": "id_" + str(i)} for i
+                        in range(30)]
+
+            # print_value(TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 1))
+            # print_value(TemplatesKeyboards.get_keyboard_select_incident_text(list, 2, 1))
+            left = TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 1)
+            left_two = TemplatesKeyboards.get_keyboard_select_incident_text(list, 2, 1)
 
 
-    print_value("AddConversation end")
+            right = {'Type': 'keyboard',
+             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_0', 'Text': 'view_0'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_1', 'Text': 'view_1'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_2', 'Text': 'view_2'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_3', 'Text': 'view_3'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_4', 'Text': 'view_4'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_5', 'Text': 'view_5'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_6', 'Text': 'view_6'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_7', 'Text': 'view_7'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_8', 'Text': 'view_8'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_9', 'Text': 'view_9'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_10', 'Text': 'view_10'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_11', 'Text': 'view_11'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_12', 'Text': 'view_12'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_13', 'Text': 'view_13'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_14', 'Text': 'view_14'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_15', 'Text': 'view_15'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_16', 'Text': 'view_16'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_17', 'Text': 'view_17'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_18', 'Text': 'view_18'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_19', 'Text': 'view_19'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_20', 'Text': 'view_20'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_21', 'Text': 'view_21'},
+                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_more_incidents', 'Text': 'ЕЩЕ'},
+                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
 
-def  test_DeclineIncident():
-    print_value("DeclineIncident begin")
+            right_two = {'Type': 'keyboard',
+             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_22', 'Text': 'view_22'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_23', 'Text': 'view_23'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_24', 'Text': 'view_24'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_25', 'Text': 'view_25'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_26', 'Text': 'view_26'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_27', 'Text': 'view_27'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_28', 'Text': 'view_28'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_29', 'Text': 'view_29'},
+                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
 
-    job_itilium = JobItilium()
-    answer = job_itilium.get_list_need_confirmed_incidents("111")
-    if answer.status:
-        if len(answer.result) == 0:
-            print_value("false no incidents in base")
-        else:
-            incident_id = answer.result[0].id
-            answer = job_itilium.decline_incident("111", incident_id, "не нравится, как сделано, переделайте")
-            if answer.status:
-                print_value("ok " + answer.result)
+            self.assertEqual(left, right)
+            self.assertEqual(left_two, right_two)
+
+            self.assertNotEqual(left, right_two)
+            self.assertNotEqual(left_two, right)
+
+            if i == 1:
+                list = [WrapperView("view_" + str(i), "detail_view_" + str(i), "id_" + str(i)) for i in range(5)]
             else:
-                print_value("false 1 " + answer.description)
-    else:
-        print_value("false see test get_list_open_incidents")
+                list = [{"view": "view_" + str(i), "detail_view": "detail_view_" + str(i), "id": "id_" + str(i)} for i
+                        in range(5)]
 
-    print_value("DeclineIncident end")
+            left = TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 2)
+            right = {'Type': 'keyboard',
+             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_0', 'Text': 'view_0'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_1', 'Text': 'view_1'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_2', 'Text': 'view_2'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_3', 'Text': 'view_3'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_4', 'Text': 'view_4'},
+                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
 
-def test_GetNeedConfirmed():
-    print_value("test_GetNeedConfirmed begin")
-    job_itilium = JobItilium()
-    answer = job_itilium.get_list_need_confirmed_incidents("111")
-    if answer.status:
-        print_value("ok ")
-    else:
-        print_value("false 1" + answer.description)
-    print_value("test_GetNeedConfirmed end")
+            self.assertEqual(left, right)
 
-
-def test_getRatingConfirmation():
-    print_value("test_getRatingConfirmation begin")
-    job_itilium = JobItilium()
-    answer = job_itilium.get_list_need_confirmed_incidents("111")
-    if answer.status:
-        if len(answer.result) == 0:
-            print_value("false no incidents in base")
-        else:
-            incident_id = answer.result[0].id
-            answer = job_itilium.get_rating_for_incidents_confirmation("111", incident_id)
-            if answer.status:
-                print_value("ok " + answer.result)
+            if i == 1:
+                list = [WrapperView("view_" + str(i), "detail_view_" + str(i), "id_" + str(i)) for i in range(30)]
             else:
-                print_value("false 1 " + answer.description)
+                list = [{"view": "view_" + str(i), "detail_view": "detail_view_" + str(i), "id": "id_" + str(i)} for i
+                        in range(30)]
 
-    else:
-        print_value("false 1" + answer.description)
-    print_value("test_getRatingConfirmation end")
+            left = TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 2)
+            left_two = TemplatesKeyboards.get_keyboard_select_incident_text(list, 2, 2)
+            right = {'Type': 'keyboard',
+             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_0', 'Text': 'view_0'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_1', 'Text': 'view_1'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_2', 'Text': 'view_2'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_3', 'Text': 'view_3'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_4', 'Text': 'view_4'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_5', 'Text': 'view_5'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_6', 'Text': 'view_6'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_7', 'Text': 'view_7'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_8', 'Text': 'view_8'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_9', 'Text': 'view_9'},
+                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_more_incidents', 'Text': 'ЕЩЕ'},
+                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
 
-def test_ConfirmIncident():
-    print_value("test_ConfirmIncident begin")
-    job_itilium = JobItilium()
-    answer = job_itilium.get_list_need_confirmed_incidents("111")
-    if answer.status:
-        if len(answer.result) == 0:
-            print_value("false no incidents in base")
-        else:
-            incident_id = answer.result[0].id
-            answer = job_itilium.confirm_incident("111", incident_id, 3, "Слабенько")
-            if answer.status:
-                print_value("ok " + answer.result)
-            else:
-                print_value("false 1 " + answer.description)
-    else:
-        print_value("false see test get_list_open_incidents")
+            right_two = {'Type': 'keyboard',
+             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_10', 'Text': 'view_10'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_11', 'Text': 'view_11'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_12', 'Text': 'view_12'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_13', 'Text': 'view_13'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_14', 'Text': 'view_14'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_15', 'Text': 'view_15'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_16', 'Text': 'view_16'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_17', 'Text': 'view_17'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_18', 'Text': 'view_18'},
+                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_19', 'Text': 'view_19'},
+                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_more_incidents', 'Text': 'ЕЩЕ'},
+                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
 
-    print_value("test_ConfirmIncident end")
+            self.assertEqual(left, right)
+            self.assertEqual(left_two, right_two)
 
-def test_getLastConversations():
-    print_value("test_ConfirmIncident begin")
-    job_itilium = JobItilium()
-    answer = job_itilium.get_last_conversations("111")
-    if answer.status:
-        print_value("ok")
-        for i in answer.result:
-            print_value(i.view)
-            print_value(i.detail_view)
-            print_value(i.id)
-    else:
-        print_value("false " + answer.description)
-    print_value("test_ConfirmIncident end")
+class TestsOthers(unittest.TestCase):
 
-def test_GetSetRegistrations():
-    state_reg = GetIsRegistration("111")
-    if state_reg == False:
-        print_value("ok")
-        SetIsRegistration("111", True)
-        state_reg = GetIsRegistration("111")
-        if state_reg == True:
-            print_value("ok")
-            state_reg = GetIsRegistration("222")
-            if state_reg == False:
-                print_value("ok")
-                SetIsRegistration("111", False)
-                state_reg = GetIsRegistration("222")
-                if state_reg == False:
-                    print_value("ok")
-                    SetIsRegistration("222", True)
-                    state_reg = GetIsRegistration("222")
-                    if state_reg == True:
-                        print_value("ok")
-                        state_reg = GetIsRegistration("111")
-                        if state_reg == False:
-                            print_value("ok")
-                        else:
-                            print_value("false 6")
-                    else:
-                        print_value("false 5")
-                else:
-                    print_value("false 4")
-            else:
-                print_value("false 3")
-        else:
-            print_value("false 2")
-    else:
-        print_value("false 1")
+    def test_GetTextCommand(self):
+        self.assertEqual(GetTextCommand("привет"), "привет")
+        self.assertNotEqual(GetTextCommand("привет"), "привет1")
+        self.assertEqual(GetTextCommand(TextMessage(text="привет")), "привет")
+        self.assertNotEqual(GetTextCommand(TextMessage(text="привет")), "привет1")
 
-def test_load_save_environ():
-    state_reg = LoadValueFromEnviron("state_users","111")
-    if state_reg == "":
-        print_value("ok")
-        SaveValueToEnviron(StartedAction("test action", {"param": "1", "reference": "dddddfdfdfdfdfdf"}).get_dict(),
-                           "state_users", "111")
-        state_reg = LoadValueFromEnviron("state_users", "111")
-        if state_reg["name"] == "test action" and state_reg["additional"]["param"] == "1":
-            print_value("ok")
-            state_reg = LoadValueFromEnviron("state_users", "222")
-            if state_reg == "":
-                print_value("ok")
-                SaveValueToEnviron("", "state_users", "111")
-                state_reg = LoadValueFromEnviron("state_users","222")
-                if state_reg == "":
-                    print_value("ok")
-                    SaveValueToEnviron(StartedAction("test action 2", {"param": "2", "reference": "dddddfdfdfdfdfdf"}).get_dict(),
-                                       "state_users", "222")
-                    state_reg = LoadValueFromEnviron("state_users", "222")
-                    if state_reg["name"] == "test action 2" and state_reg["additional"]["param"] == "2":
-                        print_value("ok")
-                        state_reg = LoadValueFromEnviron("state_users", "111")
-                        if state_reg == "":
-                            print_value("ok")
-                        else:
-                            print_value("false 6")
-                    else:
-                        print_value("false 5")
-                else:
-                    print_value("false 4")
-            else:
-                print_value("false 3")
-        else:
-            print_value("false 2")
-    else:
-        print_value("false 1")
+class TestJobMessage(unittest.TestCase):
 
-def tests():
-    # test_non_exist()
-    # test_register()
-    # test_VerifyRegistration()
-    # test_Registration()
-    # test_registerNewIncident()
-    # test_GetListOpenIncidents()
-    # test_AddConversation()
-    # test_GetNeedConfirmed()
-    # test_DeclineIncident()
-    # test_getRatingConfirmation()
-    # test_ConfirmIncident()
-    # test_getLastConversations()
-    # test_GetSetRegistrations()
-    # test_load_save_environ()
-    pass
-tests()
+    def test_is_start_message(self):
+        job = JobMessage()
+        self.assertFalse(job.is_start_message("_Itilium_bot_"))
+        self.assertTrue(job.is_start_message("ttt"))
 
-if __name__ == '__main__':
-     port = int(os.environ.get('PORT', 5000))
-     app.run(host='0.0.0.0', port=port, debug=True)
+class TestJobItilium(unittest.TestCase):
+    def test_not_exist(self):
+        job = JobItilium()
+        self.assertEqual(job.not_exist("123","kdkdkdkdkdkdk").status, False)
+
+    def test_get_set_state(self):
+        job = JobItilium()
+        left = job.set_state("123","qwe", {"name":"test"})
+        self.assertTrue(left.status)
+        left_two = job.set_state("123","qwerty", {"name2":"test2"})
+        self.assertTrue(left_two.status)
+        left_three = job.set_state("1234", "qwerty", {"name3": "test2"})
+        self.assertTrue(left_three.status)
+
+        right = job.get_state("qwe","123")
+        self.assertTrue(right.status)
+        right_two = job.get_state("qwerty", "123")
+        self.assertTrue(right_two.status)
+        right_three = job.get_state("qwerty", "1234")
+        self.assertTrue(right_three.status)
+
+        self.assertEqual({"name":"test"}, right.result)
+        self.assertEqual({"name2": "test2"}, right_two.result)
+        self.assertEqual({"name3": "test2"}, right_three.result)
+
+
+
+if is_test[0]:
+    unittest.main()
+else:
+    if __name__ == '__main__':
+        port = int(os.environ.get('PORT', 5000))
+        app.run(host='0.0.0.0', port=port, debug=True)
