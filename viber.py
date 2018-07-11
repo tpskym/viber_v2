@@ -1407,7 +1407,7 @@ class JobMessage:
                 return [TextMessage(text="Не удалось отклонить обращение по причине:" + answer.description),
                         TemplatesKeyboards.get_keyboard_start_message()]
             else:
-                return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
+                return [TextMessage(text=answer.result), TemplatesKeyboards.get_keyboard_start_message()]
 
     def continue_started_process(self, message, sender: str):
         print_debug("continue started process")
