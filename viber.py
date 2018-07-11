@@ -626,6 +626,22 @@ class TemplatesKeyboards:
             }]
         }
         )
+
+    @staticmethod
+    def get_keyboard_cancel_decline():
+        return KeyboardMessage(keyboard=
+        {
+            "Type": "keyboard",
+            "InputFieldState": "hidden",
+            "Buttons": [{
+                "Columns": 6,
+                "Rows": 1,
+                "ActionBody": "_Itilium_bot_cancel",
+                "Text": "Отменить отклонение"
+            }]
+        }
+        )
+
     @staticmethod
     def get_keyboard_rating_with_continue():
 
@@ -728,6 +744,21 @@ class TemplatesKeyboards:
                 "Rows": 1,
                 "ActionBody": "_Itilium_bot_cancel_modify",
                 "Text": "Отменить"
+            }]
+        }
+        )
+
+    @staticmethod
+    def get_keyboard_cancel():
+        return KeyboardMessage(keyboard=
+        {
+            "Type": "keyboard",
+            "InputFieldState": "hidden",
+            "Buttons": [{
+                "Columns": 6,
+                "Rows": 1,
+                "ActionBody": "_Itilium_bot_cancel",
+                "Text": "Отменить регистрацию"
             }]
         }
         )
@@ -1056,7 +1087,7 @@ class JobMessage:
         if request_ok == False:
             return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         if (command == "_Itilium_bot_cancel"):
-            return [TextMessage(text="Подтверждение не выполнено"), TemplatesKeyboards.get_keyboard_start_message()]
+            return [TextMessage(text="Подтверждение не выполнено."), TemplatesKeyboards.get_keyboard_start_message()]
         elif command == "_Itilium_bot_continue":  # Пользователю эта кнопка недоступна может быть, но он может ввести эту команду. На самом деле, если пользователь не хочет комментировать, то и не надо его заставлять
             job_itilium = JobItilium()
             answer = job_itilium.confirm_incident(sender, reference_incident, rating, "")
@@ -1081,7 +1112,7 @@ class JobMessage:
         if request_ok == False:
             return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         if (command == "_Itilium_bot_Confirm_rating_cancel"):
-            return [TextMessage(text="Подтверждение не выполнено:"), TemplatesKeyboards.get_keyboard_start_message()]
+            return [TextMessage(text="Подтверждение не выполнено."), TemplatesKeyboards.get_keyboard_start_message()]
         elif command == "_Itilium_bot_Confirm_continue":
 
             job_itilium = JobItilium()
@@ -1170,11 +1201,11 @@ class JobMessage:
             if request_ok == False:
                 return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
             return [TextMessage(text="Укажите причину отклонения"),
-                    TemplatesKeyboards.get_keyboard_cancel()]
+                    TemplatesKeyboards.get_keyboard_cancel_decline()]
 
 
         else:  # cancel
-            return [TextMessage(text="Подтверждение не выполнено:"), TemplatesKeyboards.get_keyboard_start_message()]
+            return [TextMessage(text="Подтверждение не выполнено."), TemplatesKeyboards.get_keyboard_start_message()]
 
     def continue_get_last_conversations_select_actions(self, message, sender: str, started_action: StartedAction):
         print_debug("continue_get_last_conversations_select_actions")
@@ -1243,7 +1274,7 @@ class JobMessage:
 
         command = self.get_text_comand(message)
         if (command == "_Itilium_bot_cancel_modify"):
-            return [TextMessage(text="Подтверждение не выполнено"),TemplatesKeyboards.get_keyboard_start_message()]
+            return [TextMessage(text="Подтверждение не выполнено."),TemplatesKeyboards.get_keyboard_start_message()]
         if (command == "_Itilium_bot_cancel_confirmation"):
             return [TemplatesKeyboards.get_keyboard_start_message()]
         elif command == "_Itilium_bot_more_incidents":
@@ -1368,7 +1399,7 @@ class JobMessage:
         if request_ok == False:
             return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
         if (command == "_Itilium_bot_cancel"):
-            return [TextMessage(text="Обращение не отклонено"), TemplatesKeyboards.get_keyboard_start_message()]
+            return [TextMessage(text="Обращение не отклонено."), TemplatesKeyboards.get_keyboard_start_message()]
         else:
             job_itilium = JobItilium()
             answer = job_itilium.decline_incident(sender, reference, command)
