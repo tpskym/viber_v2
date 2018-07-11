@@ -983,10 +983,10 @@ class JobMessage:
                 return [TextMessage(text="Нет обращений, требующих подтверждения"),
                         TemplatesKeyboards.get_keyboard_start_message()]
             elif len(list) == 1:
-                # started_action = StartedAction("GetConfirmed_SelectButtonsConfirmDecline", command)
-                # request_ok, description = SaveState(started_action, sender)
-                # if request_ok == False:
-                #     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
+                started_action = StartedAction("GetConfirmed_SelectButtonsConfirmDecline", list[0].id)
+                request_ok, description = SaveState(started_action, sender)
+                if request_ok == False:
+                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
                 return [TextMessage(text="Подтвердите или отклоните выполнение обращения:"),
                         TextMessage(text=list[0].detail_view),
                         TemplatesKeyboards.get_keyboard_confirm()]
