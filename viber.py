@@ -188,6 +188,7 @@ class JobItilium:
             answer.description = "Ошибка соединения с Итилиум. Обратитесь к администратору."
             answer.status = False
             return answer
+
     def not_exist(self, sender, Login = "", Password = "", Adress = "" ):
         print_debug("not_exist(self, sender, Login = "", Password = "", Adress = "" )")
         if(Login == ""):
@@ -932,7 +933,7 @@ class JobMessage:
                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
                 list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(
                     keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
-                                                                                  started_action.additional.get("number"),2))]
+                                                                        started_action.additional.get("number"),2))]
                 return list_answer
         else:
             return [TextMessage(text="ошибка" + answer.description),
@@ -948,7 +949,12 @@ class JobMessage:
                 return [TextMessage(text="Нет обращений, требующих подтверждения"),
                         TemplatesKeyboards.get_keyboard_start_message()]
             elif len(list) == 1:
-                return [TextMessage(text="Детальная информация:"), TextMessage(text=list[0].detail_view),
+                # started_action = StartedAction("GetConfirmed_SelectButtonsConfirmDecline", command)
+                # request_ok, description = SaveState(started_action, sender)
+                # if request_ok == False:
+                #     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
+                return [TextMessage(text="Подтвердите или отклоните выполнение обращения:"),
+                        TextMessage(text=list[0].detail_view),
                         TemplatesKeyboards.get_keyboard_confirm()]
             else:
                 started_action = StartedAction( "GetConfirmedSelectIncident", {"number": 1, "list": list})
@@ -957,7 +963,7 @@ class JobMessage:
                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
                 list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(
                     keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
-                                                                                  started_action.additional.get("number"),2))]
+                                                                    started_action.additional.get("number"),2))]
                 return list_answer
         else:
             return [TextMessage(text="Ошибка" + answer.description),
@@ -1236,6 +1242,8 @@ class JobMessage:
             return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
         command = self.get_text_comand(message)
+        if (command == "_Itilium_bot_cancel_modify"):
+            return [TextMessage(text="Подтверждение не выполнено"),TemplatesKeyboards.get_keyboard_start_message()]
         if (command == "_Itilium_bot_cancel_confirmation"):
             return [TemplatesKeyboards.get_keyboard_start_message()]
         elif command == "_Itilium_bot_more_incidents":
@@ -1519,7 +1527,7 @@ def VerifyRegistration(senderid, message ):
                     if request_ok == False:
                         return True, TextMessage(text=description)
                     # print_value("is registrations {}".format(GetIsRegistration(senderid)))
-                    return True, ret
+                    return  True, ret
                 else:
                     print_debug("-Verify registration exist")
                     return False, EmptyValue()
