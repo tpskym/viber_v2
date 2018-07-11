@@ -26,7 +26,7 @@ if(is_test[0]):
     AddressApiItilium = ""
     LoginItilium = ""
     PasswordItilium = ""
-    auth_token_out = '4807270b7ee7d14d-fa37d43de286a0ef-be81bbab61de274b'
+    auth_token_out = ""
 else:
     AddressApiItilium = os.environ['AddressApiItilium']
     LoginItilium = os.environ['LoginItilium']
@@ -69,13 +69,14 @@ def print_value(object_to_print, value: str = "-----------------------------"):
 
 
 class RatingIncidents:
-    need_rating: bool = False
-    rating_exist: bool = True
-    five_need_comment: bool = True
-    four_need_comment: bool = True
-    three_need_comment: bool = True
-    two_need_comment: bool = False
-    one_need_comment: bool = False
+    def __init__(self):
+        self.need_rating: bool = False
+        self.rating_exist: bool = True
+        self.five_need_comment: bool = True
+        self.four_need_comment: bool = True
+        self.three_need_comment: bool = True
+        self.two_need_comment: bool = False
+        self.one_need_comment: bool = False
 
 
 class StartedAction:
@@ -91,7 +92,7 @@ class StartedAction:
                 if isinstance(self.additional[key], list):
                     temp = []
                     for item in self.additional[key]:
-                        if isinstance(item, WrapperView):
+                        if isinstance(item, WrapperView) or isinstance(item, RatingIncidents):
                             temp.append(item.__dict__)
                         else:
                             temp.append(item)
@@ -1669,6 +1670,13 @@ class TestsStartedAction(unittest.TestCase):
         started_actions = StartedAction("test", {"data":[WrapperView("1","2","3")]})
         left = started_actions.get_dict()
         self.assertEqual(left, {"name": "test", "additional": {"data":[{"view":"1","id":"3", "detail_view": "2"}]}})
+        self.assertNotEqual(left, {"name": "test", "additional": "str"})
+
+        started_actions = StartedAction("test", {"data": [RatingIncidents()]})
+        left = started_actions.get_dict()
+        self.assertEqual(left, {"name": "test", "additional": {"data": [{"need_rating": False, "rating_exist": True, "five_need_comment":
+            True, "four_need_comment": True, "three_need_comment": True, "two_need_comment": False,
+                                                                         "one_need_comment": False}]}})
         self.assertNotEqual(left, {"name": "test", "additional": "str"})
 
         started_actions = StartedAction("test", {"data": "123"})
