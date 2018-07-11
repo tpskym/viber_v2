@@ -1613,7 +1613,7 @@ def incoming():
 
         # print_debug("before test variable{}".format(w[0]))
 
-        viber.send_messages(viber_request.sender.id, KeyboardMessage(keyboard={
+        viber.send_messages(viber_request.sender.id, TextMessage(text="Обработка.", keyboard={
             "Type": "keyboard",
             "InputFieldState": "hidden",
             "Buttons": []
