@@ -1097,14 +1097,14 @@ class JobMessage:
             if (answer == False):
                 return [TextMessage(text="Не удалось подтвердить обращение по причине:" + answer.description)]
             else:
-                return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
+                return [TextMessage(text=answer.result), TemplatesKeyboards.get_keyboard_start_message()]
         else:  # Комментарий введен
             job_itilium = JobItilium()
             answer = job_itilium.confirm_incident(sender, reference_incident, rating, command)
             if (answer == False):
                 return [TextMessage(text="Не удалось подтвердить обращение по причине:" + answer.description)]
             else:
-                return [TextMessage(text=answer.description),TemplatesKeyboards.get_keyboard_start_message()]
+                return [TextMessage(text=answer.result),TemplatesKeyboards.get_keyboard_start_message()]
 
     def continue_confirmed_select_rating(self, message, sender: str, started_action: StartedAction):
         print_debug("continue_confirmed_select_rating")
@@ -1193,7 +1193,7 @@ class JobMessage:
                     if (answer == False):
                         return [TextMessage(text="Не удалось подтвердить обращение по причине:" + answer.description)]
                     else:
-                        return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
+                        return [TextMessage(text=answer.result), TemplatesKeyboards.get_keyboard_start_message()]
             else:
                 return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
         elif command == "_Itilium_bot_Decline":
