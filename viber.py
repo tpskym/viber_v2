@@ -1129,23 +1129,23 @@ class JobMessage:
             rating = -1
             if command == "_Itilium_bot_Confirm_rating_1":
                 rating = 1
-                if rating_state.one_need_comment == True:
+                if rating_state['one_need_comment'] == True:
                     need_comment = True
             elif command == "_Itilium_bot_Confirm_rating_2":
                 rating = 2
-                if rating_state.two_need_comment == True:
+                if rating_state['two_need_comment'] == True:
                     need_comment = True
             elif command == "_Itilium_bot_Confirm_rating_3":
                 rating = 3
-                if rating_state.three_need_comment == True:
+                if rating_state['three_need_comment'] == True:
                     need_comment = True
             elif command == "_Itilium_bot_Confirm_rating_4":
                 rating = 4
-                if rating_state.four_need_comment == True:
+                if rating_state['four_need_comment'] == True:
                     need_comment = True
             elif command == "_Itilium_bot_Confirm_rating_5":
                 rating = 5
-                if rating_state.five_need_comment == True:
+                if rating_state['five_need_comment'] == True:
                     need_comment = True
 
             started_action = StartedAction( "Get_Comfirmed_input_comment",
