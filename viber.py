@@ -1123,7 +1123,7 @@ class JobMessage:
             if (answer == False):
                 return [TextMessage(text="Не удалось подтвердить обращение по причине:" + answer.description)]
             else:
-                return [TextMessage(text=answer.description), TemplatesKeyboards.get_keyboard_start_message()]
+                return [TextMessage(text=answer.result), TemplatesKeyboards.get_keyboard_start_message()]
         else:
             need_comment = False
             rating = -1
