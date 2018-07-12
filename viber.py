@@ -952,6 +952,7 @@ class JobMessage:
                 list_answer = [TextMessage(text="Выберите обращение")].append(
                     TemplatesKeyboards.get_keyboard_select_incident_text(
                         list,started_action.additional.get("number"),2))
+                print_debug(list_answer)
                 return list_answer
         else:
             return [TextMessage(text="Ошибка." + answer.description),
@@ -1757,7 +1758,7 @@ class TestsTemplatesKeyboards(unittest.TestCase):
                 list = [{"view": "view_" + str(i), "detail_view": "detail_view_" + str(i), "id": "id_" + str(i)} for i
                         in range(30)]
 
-            # print_value(TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 1))
+            # print_value(TemplatesKeyboards.r(list, 1, 1))
             # print_value(TemplatesKeyboards.get_keyboard_select_incident_text(list, 2, 1))
             left = TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 1)
             left_two = TemplatesKeyboards.get_keyboard_select_incident_text(list, 2, 1)
