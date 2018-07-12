@@ -787,8 +787,7 @@ class TemplatesKeyboards:
 
         {
             "Type": "keyboard",
-            "InputFieldState": "regular",
-            # "DefaultHeight": "true",
+            "InputFieldState": "hidden",
             "Buttons": [{
                 "Columns": 3,
                 "Rows": 1,
