@@ -696,9 +696,11 @@ class TemplatesKeyboards:
 
     @staticmethod
     def get_keyboard_on_show_conversation():
-        return KeyboardMessage(keyboard=
+        return KeyboardMessage(min_api_version=4,
+                               keyboard=
         {
             "Type": "keyboard",
+            "InputFieldState": "hidden",
             "Buttons": [{
                 "Columns": 3,
                 "Rows": 1,
