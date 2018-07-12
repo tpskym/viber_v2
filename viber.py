@@ -239,7 +239,14 @@ class JobItilium:
         if Adress == "":
             Adress = AddressApiItilium
         text = GetTextCommand(message)
-
+        quote = "\""
+        print_debug("""{
+                                                                "data": {
+                                                                "action": "register",
+                                                                "sender": """ + quote + sender + quote + """,
+                                                                "phone":  """ + quote + text  + quote + """,
+                                                                }
+                                                            }""")
         try:
             quote = "\""
             response = requests.post(Adress, data="""{

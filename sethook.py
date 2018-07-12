@@ -20,46 +20,18 @@ SAMPLE_ALT_TEXT = "upgrade now!"
 # list_answer = [TextMessage(text="Выберите обращение")].extend( [TextMessage(text="Выберите обращение"),TextMessage(text="Выберите обращение")] )
 # list_answer = [TextMessage(text="Выберите обращение"),TextMessage(text="Выберите обращение")]
 
-list_answer = [1]
-list_answer.extend( [1,2] )
-print("before list answer")
-print("{}".format(list_answer))
 
 
-# details = viber.get_user_details(id)
-viber.send_messages(id, [TextMessage(text="привет"),
-            RichMediaMessage(min_api_version=4, rich_media=
-                {
-                "Type": "rich_media",
-                "BgColor": "#FFFFFF",
-                "Buttons":[
-                    {
-                        "ActionBody":"454545454",
-                        "ActionType":"reply",
-                        "Text":"222222Очень длинный текст обращения, Очень длинный текст обращения, Очень длинный текст обращения, "
-                    },
-                    {
-                        "ActionBody":"https://www.google.com",
-                        "ActionType":"open-url",
-                        "Text":"2S2hould get back my URL encoded ID instead of replace_me_with_url_encoded_receiver_id"
-                    }]}),KeyboardMessage(min_api_version=4, keyboard={
-            "Type": "keyboard",
-            "InputFieldState": "hidden",
-            "Buttons": [{
-                "Columns": 6,
-                "Rows": 1,
-                "ActionBody": "_Itilium_bot_cancel",
-                "Text": "Отменить подтверждение"
-            }]
-        })])
+quote = "\""
+response = requests.post('http://demo.desnol.ru/suhov_itil/hs/viberapi/action', data="""{
+                                                    "data": {
+                                                    "action": "register",
+                                                    "sender": """ + quote + id + quote + """,
+                                                    "phone":  """ + quote + '293' + quote + """,
+                                                    }
+                                                }""",
+                         auth=('admin', '1Q2w3e4r5t'))
+code = response.status_code
+description = response.text
 
-# viber.send_messages(id, [KeyboardMessage(min_api_version=4, keyboard={
-#             "Type": "keyboard",
-#             "InputFieldState": "hidden",
-#             "Buttons": [{
-#                 "Columns": 6,
-#                 "Rows": 1,
-#                 "ActionBody": "_Itilium_bot_cancel",
-#                 "Text": "Отменить подтверждение"
-#             }]
-#         })])
+
