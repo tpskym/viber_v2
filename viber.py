@@ -7,6 +7,7 @@ from viberbot.api.bot_configuration import BotConfiguration
 from viberbot.api.messages import VideoMessage
 from viberbot.api.messages.text_message import TextMessage
 from viberbot.api.messages.keyboard_message import KeyboardMessage
+from viberbot.api.messages.rich_media_message import RichMediaMessage
 import requests
 import logging
 from flask import Flask, request, Response
@@ -822,9 +823,9 @@ class TemplatesKeyboards:
 
     @staticmethod
     def get_keyboard_select_incident_text(list, number_parts, height_one_string = 1):#+
-        max_buttons = 24 / height_one_string
-        if (len(list) > max_buttons - 1):
-            count_in_part = max_buttons - 2
+        max_buttons = 42
+        if (len(list) > max_buttons ):
+            count_in_part = max_buttons
             first_number = number_parts * count_in_part - count_in_part
             last_number = first_number + count_in_part - 1
             index = 0
@@ -842,17 +843,22 @@ class TemplatesKeyboards:
                     isEnd = False
                     break
                 elif index >= first_number:
-                    buttons.append({"Columns": 6, "TextHAlign": "left", "Rows": height_one_string, "ActionBody": id, "Text": view})
+                    buttons.append({"TextHAlign": "left", "ActionBody": id, "ActionType":"reply", "Text": view})
                 index += 1
-
+            buttons_keyboard = []
             if (isEnd == False):
-                buttons.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_more_incidents", "Text": "ЕЩЕ"})
-            buttons.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_cancel_modify", "Text": "Отменить"})
-            text_keyboard = {"Type": "keyboard","InputFieldState": "hidden", "Buttons": buttons}
-            return text_keyboard
+                buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_more_incidents", "Text":
+                    "ЕЩЕ"})
+            buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_cancel_modify", "Text":
+                "Отменить"})
+            text_keyboard = {"Type": "keyboard","InputFieldState": "hidden", "Buttons": buttons_keyboard}
+            return [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
+                                                                   "Buttons":buttons}), KeyboardMessage(
+                                                                            keyboard=text_keyboard, min_api_version=4)]
         else:
             text_keyboard = {"Type": "keyboard", "InputFieldState": "hidden"}
             buttons = []
+            buttons_keyboard = []
             for wrapper in list:
                 if isinstance(wrapper, WrapperView):
                     id = wrapper.id
@@ -860,10 +866,12 @@ class TemplatesKeyboards:
                 else:
                     id = wrapper['id']
                     view = wrapper['view']
-                buttons.append({"Columns": 6, "TextHAlign": "left", "Rows": height_one_string, "ActionBody": id, "Text": view})
-            buttons.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_cancel_modify", "Text": "Отменить"})
+                buttons.append({"TextHAlign": "left", "ActionBody": id, "Text": view})
+            buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_cancel_modify", "Text": "Отменить"})
             text_keyboard.update({"Buttons": buttons})
-            return text_keyboard
+            return [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
+                                                                   "Buttons":buttons}), KeyboardMessage(
+                                                                            keyboard=text_keyboard, min_api_version=4)]
 
     @staticmethod
     def get_keyboard_cancel_or_continue_withont_comment():
@@ -940,9 +948,10 @@ class JobMessage:
                 request_ok, description = SaveState(started_action, sender)
                 if request_ok == False:
                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
-                list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(min_api_version=4,
-                    keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
-                                                                        started_action.additional.get("number"),2))]
+
+                list_answer = [TextMessage(text="Выберите обращение")].append(
+                    TemplatesKeyboards.get_keyboard_select_incident_text(
+                        list,started_action.additional.get("number"),2))
                 return list_answer
         else:
             return [TextMessage(text="Ошибка." + answer.description),
@@ -966,9 +975,10 @@ class JobMessage:
                 request_ok, description = SaveState(started_action, sender)
                 if request_ok == False:
                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
-                list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(min_api_version=4,
-                    keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
-                                                                        started_action.additional.get("number"),2))]
+
+                list_answer = [TextMessage(text="Выберите обращение")].append(
+                    TemplatesKeyboards.get_keyboard_select_incident_text(
+                        list, started_action.additional.get("number"), 2))
                 return list_answer
         else:
             return [TextMessage(text="ошибка" + answer.description),
@@ -996,9 +1006,12 @@ class JobMessage:
                 request_ok, description = SaveState(started_action, sender)
                 if request_ok == False:
                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
-                list_answer = [TextMessage(text="Выберите обращение"), KeyboardMessage(min_api_version=4,
-                    keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
-                                                                    started_action.additional.get("number"),2))]
+
+
+                list_answer = [TextMessage(text="Выберите обращение")].append(
+                    TemplatesKeyboards.get_keyboard_select_incident_text(
+                        list, started_action.additional.get("number"), 2))
+
                 return list_answer
         else:
             return [TextMessage(text="Ошибка" + answer.description),
@@ -1018,10 +1031,10 @@ class JobMessage:
                 request_ok, description = SaveState(started_action, sender)
                 if request_ok == False:
                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
-                list_answer = [TextMessage(text="Выберите сообщение для уточнения или просмотра"),
-                               KeyboardMessage(min_api_version=4,
-                    keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list,
-                                                                                  started_action.additional.get("number"), 2))]
+
+                list_answer = [TextMessage(text="Выберите сообщение для уточнения или просмотра")].append(
+                    TemplatesKeyboards.get_keyboard_select_incident_text(
+                        list, started_action.additional.get("number"), 2))
                 return list_answer
         else:
             return [TextMessage(text="ошибка" + answer.description), TemplatesKeyboards.get_keyboard_start_message()]
@@ -1250,8 +1263,10 @@ class JobMessage:
             request_ok, description = SaveState(started_action, sender)
             if request_ok == False:
                 return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
-            list_answer = [KeyboardMessage(min_api_version=4,
-                keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list, number_page + 1, 2))]
+
+            list_answer = TemplatesKeyboards.get_keyboard_select_incident_text(
+                    list, number_page + 1, 2)
+
 
             return list_answer
         else:
@@ -1288,8 +1303,9 @@ class JobMessage:
             request_ok, description = SaveState(started_action, sender)
             if request_ok == False:
                 return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
-            list_answer = [KeyboardMessage(min_api_version=4,
-                keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list, number_page + 1,2))]
+
+            list_answer = TemplatesKeyboards.get_keyboard_select_incident_text(
+                list, number_page + 1, 2)
 
             return list_answer
         else:
@@ -1322,8 +1338,10 @@ class JobMessage:
             request_ok, description = SaveState(started_action, sender)
             if request_ok == False:
                 return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
-            list_answer = [KeyboardMessage(min_api_version=4,
-                keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list, number_page + 1,2))]
+
+
+            list_answer = TemplatesKeyboards.get_keyboard_select_incident_text(
+                list, number_page + 1, 2)
 
             return list_answer
         else:
@@ -1353,9 +1371,9 @@ class JobMessage:
             request_ok, description = SaveState(started_action, sender)
             if request_ok == False:
                 return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
-            list_answer = [KeyboardMessage(min_api_version=4,
-                keyboard=TemplatesKeyboards.get_keyboard_select_incident_text(list, number_page + 1,2))]
 
+            list_answer = TemplatesKeyboards.get_keyboard_select_incident_text(
+                list, number_page + 1, 2)
             return list_answer
         else:
             request_ok, description = self.remove_started_action(sender)
