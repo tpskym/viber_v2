@@ -783,7 +783,7 @@ class TemplatesKeyboards:
 
     @staticmethod
     def get_keyboard_start_message():
-        return KeyboardMessage(keyboard=
+        return KeyboardMessage(min_api_version=4, keyboard=
 
         {
             "Type": "keyboard",
@@ -1613,8 +1613,7 @@ def incoming():
 
         # print_debug("before test variable{}".format(w[0]))
 
-        viber.send_messages(viber_request.sender.id, TextMessage(text="Обработка."))
-
+        viber.send_messages(viber_request.sender.id, TextMessage(text="..."))
 
         print_debug("incoming message:" + viber_request.message.text)
         # print_debug("before test variable{}".format(os.environ["test"]))
@@ -1628,7 +1627,8 @@ def incoming():
             viber.send_messages(viber_request.sender.id, mess)
 
         else:
-            viber.send_messages(viber_request.sender.id, integration.on_new_message(viber_request.message, viber_request.sender.id))
+            viber.send_messages(viber_request.sender.id, integration.on_new_message(viber_request.message,
+                                                                                    viber_request.sender.id))
 
         # print_debug("after sender_has_started_actions(sender) {}".format(job.sender_has_started_actions(viber_request.sender.id)))
         # print_debug("after sender_has_started_actions(sender) {}".format(os.environ["temp_data_fields"]))
