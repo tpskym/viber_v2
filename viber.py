@@ -239,23 +239,16 @@ class JobItilium:
         if Adress == "":
             Adress = AddressApiItilium
         text = GetTextCommand(message)
-        quote = "\""
-        print_debug("""{
-                                                                "data": {
-                                                                "action": "register",
-                                                                "sender": """ + quote + sender + quote + """,
-                                                                "phone":  """ + quote + text  + quote + """,
-                                                                }
-                                                            }""")
+
         try:
             quote = "\""
-            response = requests.post(Adress, data="""{
+            response = requests.post(Adress, data=json.dumps({
                                                                 "data": {
                                                                 "action": "register",
-                                                                "sender": """ + quote + sender + quote + """,
-                                                                "phone":  """ + quote + text  + quote + """,
+                                                                "sender": sender,
+                                                                "phone":  text
                                                                 }
-                                                            }""",
+                                                            }).encode('utf-8'),
                                  auth=(Login, Password))
             code = response.status_code
             description = response.text
