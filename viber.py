@@ -952,6 +952,7 @@ class JobMessage:
                 list_answer = [TextMessage(text="Выберите обращение")].append(
                     TemplatesKeyboards.get_keyboard_select_incident_text(
                         list,started_action.additional.get("number"),2))
+                print_debug("before list answer")
                 print_debug(list_answer)
                 return list_answer
         else:
