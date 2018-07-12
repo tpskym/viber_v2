@@ -672,7 +672,7 @@ class TemplatesKeyboards:
             "ActionBody": "_Itilium_bot_Confirm_rating_cancel",
             "Text": "Отменить"
         })
-        return KeyboardMessage(keyboard={"Type": "keyboard", "Buttons": buttons})
+        return KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons})
 
     @staticmethod
     def get_keyboard_rating():
@@ -693,7 +693,7 @@ class TemplatesKeyboards:
             "ActionBody": "_Itilium_bot_Confirm_rating_cancel",
             "Text": "Отменить"
         })
-        return KeyboardMessage(keyboard={"Type": "keyboard", "Buttons": buttons})
+        return KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons})
 
     @staticmethod
     def get_keyboard_on_show_conversation():
