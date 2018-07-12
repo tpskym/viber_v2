@@ -718,8 +718,9 @@ class TemplatesKeyboards:
 
     @staticmethod
     def get_keyboard_confirm():
-        return KeyboardMessage(keyboard=
+        return KeyboardMessage(min_api_version=4, keyboard=
         {
+            "InputFieldState": "hidden",
             "Type": "keyboard",
             "Buttons": [{
                 "Columns": 3,
