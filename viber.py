@@ -822,7 +822,7 @@ class TemplatesKeyboards:
         )
 
     @staticmethod
-    def get_keyboard_select_incident_text(list, number_parts, height_one_string = 1):#+
+    def get_keyboard_select_incident_text(list, number_parts):#+
         max_buttons = 42
         if (len(list) > max_buttons ):
             count_in_part = max_buttons
@@ -835,15 +835,17 @@ class TemplatesKeyboards:
                 if isinstance(wrapper, WrapperView):
                     id = wrapper.id
                     view = wrapper.view
+                    detail_view = wrapper.detail_view
                 else:
                     id = wrapper['id']
                     view = wrapper['view']
+                    detail_view = wrapper['detail_view']
 
                 if (index > last_number):
                     isEnd = False
                     break
                 elif index >= first_number:
-                    buttons.append({"TextHAlign": "left", "ActionBody": id, "ActionType":"reply", "Text": view})
+                    buttons.append({"TextHAlign": "left", "ActionBody": id, "ActionType":"reply", "Text": detail_view})
                 index += 1
             buttons_keyboard = []
             if (isEnd == False):
@@ -863,10 +865,12 @@ class TemplatesKeyboards:
                 if isinstance(wrapper, WrapperView):
                     id = wrapper.id
                     view = wrapper.view
+                    detail_view = wrapper.detail_view
                 else:
                     id = wrapper['id']
                     view = wrapper['view']
-                buttons.append({"TextHAlign": "left", "ActionBody": id, "Text": view})
+                    detail_view = wrapper['detail_view']
+                buttons.append({"TextHAlign": "left", "ActionBody": id, "Text": detail_view})
             buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_cancel_modify", "Text": "Отменить"})
             text_keyboard.update({"Buttons": buttons_keyboard})
             return [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
@@ -952,8 +956,8 @@ class JobMessage:
                 list_answer = [TextMessage(text="Выберите обращение")]
                 list_answer.extend(
                     TemplatesKeyboards.get_keyboard_select_incident_text(
-                        list,started_action.additional.get("number"),2))
-                print_debug("before list answer")
+                        list,started_action.additional.get("number")))
+
                 print_debug(list_answer)
                 return list_answer
         else:
@@ -982,7 +986,7 @@ class JobMessage:
                 list_answer = [TextMessage(text="Выберите обращение")]
                 list_answer.extend(
                     TemplatesKeyboards.get_keyboard_select_incident_text(
-                        list, started_action.additional.get("number"), 2))
+                        list, started_action.additional.get("number")))
                 return list_answer
         else:
             return [TextMessage(text="ошибка" + answer.description),
@@ -1015,7 +1019,7 @@ class JobMessage:
                 list_answer = [TextMessage(text="Выберите обращение")]
                 list_answer.extend(
                     TemplatesKeyboards.get_keyboard_select_incident_text(
-                        list, started_action.additional.get("number"), 2))
+                        list, started_action.additional.get("number")))
 
                 return list_answer
         else:
@@ -1040,7 +1044,7 @@ class JobMessage:
                 list_answer = [TextMessage(text="Выберите сообщение для уточнения или просмотра")]
                 list_answer.extend(
                     TemplatesKeyboards.get_keyboard_select_incident_text(
-                        list, started_action.additional.get("number"), 2))
+                        list, started_action.additional.get("number")))
                 return list_answer
         else:
             return [TextMessage(text="ошибка" + answer.description), TemplatesKeyboards.get_keyboard_start_message()]
@@ -1271,7 +1275,7 @@ class JobMessage:
                 return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
             list_answer = TemplatesKeyboards.get_keyboard_select_incident_text(
-                    list, number_page + 1, 2)
+                    list, number_page + 1)
 
 
             return list_answer
@@ -1311,7 +1315,7 @@ class JobMessage:
                 return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
             list_answer = TemplatesKeyboards.get_keyboard_select_incident_text(
-                list, number_page + 1, 2)
+                list, number_page + 1)
 
             return list_answer
         else:
@@ -1347,7 +1351,7 @@ class JobMessage:
 
 
             list_answer = TemplatesKeyboards.get_keyboard_select_incident_text(
-                list, number_page + 1, 2)
+                list, number_page + 1)
 
             return list_answer
         else:
@@ -1379,7 +1383,7 @@ class JobMessage:
                 return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
             list_answer = TemplatesKeyboards.get_keyboard_select_incident_text(
-                list, number_page + 1, 2)
+                list, number_page + 1)
             return list_answer
         else:
             request_ok, description = self.remove_started_action(sender)
@@ -1735,138 +1739,6 @@ class TestsStartedAction(unittest.TestCase):
         self.assertNotEqual(left,
                             {"name": "test", "additional": {"data": [{"view": "1", "id": "3", "detail_view": "2"}]}})
 
-class TestsTemplatesKeyboards(unittest.TestCase):
-    def test_get_keyboard_select_incident_text(self):
-        for i in range(2):
-            if i == 1:
-                list = [WrapperView("view_" + str(i), "detail_view_" + str(i), "id_" + str(i)) for i in range(5)]
-            else:
-                list = [{"view": "view_" + str(i), "detail_view": "detail_view_" + str(i), "id": "id_" + str(i)} for i in range(5)]
-
-            list = [ WrapperView("view_" + str(i), "detail_view_" + str(i), "id_" + str(i)) for i in range(5)]
-            left = TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 1)
-
-            right = {'Type': 'keyboard',
-             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_0', 'Text': 'view_0'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_1', 'Text': 'view_1'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_2', 'Text': 'view_2'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_3', 'Text': 'view_3'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_4', 'Text': 'view_4'},
-                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
-
-
-            self.assertEqual(left, right)
-
-            if i == 1:
-                list = [WrapperView("view_" + str(i), "detail_view_" + str(i), "id_" + str(i)) for i in range(30)]
-            else:
-                list = [{"view": "view_" + str(i), "detail_view": "detail_view_" + str(i), "id": "id_" + str(i)} for i
-                        in range(30)]
-
-            # print_value(TemplatesKeyboards.r(list, 1, 1))
-            # print_value(TemplatesKeyboards.get_keyboard_select_incident_text(list, 2, 1))
-            left = TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 1)
-            left_two = TemplatesKeyboards.get_keyboard_select_incident_text(list, 2, 1)
-
-
-            right = {'Type': 'keyboard',
-             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_0', 'Text': 'view_0'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_1', 'Text': 'view_1'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_2', 'Text': 'view_2'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_3', 'Text': 'view_3'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_4', 'Text': 'view_4'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_5', 'Text': 'view_5'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_6', 'Text': 'view_6'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_7', 'Text': 'view_7'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_8', 'Text': 'view_8'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_9', 'Text': 'view_9'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_10', 'Text': 'view_10'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_11', 'Text': 'view_11'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_12', 'Text': 'view_12'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_13', 'Text': 'view_13'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_14', 'Text': 'view_14'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_15', 'Text': 'view_15'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_16', 'Text': 'view_16'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_17', 'Text': 'view_17'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_18', 'Text': 'view_18'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_19', 'Text': 'view_19'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_20', 'Text': 'view_20'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_21', 'Text': 'view_21'},
-                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_more_incidents', 'Text': 'ЕЩЕ'},
-                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
-
-            right_two = {'Type': 'keyboard',
-             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_22', 'Text': 'view_22'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_23', 'Text': 'view_23'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_24', 'Text': 'view_24'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_25', 'Text': 'view_25'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_26', 'Text': 'view_26'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_27', 'Text': 'view_27'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_28', 'Text': 'view_28'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 1, 'ActionBody': 'id_29', 'Text': 'view_29'},
-                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
-
-            self.assertEqual(left, right)
-            self.assertEqual(left_two, right_two)
-
-            self.assertNotEqual(left, right_two)
-            self.assertNotEqual(left_two, right)
-
-            if i == 1:
-                list = [WrapperView("view_" + str(i), "detail_view_" + str(i), "id_" + str(i)) for i in range(5)]
-            else:
-                list = [{"view": "view_" + str(i), "detail_view": "detail_view_" + str(i), "id": "id_" + str(i)} for i
-                        in range(5)]
-
-            left = TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 2)
-            right = {'Type': 'keyboard',
-             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_0', 'Text': 'view_0'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_1', 'Text': 'view_1'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_2', 'Text': 'view_2'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_3', 'Text': 'view_3'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_4', 'Text': 'view_4'},
-                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
-
-            self.assertEqual(left, right)
-
-            if i == 1:
-                list = [WrapperView("view_" + str(i), "detail_view_" + str(i), "id_" + str(i)) for i in range(30)]
-            else:
-                list = [{"view": "view_" + str(i), "detail_view": "detail_view_" + str(i), "id": "id_" + str(i)} for i
-                        in range(30)]
-
-            left = TemplatesKeyboards.get_keyboard_select_incident_text(list, 1, 2)
-            left_two = TemplatesKeyboards.get_keyboard_select_incident_text(list, 2, 2)
-            right = {'Type': 'keyboard',
-             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_0', 'Text': 'view_0'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_1', 'Text': 'view_1'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_2', 'Text': 'view_2'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_3', 'Text': 'view_3'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_4', 'Text': 'view_4'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_5', 'Text': 'view_5'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_6', 'Text': 'view_6'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_7', 'Text': 'view_7'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_8', 'Text': 'view_8'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_9', 'Text': 'view_9'},
-                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_more_incidents', 'Text': 'ЕЩЕ'},
-                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
-
-            right_two = {'Type': 'keyboard',
-             'Buttons': [{'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_10', 'Text': 'view_10'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_11', 'Text': 'view_11'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_12', 'Text': 'view_12'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_13', 'Text': 'view_13'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_14', 'Text': 'view_14'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_15', 'Text': 'view_15'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_16', 'Text': 'view_16'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_17', 'Text': 'view_17'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_18', 'Text': 'view_18'},
-                         {'Columns': 6, 'TextHAlign': 'left', 'Rows': 2, 'ActionBody': 'id_19', 'Text': 'view_19'},
-                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_more_incidents', 'Text': 'ЕЩЕ'},
-                         {'Columns': 6, 'Rows': 1, 'ActionBody': '_Itilium_bot_cancel_modify', 'Text': 'Отменить'}]}
-
-            self.assertEqual(left, right)
-            self.assertEqual(left_two, right_two)
 
 class TestsOthers(unittest.TestCase):
 
