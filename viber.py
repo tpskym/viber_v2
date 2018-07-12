@@ -949,7 +949,8 @@ class JobMessage:
                 if request_ok == False:
                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
-                list_answer = [TextMessage(text="Выберите обращение")].append(
+                list_answer = [TextMessage(text="Выберите обращение")]
+                list_answer.extend(
                     TemplatesKeyboards.get_keyboard_select_incident_text(
                         list,started_action.additional.get("number"),2))
                 print_debug("before list answer")
@@ -978,7 +979,8 @@ class JobMessage:
                 if request_ok == False:
                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
-                list_answer = [TextMessage(text="Выберите обращение")].append(
+                list_answer = [TextMessage(text="Выберите обращение")]
+                list_answer.extend(
                     TemplatesKeyboards.get_keyboard_select_incident_text(
                         list, started_action.additional.get("number"), 2))
                 return list_answer
@@ -1010,7 +1012,8 @@ class JobMessage:
                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
 
-                list_answer = [TextMessage(text="Выберите обращение")].append(
+                list_answer = [TextMessage(text="Выберите обращение")]
+                list_answer.extend(
                     TemplatesKeyboards.get_keyboard_select_incident_text(
                         list, started_action.additional.get("number"), 2))
 
@@ -1034,7 +1037,8 @@ class JobMessage:
                 if request_ok == False:
                     return [TextMessage(text=description), TemplatesKeyboards.get_keyboard_start_message()]
 
-                list_answer = [TextMessage(text="Выберите сообщение для уточнения или просмотра")].append(
+                list_answer = [TextMessage(text="Выберите сообщение для уточнения или просмотра")]
+                list_answer.extend(
                     TemplatesKeyboards.get_keyboard_select_incident_text(
                         list, started_action.additional.get("number"), 2))
                 return list_answer
