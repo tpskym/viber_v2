@@ -845,7 +845,7 @@ class TemplatesKeyboards:
                     isEnd = False
                     break
                 elif index >= first_number:
-                    buttons.append({"TextHAlign": "left", "ActionBody": id, "ActionType":"reply", "Text": view})
+                    buttons.append({"TextVAlign": "top", "TextHAlign": "left", "ActionBody": id, "ActionType":"reply", "Text": view})
                 index += 1
             buttons_keyboard = []
             if (isEnd == False):
@@ -870,7 +870,7 @@ class TemplatesKeyboards:
                     id = wrapper['id']
                     view = wrapper['view']
                     detail_view = wrapper['detail_view']
-                buttons.append({"TextHAlign": "left", "ActionBody": id, "Text": view})
+                buttons.append({"TextVAlign": "top", "TextHAlign": "left", "ActionBody": id, "Text": view})
             buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_cancel_modify", "Text": "Отменить"})
             text_keyboard.update({"Buttons": buttons_keyboard})
             return [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
