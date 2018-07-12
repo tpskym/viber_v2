@@ -868,7 +868,7 @@ class TemplatesKeyboards:
                     view = wrapper['view']
                 buttons.append({"TextHAlign": "left", "ActionBody": id, "Text": view})
             buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "_Itilium_bot_cancel_modify", "Text": "Отменить"})
-            text_keyboard.update({"Buttons": buttons})
+            text_keyboard.update({"Buttons": buttons_keyboard})
             return [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
                                                                    "Buttons":buttons}), KeyboardMessage(
                                                                             keyboard=text_keyboard, min_api_version=4)]
