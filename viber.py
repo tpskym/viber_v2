@@ -1649,7 +1649,7 @@ def incoming():
         print_debug("incoming message:" + viber_request.message.text)
         # print_debug("before test variable{}".format(os.environ["test"]))
         # os.environ["test"] = os.environ["test"] + '1'
-        job = JobMessage()
+        # job = JobMessage()
         # print_debug("before sender_has_started_actions(sender) {}".format(job.sender_has_started_actions(viber_request.sender.id)))
         # print_debug("before sender_has_started_actions(sender) {}".format(os.environ["temp_data_fields"]))
         isReg, mess = VerifyRegistration(viber_request.sender.id, viber_request.message)
