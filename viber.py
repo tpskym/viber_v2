@@ -1586,7 +1586,7 @@ def VerifyRegistration(senderid, message ):
             if answer.status:
                 if (answer.result == str(1)):
                     print_debug("-Verify registration non exist")
-                    ret = TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")
+                    ret = TextMessage(text="Укажите идентификатор подписчика")
                     request_ok, description = SetIsRegistration( senderid, True)
                     if request_ok == False:
                         return True, TextMessage(text=description)
