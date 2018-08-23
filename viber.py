@@ -1513,6 +1513,7 @@ class Integration:
 
     def on_failed_message(self, message: str, sender: str):
        # logger.warning("client failed receiving message. failure: {0}".format(message))
+        pass
 
 
 
