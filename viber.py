@@ -1610,7 +1610,7 @@ def VerifyRegistration(senderid, message ):
                     return False, EmptyValue()
                 else:
                     ret = [TextMessage(text=answer.result),
-                           TextMessage(text="Укажите свой номер телефона в формате +7хххххххххх")]
+                           TextMessage(text="Укажите идентификатор подписчика")]
                     return True, ret
 
             else:
