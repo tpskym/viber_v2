@@ -74,7 +74,9 @@ def incomingGET():
 
         # Query the database and obtain data as Python objects
         cur.execute("SELECT * FROM data_users;")
-        text += cur.fetchone()
+        result_query = cur.fetchone()
+        if(not result_query == None)
+            text += result_query['sender_id']
 
         # Make the changes to the database persistent
         conn.commit()
