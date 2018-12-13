@@ -104,23 +104,30 @@ def incomingGET():
         text += '\n' + "Add string"
         # Query the database and obtain data as Python objects
         cur.execute("SELECT sender_id,  state_id,  carousel_id, data_user,  data FROM data_users;")
-        sender_id, state_id, carousel_id, data_user, data  = cur.fetchone()
-        text += '\n' + "sender_id: " + sender_id
-        text += '\n' + "state_id: " + state_id
-        text += '\n' + "carousel_id: " + carousel_id
-        text += '\n' + "data_user: " + data_user
-        text += '\n' + "data: " + data
+        result_query = cur.fetchone()
+        if(not result_query == None):
+            text += '\n' + "sender_id: " + result_query[0]
+            text += '\n' + "state_id: " + result_query[1]
+            text += '\n' + "carousel_id: " + result_query[2]
+            text += '\n' + "data_user: " + result_query[3]
+            text += '\n' + "data: " + result_query[4]
+        else:
+            text += '\n' + "empty result"
+
 
         cur.execute("DELETE FROM data_users WHERE sender_id = %s", ("sender_id_test",));
         text += '\n' + "remove string"
 
         cur.execute("SELECT sender_id,  state_id,  carousel_id, data_user,  data FROM data_users;")
-        sender_id, state_id, carousel_id, data_user, data  = cur.fetchone()
-        text += '\n' + "sender_id: " + sender_id
-        text += '\n' + "state_id: " + state_id
-        text += '\n' + "carousel_id: " + carousel_id
-        text += '\n' + "data_user: " + data_user
-        text += '\n' + "data: " + data
+        result_query = cur.fetchone()
+        if(not result_query == None):
+            text += '\n' + "sender_id: " + result_query[0]
+            text += '\n' + "state_id: " + result_query[1]
+            text += '\n' + "carousel_id: " + result_query[2]
+            text += '\n' + "data_user: " + result_query[3]
+            text += '\n' + "data: " + result_query[4]
+        else:
+            text += '\n' + "empty result"
 
         # Make the changes to the database persistent
         conn.commit()
