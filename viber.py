@@ -59,8 +59,10 @@ def incomingGET():
         text = "exist_table"        
     else:
         text = "NOT exist_table"
+        cur.execute("CREATE TABLE data_users (id serial PRIMARY KEY, num integer, sender_id varchar(50), state_id varchar(36), carousel_id varchar(36),data_user text, data text );")
+        text += "Table created"
     # Execute a command: this creates a new table
-    #cur.execute("CREATE TABLE test (id serial PRIMARY KEY, num integer, data varchar);")
+    #cur.execute("CREATE TABLE test (id serial PRIMARY KEY, num integer, sender_id varchar,state_id varchar(36) ,);")
 
     # Pass data to fill a query placeholders and let Psycopg perform
     # the correct conversion (no more SQL injections!)
