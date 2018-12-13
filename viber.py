@@ -44,7 +44,7 @@ import json
 # Close communication with the database
 #cur.close()
 #conn.close()
-
+app = Flask(__name__)
 @app.route('/',  methods=['POST'])
 def incoming():
     print("Hello World")
