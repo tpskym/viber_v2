@@ -60,7 +60,7 @@ def incomingGET():
     else:
         text = "NOT exist_table"
         cur.execute("CREATE TABLE data_users (id serial PRIMARY KEY, num integer, sender_id varchar(50), state_id varchar(36), carousel_id varchar(36),data_user text, data text );")
-        text += "Table created"
+        text += "\nTable created"
     # Execute a command: this creates a new table
     #cur.execute("CREATE TABLE test (id serial PRIMARY KEY, num integer, sender_id varchar,state_id varchar(36) ,);")
 
@@ -75,7 +75,7 @@ def incomingGET():
     #(1, 100, "abc'def")
 
     # Make the changes to the database persistent
-    #conn.commit()
+    conn.commit()
 
     # Close communication with the database
     cur.close()
