@@ -72,6 +72,7 @@ def SaveState():
         conn.close()
 
 def RestoreState():
+    pass
 
 app = Flask(__name__)
 @app.route('/',  methods=['GET'])
