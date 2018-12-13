@@ -111,7 +111,7 @@ def incomingGET():
         text += '\n' + "data_user: " + data_user
         text += '\n' + "data: " + data
 
-        cur.execute("DELETE FROM data_users WHERE sender_id = %s", ("sender_id_test"));
+        cur.execute("DELETE FROM data_users WHERE sender_id = %s", ("sender_id_test",));
         text += '\n' + "remove string"
 
         cur.execute("SELECT sender_id,  state_id,  carousel_id, data_user,  data FROM data_users;")
