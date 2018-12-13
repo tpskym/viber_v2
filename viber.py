@@ -54,32 +54,34 @@ def incomingGET():
     
     # Open a cursor to perform database operations
     cur = conn.cursor()
-    cur.execute("select * from information_schema.tables where table_name=%s", ('data_users',))
-    if(cur.rowcount > 0):
-        text = "exist_table"        
-    else:
-        text = "NOT exist_table"
-        cur.execute("CREATE TABLE data_users (id serial PRIMARY KEY, num integer, sender_id varchar(50), state_id varchar(36), carousel_id varchar(36),data_user text, data text );")
-        text += "\nTable created"
-    # Execute a command: this creates a new table
-    #cur.execute("CREATE TABLE test (id serial PRIMARY KEY, num integer, sender_id varchar,state_id varchar(36) ,);")
+    try:
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_users',))
+        if(cur.rowcount > 0):
+            text = "exist_table"        
+        else:
+            text = "NOT exist_table"
+            # Execute a command: this creates a new table
+            cur.execute("CREATE TABLE data_users (id serial PRIMARY KEY, sender_id varchar(50), state_id varchar(36), carousel_id varchar(36),data_user text, data text );")
+            text += "\nTable created"
 
-    # Pass data to fill a query placeholders and let Psycopg perform
-    # the correct conversion (no more SQL injections!)
-    #cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)",
-    #...      (100, "abc'def"))
 
-    # Query the database and obtain data as Python objects
-    #cur.execute("SELECT * FROM test;")
-    #cur.fetchone()
-    #(1, 100, "abc'def")
 
-    # Make the changes to the database persistent
-    conn.commit()
+        # Pass data to fill a query placeholders and let Psycopg perform
+        # the correct conversion (no more SQL injections!)
+        cur.execute("INSERT INTO data_users (sender_id, state_id, carousel_id, data_user, data) VALUES (%s, %s, %s, %s, %s, %s)",
+              ("sender_id_test", "state_id_test", "carousel_id_test", "data_user", "data"))
 
-    # Close communication with the database
-    cur.close()
-    conn.close()
+        # Query the database and obtain data as Python objects
+        cur.execute("SELECT * FROM data_users;")
+        text += cur.fetchone()    
+
+        # Make the changes to the database persistent
+        conn.commit()
+
+        # Close communication with the database
+    finally:
+        cur.close()
+        conn.close()
     return text
     
 @app.route('/',  methods=['POST'])
