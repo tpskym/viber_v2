@@ -45,11 +45,11 @@ import json
 #cur.close()
 #conn.close()
 app = Flask(__name__)
-app.route('/',  methods=['GET'])
+@app.route('/',  methods=['GET'])
 def incomingGET():
     return "Hello, World!"
     
-app.route('/',  methods=['POST'])
+@app.route('/',  methods=['POST'])
 def incoming():
     print("Hello World")
 
