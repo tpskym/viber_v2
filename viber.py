@@ -46,18 +46,18 @@ import json
 #conn.close()
 app = Flask(__name__)
 @app.route('/',  methods=['GET'])
-def incomingGET():    
+def incomingGET():
     DATABASE_URL = os.environ['DATABASE_URL']
     text = "empty"
     # Connect to an existing database
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    
+
     # Open a cursor to perform database operations
     cur = conn.cursor()
     try:
         cur.execute("select * from information_schema.tables where table_name=%s", ('data_users',))
         if(cur.rowcount > 0):
-            text = "exist_table"        
+            text = "exist_table"
         else:
             text = "NOT exist_table"
             # Execute a command: this creates a new table
@@ -68,12 +68,13 @@ def incomingGET():
 
         # Pass data to fill a query placeholders and let Psycopg perform
         # the correct conversion (no more SQL injections!)
+
         cur.execute("INSERT INTO data_users (sender_id, state_id, carousel_id, data_user, data) VALUES (%s, %s, %s, %s, %s, %s)",
               ("sender_id_test", "state_id_test", "carousel_id_test", "data_user", "data"))
 
         # Query the database and obtain data as Python objects
         cur.execute("SELECT * FROM data_users;")
-        text += cur.fetchone()    
+        text += cur.fetchone()
 
         # Make the changes to the database persistent
         conn.commit()
@@ -83,19 +84,18 @@ def incomingGET():
         cur.close()
         conn.close()
     return text
-    
+
 @app.route('/',  methods=['POST'])
 def incoming():
     print("Hello World")
 
-    
+
     if not viber.verify_signature(request.get_data(), request.headers.get('X-Viber-Content-Signature')):
         return Response(status=403)
 
     viber_request = viber.parse_request(request.get_data())
-    
+
     if isinstance(viber_request, ViberMessageRequest):
         print("Hello World")
-        
-    return Response(status=200)
 
+    return Response(status=200)
