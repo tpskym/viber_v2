@@ -121,6 +121,12 @@ def RestoreStateFromPostgress(sender_id):
 
 
 app = Flask(__name__)
+
+@app.route('/register',  methods=['GET'])
+def incomingGET():
+    text = request.url
+    return text
+
 @app.route('/',  methods=['GET'])
 def incomingGET():
     text = request.url
