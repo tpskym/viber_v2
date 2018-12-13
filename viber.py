@@ -1,5 +1,5 @@
 import os
-import unittest
+import psycopg2
 from viberbot import Api
 from viberbot.api.bot_configuration import BotConfiguration
 from viberbot.api.messages import VideoMessage
