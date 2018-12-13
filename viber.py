@@ -69,7 +69,7 @@ def incomingGET():
         # Pass data to fill a query placeholders and let Psycopg perform
         # the correct conversion (no more SQL injections!)
 
-        cur.execute("INSERT INTO data_users (sender_id, state_id, carousel_id, data_user, data) VALUES (%s, %s, %s, %s, %s, %s)",
+        cur.execute("INSERT INTO data_users (sender_id, state_id, carousel_id, data_user, data) VALUES (%s, %s, %s, %s, %s)",
               ("sender_id_test", "state_id_test", "carousel_id_test", "data_user", "data"))
 
         # Query the database and obtain data as Python objects
