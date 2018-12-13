@@ -123,7 +123,7 @@ def RestoreStateFromPostgress(sender_id):
 app = Flask(__name__)
 @app.route('/',  methods=['GET'])
 def incomingGET():
-    text = __name__
+    text = request.url
     # DATABASE_URL = os.environ['DATABASE_URL']
     # text = "empty"
     # # Connect to an existing database
