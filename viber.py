@@ -76,7 +76,8 @@ def incomingGET():
         cur.execute("SELECT * FROM data_users;")
         result_query = cur.fetchone()
         if(not result_query == None)
-            text += result_query['sender_id'] 
+            text += result_query['sender_id']
+            
 
         # Make the changes to the database persistent
         conn.commit()
