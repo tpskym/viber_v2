@@ -47,7 +47,7 @@ import json
 app = Flask(__name__)
 app.route('/',  methods=['GET'])
 def incomingGET():
-    print("Hello World")
+    return "Hello, World!"
     
 app.route('/',  methods=['POST'])
 def incoming():
