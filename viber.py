@@ -48,13 +48,17 @@ app = Flask(__name__)
 @app.route('/',  methods=['GET'])
 def incomingGET():    
     DATABASE_URL = os.environ['DATABASE_URL']
-    text = DATABASE_URL
+    text = "empty"
     # Connect to an existing database
-    #conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    
     # Open a cursor to perform database operations
-    #cur = conn.cursor()
-
+    cur = conn.cursor()
+    cur.execute("select * from information_schema.tables where table_name=%s", ('data_users',))
+    if(cur.count > 0)
+        text = "exist_table"        
+    else
+        text = "NOT exist_table"
     # Execute a command: this creates a new table
     #cur.execute("CREATE TABLE test (id serial PRIMARY KEY, num integer, data varchar);")
 
@@ -72,8 +76,8 @@ def incomingGET():
     #conn.commit()
 
     # Close communication with the database
-    #cur.close()
-    #conn.close()
+    cur.close()
+    conn.close()
     return text
     
 @app.route('/',  methods=['POST'])
