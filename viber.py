@@ -73,10 +73,10 @@ def incomingGET():
               ("sender_id_test", "state_id_test", "carousel_id_test", "data_user", "data"))
 
         # Query the database and obtain data as Python objects
-        cur.execute("SELECT * FROM data_users;")
-        result_query = cur.fetchone()
+        cur.execute("SELECT sender_id,  state_id,  carousel_id, data_user,  data FROM data_users;")
+        sender_id, state_id, carousel_id, data_user, data  = cur.fetchone()
         if(not result_query == None):
-            text += result_query['sender_id']
+            text += sender_id
 
 
         # Make the changes to the database persistent
