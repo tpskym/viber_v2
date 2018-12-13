@@ -74,7 +74,7 @@ def incomingGET():
 
         # Query the database and obtain data as Python objects
         cur.execute("SELECT * FROM data_users;")
-        text += cur.fetchone()
+        text = text.join(cur.fetchone())
 
         # Make the changes to the database persistent
         conn.commit()
