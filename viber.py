@@ -55,7 +55,7 @@ def incomingGET():
     # Open a cursor to perform database operations
     cur = conn.cursor()
     cur.execute("select * from information_schema.tables where table_name=%s", ('data_users',))
-    if(cur.count > 0)
+    if(cur.rowcount > 0)
         text = "exist_table"        
     else
         text = "NOT exist_table"
