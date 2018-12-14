@@ -1086,25 +1086,25 @@ def SetHooksIfNeed():
             cur.execute("INSERT INTO data_hooks (state) VALUES (%s)",
                   ("1",))
         conn.commit()
-    except:
-        return False, False
+    except Exception as e:
+        return False, False, e
     finally:
         cur.close()
         conn.close()
-    return True, need_hook
+    return True, need_hook, ""
 
 app = Flask(__name__)
 
 @app.route('/',  methods=['GET'])
 def IncomingGet():
-    state, need_hook = SetHooksIfNeed()
+    state, need_hook, error = SetHooksIfNeed()
     if state:
         if need_hook:
             return "Регистрация бота прошла успешно"
         else:
             return "Бот был зарегистрирован ранее"
     else:
-        return "Ошибка при регистрации бота. Попробуйте вручную (см. документацию)"
+        return "Ошибка при регистрации бота. Попробуйте вручную (см. документацию) " + error.args[0]
 
 @app.route('/',  methods=['POST'])
 def incoming():
