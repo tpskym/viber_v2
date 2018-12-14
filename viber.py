@@ -1079,7 +1079,9 @@ def GoToCurrentState(sender_id, message):
             if is_error:
                 viber.send_messages(sender_id, TextMessage(text="ERROR RESTORE STATE"))
                 GoToStateError(sender_id, message, GetIdErrorState(), data, data_user, carousel_id)
+                print("GoToStateError")
             else:
+                print("GoToStateFirst")
                 GoToStateFirst(sender_id, message, GetIdFirstState(), data, data_user, carousel_id)
     except Exception as e:
         print("Ошибка при GoToCurrentState: " + e.args[0])
