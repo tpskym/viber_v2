@@ -189,7 +189,7 @@ def proc_function02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, serv
 def proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_bot_need, carousel_id):
     #Ввод секретного кода (выбор по результатам ввода с клавиатуры)
     viber.send_messages(sender_id, TextMessage(text="Введите секретный код"))
-    if not SaveState(sender_id, "607f5c73-f5c8-43aa-8472-b1d2b8d251b0", service_data_bot_need, data, carousel_id): #proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea
+    if not SaveState(sender_id, "971e7aea-ac3d-4b2b-aceb-3a211be3724b", service_data_bot_need, data, carousel_id): #proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -220,7 +220,7 @@ def proc2b3f0bd4eef0409c9ffb14ffb0d21861(sender_id, message, data, service_data_
 
 def proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id):
     #Выбор действия (выбор из подчиненных команд)
-    if not SaveState(sender_id, "3971136a-4c27-438c-8819-2b340e984fe3", service_data_bot_need, data, carousel_id): #proc095761bb67d8455bbf094e32d0e8dc4f
+    if not SaveState(sender_id, "3462839c-806e-4824-b133-58efad3c6001", service_data_bot_need, data, carousel_id): #proc095761bb67d8455bbf094e32d0e8dc4f
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -247,7 +247,7 @@ def proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_
         "ActionBody": "5160f46d-71b8-466a-8b28-db1bf17d5392",
         "Text": "Обращения для подтверждения" })
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
-    if not SaveState(sender_id, "fd0d3b54-4e14-4b7e-a758-35e5b0bd616c", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f
+    if not SaveState(sender_id, "05226dfc-c882-4a09-972b-850fc50b1957", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -268,7 +268,7 @@ def proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f(sender_id, mes
 
 def procf6829c8beb464c618ab63bd31f6bc879(sender_id, message, data, service_data_bot_need, carousel_id):
     #Мои обращения (Карусель)
-    if not SaveState(sender_id, "69e4dceb-9261-401d-89d7-9221e3f9266b", service_data_bot_need, data, carousel_id): #procf6829c8beb464c618ab63bd31f6bc879
+    if not SaveState(sender_id, "c387f767-630a-4288-96ff-4a2336e69091", service_data_bot_need, data, carousel_id): #procf6829c8beb464c618ab63bd31f6bc879
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -282,7 +282,7 @@ def procf6829c8beb464c618ab63bd31f6bc879(sender_id, message, data, service_data_
 
         ShowCarousel(sender_id, result_list, number_parts)
         service_data_bot_need.update({"number_partsf6829c8beb464c618ab63bd31f6bc879":number_parts})
-        if not SaveState(sender_id, "dc115393-b4e9-4a4e-93ef-c8628ad02ed8", service_data_bot_need, data, carousel_id): #proc_expect_comand_userf6829c8beb464c618ab63bd31f6bc879
+        if not SaveState(sender_id, "fd2de31c-e5e9-4d90-9df7-1644e3a28773", service_data_bot_need, data, carousel_id): #proc_expect_comand_userf6829c8beb464c618ab63bd31f6bc879
             viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
             GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
             return
@@ -329,13 +329,13 @@ def proc_get_user_detail_view_by_idea557c1bbda64ec0a0c7ad3e4f493afc(sender_id, e
 
 def proc17c11a9477c8493db93470bdbee77ffc(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команды карусели (команды элемента карусели)
-    if not SaveState(sender_id, "76248bad-7053-4326-9cc3-2192b820c79f", service_data_bot_need, data, carousel_id): #proc17c11a9477c8493db93470bdbee77ffc
+    if not SaveState(sender_id, "4f6e8e73-634f-41c7-adce-7f3647246879", service_data_bot_need, data, carousel_id): #proc17c11a9477c8493db93470bdbee77ffc
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     buttons = []
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
-    if not SaveState(sender_id, "25f150e8-35b4-469b-8dfa-1205c2bd37df", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click17c11a9477c8493db93470bdbee77ffc
+    if not SaveState(sender_id, "fd7819b7-bae8-4458-a4fa-85b8ccd35414", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click17c11a9477c8493db93470bdbee77ffc
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -348,7 +348,7 @@ def proc_expect_user_button_click17c11a9477c8493db93470bdbee77ffc(sender_id, mes
 
 def proc11fe0cd9823f4515909ff0df1baccf1a(sender_id, message, data, service_data_bot_need, carousel_id):
     #Мои согласования (Карусель)
-    if not SaveState(sender_id, "39ee7682-eaf5-4931-8eb4-056c9bd10fbe", service_data_bot_need, data, carousel_id): #proc11fe0cd9823f4515909ff0df1baccf1a
+    if not SaveState(sender_id, "87420b18-1227-4cd4-bcc0-ca7cacd60426", service_data_bot_need, data, carousel_id): #proc11fe0cd9823f4515909ff0df1baccf1a
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -362,7 +362,7 @@ def proc11fe0cd9823f4515909ff0df1baccf1a(sender_id, message, data, service_data_
 
         ShowCarousel(sender_id, result_list, number_parts)
         service_data_bot_need.update({"number_parts11fe0cd9823f4515909ff0df1baccf1a":number_parts})
-        if not SaveState(sender_id, "da9bb1ab-59c9-4581-9e68-c4357784b31a", service_data_bot_need, data, carousel_id): #proc_expect_comand_user11fe0cd9823f4515909ff0df1baccf1a
+        if not SaveState(sender_id, "9c995a40-2747-49ec-b65e-269de2c115c1", service_data_bot_need, data, carousel_id): #proc_expect_comand_user11fe0cd9823f4515909ff0df1baccf1a
             viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
             GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
             return
@@ -409,13 +409,13 @@ def proc_get_user_detail_view_by_idab414b6fa89b423faf796cc966fe1af8(sender_id, e
 
 def procb591e68ff608423c982dd67e280ab1d4(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команды карусели (команды элемента карусели)
-    if not SaveState(sender_id, "8dd9aa23-57a8-4581-8a06-c1db20d9588e", service_data_bot_need, data, carousel_id): #procb591e68ff608423c982dd67e280ab1d4
+    if not SaveState(sender_id, "fc492283-e51a-4357-9829-4bda97bccce5", service_data_bot_need, data, carousel_id): #procb591e68ff608423c982dd67e280ab1d4
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     buttons = []
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
-    if not SaveState(sender_id, "04c5b7de-1f3e-49c3-998b-1bdee94d48c6", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clickb591e68ff608423c982dd67e280ab1d4
+    if not SaveState(sender_id, "640e4e94-3213-4242-98d7-4b683e78bae8", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clickb591e68ff608423c982dd67e280ab1d4
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -428,7 +428,7 @@ def proc_expect_user_button_clickb591e68ff608423c982dd67e280ab1d4(sender_id, mes
 
 def proce73308888cc644eea230a5c12d47ffd3(sender_id, message, data, service_data_bot_need, carousel_id):
     #Последние сообщения (Карусель)
-    if not SaveState(sender_id, "a5306ac2-64ba-45a0-9c52-9e0274064e5b", service_data_bot_need, data, carousel_id): #proce73308888cc644eea230a5c12d47ffd3
+    if not SaveState(sender_id, "95414756-7065-4119-93c5-557c9287883e", service_data_bot_need, data, carousel_id): #proce73308888cc644eea230a5c12d47ffd3
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -442,7 +442,7 @@ def proce73308888cc644eea230a5c12d47ffd3(sender_id, message, data, service_data_
 
         ShowCarousel(sender_id, result_list, number_parts)
         service_data_bot_need.update({"number_partse73308888cc644eea230a5c12d47ffd3":number_parts})
-        if not SaveState(sender_id, "4fc18550-572a-45b2-8e79-37662d108d78", service_data_bot_need, data, carousel_id): #proc_expect_comand_usere73308888cc644eea230a5c12d47ffd3
+        if not SaveState(sender_id, "0a2a6258-0d61-4ead-8877-0d3d554152ab", service_data_bot_need, data, carousel_id): #proc_expect_comand_usere73308888cc644eea230a5c12d47ffd3
             viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
             GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
             return
@@ -477,13 +477,13 @@ def proc_expect_comand_usere73308888cc644eea230a5c12d47ffd3(sender_id, message, 
 
 def proc317d123326fa48198178c3fa479cd7cc(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команды карусели (команды элемента карусели)
-    if not SaveState(sender_id, "f0007805-c0ec-4a99-bcef-f46d41b4baa5", service_data_bot_need, data, carousel_id): #proc317d123326fa48198178c3fa479cd7cc
+    if not SaveState(sender_id, "b8f847a8-e789-47b7-9e05-1e9799e45110", service_data_bot_need, data, carousel_id): #proc317d123326fa48198178c3fa479cd7cc
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     buttons = []
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
-    if not SaveState(sender_id, "e2884808-face-4436-89e3-cb419b9abf1d", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click317d123326fa48198178c3fa479cd7cc
+    if not SaveState(sender_id, "d0c5eb67-4e4d-4428-a45c-695034d60752", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click317d123326fa48198178c3fa479cd7cc
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -496,7 +496,7 @@ def proc_expect_user_button_click317d123326fa48198178c3fa479cd7cc(sender_id, mes
 
 def proc5160f46d71b8466a8b28db1bf17d5392(sender_id, message, data, service_data_bot_need, carousel_id):
     #Обращения для подтверждения (Карусель)
-    if not SaveState(sender_id, "15afe971-862f-47ad-98e1-edcb12d9e303", service_data_bot_need, data, carousel_id): #proc5160f46d71b8466a8b28db1bf17d5392
+    if not SaveState(sender_id, "637cfc3e-f8a4-4d88-b388-f87e25200947", service_data_bot_need, data, carousel_id): #proc5160f46d71b8466a8b28db1bf17d5392
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -510,7 +510,7 @@ def proc5160f46d71b8466a8b28db1bf17d5392(sender_id, message, data, service_data_
 
         ShowCarousel(sender_id, result_list, number_parts)
         service_data_bot_need.update({"number_parts5160f46d71b8466a8b28db1bf17d5392":number_parts})
-        if not SaveState(sender_id, "bf56c964-bcf4-42e0-9f63-6e2a3d26d4ac", service_data_bot_need, data, carousel_id): #proc_expect_comand_user5160f46d71b8466a8b28db1bf17d5392
+        if not SaveState(sender_id, "e8ff73e4-8daf-4acb-b4dc-baa9f158daec", service_data_bot_need, data, carousel_id): #proc_expect_comand_user5160f46d71b8466a8b28db1bf17d5392
             viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
             GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
             return
@@ -545,7 +545,7 @@ def proc_expect_comand_user5160f46d71b8466a8b28db1bf17d5392(sender_id, message, 
 
 def procdae1f3640d8a4eb0aed3fc1b63e187aa(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команды карусели (команды элемента карусели)
-    if not SaveState(sender_id, "9ebb701c-9515-4b25-a926-21f1a190fa62", service_data_bot_need, data, carousel_id): #procdae1f3640d8a4eb0aed3fc1b63e187aa
+    if not SaveState(sender_id, "8f416678-2ae3-4284-9043-235fb872e461", service_data_bot_need, data, carousel_id): #procdae1f3640d8a4eb0aed3fc1b63e187aa
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -566,7 +566,7 @@ def procdae1f3640d8a4eb0aed3fc1b63e187aa(sender_id, message, data, service_data_
         "ActionBody": "42747c5a-b756-49b0-b830-bcf82d3dca9c",
         "Text": "Назад" })
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
-    if not SaveState(sender_id, "5f136873-aa5a-4cfe-9b13-2020e4ef1a4c", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clickdae1f3640d8a4eb0aed3fc1b63e187aa
+    if not SaveState(sender_id, "ae8476a3-9ea3-4afb-b4fa-06d102888291", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clickdae1f3640d8a4eb0aed3fc1b63e187aa
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -601,7 +601,7 @@ def proc_function5ba6c9fdcb214aa2972c4020574f3157(sender_id, message, data, serv
 
 def proca22a380f1e104600808c465bd6ab3777(sender_id, message, data, service_data_bot_need, carousel_id):
     #Указать оценку обязательно (выбор из подчиненных команд)
-    if not SaveState(sender_id, "691be90e-80ff-4407-8ac6-b7693f4cceef", service_data_bot_need, data, carousel_id): #proca22a380f1e104600808c465bd6ab3777
+    if not SaveState(sender_id, "d07802e1-5345-447e-95b1-864828412278", service_data_bot_need, data, carousel_id): #proca22a380f1e104600808c465bd6ab3777
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -638,7 +638,7 @@ def proca22a380f1e104600808c465bd6ab3777(sender_id, message, data, service_data_
         "ActionBody": "e6d53aa2-210b-4ed3-8e9f-5e6cea9bc777",
         "Text": "Отменить" })
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
-    if not SaveState(sender_id, "0be901e6-453f-49b6-88f6-c3e502b84f10", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clicka22a380f1e104600808c465bd6ab3777
+    if not SaveState(sender_id, "a938f413-3fb5-4d9b-8eb2-4ddfb6f977e7", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clicka22a380f1e104600808c465bd6ab3777
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -708,7 +708,7 @@ def proc268053bdfcb14b06aacdc9c1d1131c63(sender_id, message, data, service_data_
 def procd2aeca9275214a6caa98de3001dd081f(sender_id, message, data, service_data_bot_need, carousel_id):
     #Указать комментарий (выбор по результатам ввода с клавиатуры)
     viber.send_messages(sender_id, TextMessage(text="Укажите комментарий"))
-    if not SaveState(sender_id, "08cf15c2-56e1-4e21-873c-a4cf2a5089f2", service_data_bot_need, data, carousel_id): #proc_function_expect_userd2aeca9275214a6caa98de3001dd081f
+    if not SaveState(sender_id, "b81a92b1-7c8a-4123-a535-b728c6618068", service_data_bot_need, data, carousel_id): #proc_function_expect_userd2aeca9275214a6caa98de3001dd081f
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -807,7 +807,7 @@ def proce6d53aa2210b4ed38e9f5e6cea9bc777(sender_id, message, data, service_data_
 
 def procd454043806d1401f87b5ab49f4142f18(sender_id, message, data, service_data_bot_need, carousel_id):
     #Указать оценку по желанию (выбор из подчиненных команд)
-    if not SaveState(sender_id, "ad20fa29-f130-4a7c-b5b6-05bed429c6f7", service_data_bot_need, data, carousel_id): #procd454043806d1401f87b5ab49f4142f18
+    if not SaveState(sender_id, "77db62f8-0146-4da4-a57e-0ee4013b5aa8", service_data_bot_need, data, carousel_id): #procd454043806d1401f87b5ab49f4142f18
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -844,7 +844,7 @@ def procd454043806d1401f87b5ab49f4142f18(sender_id, message, data, service_data_
         "ActionBody": "45188a2f-e76f-463d-a930-4c5a53876d70",
         "Text": "Пропустить" })
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
-    if not SaveState(sender_id, "a3765a10-97a2-4e71-b42d-8c528cd2ef6a", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clickd454043806d1401f87b5ab49f4142f18
+    if not SaveState(sender_id, "a8afc871-ff7e-4648-8910-af703d007637", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clickd454043806d1401f87b5ab49f4142f18
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -955,7 +955,7 @@ def proc45188a2fe76f463da9304c5a53876d70(sender_id, message, data, service_data_
 def proc3ec26f31a5dd4ff7a95fc7c612cf273a(sender_id, message, data, service_data_bot_need, carousel_id):
     #Отклонить (выбор по результатам ввода с клавиатуры)
     viber.send_messages(sender_id, TextMessage(text="Введите комментарий"))
-    if not SaveState(sender_id, "81057b66-d271-4a20-a5e2-fbfa8c37c5bd", service_data_bot_need, data, carousel_id): #proc_function_expect_user3ec26f31a5dd4ff7a95fc7c612cf273a
+    if not SaveState(sender_id, "5d95bce7-0448-4c59-adc4-a278fa36a883", service_data_bot_need, data, carousel_id): #proc_function_expect_user3ec26f31a5dd4ff7a95fc7c612cf273a
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
@@ -994,31 +994,31 @@ def proc42747c5ab75649b0b830bcf82d3dca9c(sender_id, message, data, service_data_
     return
 
 list_procs = {}
-list_procs.update( { '607f5c73-f5c8-43aa-8472-b1d2b8d251b0': proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea} )
-list_procs.update( { '3971136a-4c27-438c-8819-2b340e984fe3': proc095761bb67d8455bbf094e32d0e8dc4f} )
-list_procs.update( { 'fd0d3b54-4e14-4b7e-a758-35e5b0bd616c': proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f} )
-list_procs.update( { '69e4dceb-9261-401d-89d7-9221e3f9266b': procf6829c8beb464c618ab63bd31f6bc879} )
-list_procs.update( { 'dc115393-b4e9-4a4e-93ef-c8628ad02ed8': proc_expect_comand_userf6829c8beb464c618ab63bd31f6bc879} )
-list_procs.update( { '76248bad-7053-4326-9cc3-2192b820c79f': proc17c11a9477c8493db93470bdbee77ffc} )
-list_procs.update( { '25f150e8-35b4-469b-8dfa-1205c2bd37df': proc_expect_user_button_click17c11a9477c8493db93470bdbee77ffc} )
-list_procs.update( { '39ee7682-eaf5-4931-8eb4-056c9bd10fbe': proc11fe0cd9823f4515909ff0df1baccf1a} )
-list_procs.update( { 'da9bb1ab-59c9-4581-9e68-c4357784b31a': proc_expect_comand_user11fe0cd9823f4515909ff0df1baccf1a} )
-list_procs.update( { '8dd9aa23-57a8-4581-8a06-c1db20d9588e': procb591e68ff608423c982dd67e280ab1d4} )
-list_procs.update( { '04c5b7de-1f3e-49c3-998b-1bdee94d48c6': proc_expect_user_button_clickb591e68ff608423c982dd67e280ab1d4} )
-list_procs.update( { 'a5306ac2-64ba-45a0-9c52-9e0274064e5b': proce73308888cc644eea230a5c12d47ffd3} )
-list_procs.update( { '4fc18550-572a-45b2-8e79-37662d108d78': proc_expect_comand_usere73308888cc644eea230a5c12d47ffd3} )
-list_procs.update( { 'f0007805-c0ec-4a99-bcef-f46d41b4baa5': proc317d123326fa48198178c3fa479cd7cc} )
-list_procs.update( { 'e2884808-face-4436-89e3-cb419b9abf1d': proc_expect_user_button_click317d123326fa48198178c3fa479cd7cc} )
-list_procs.update( { '15afe971-862f-47ad-98e1-edcb12d9e303': proc5160f46d71b8466a8b28db1bf17d5392} )
-list_procs.update( { 'bf56c964-bcf4-42e0-9f63-6e2a3d26d4ac': proc_expect_comand_user5160f46d71b8466a8b28db1bf17d5392} )
-list_procs.update( { '9ebb701c-9515-4b25-a926-21f1a190fa62': procdae1f3640d8a4eb0aed3fc1b63e187aa} )
-list_procs.update( { '5f136873-aa5a-4cfe-9b13-2020e4ef1a4c': proc_expect_user_button_clickdae1f3640d8a4eb0aed3fc1b63e187aa} )
-list_procs.update( { '691be90e-80ff-4407-8ac6-b7693f4cceef': proca22a380f1e104600808c465bd6ab3777} )
-list_procs.update( { '0be901e6-453f-49b6-88f6-c3e502b84f10': proc_expect_user_button_clicka22a380f1e104600808c465bd6ab3777} )
-list_procs.update( { '08cf15c2-56e1-4e21-873c-a4cf2a5089f2': proc_function_expect_userd2aeca9275214a6caa98de3001dd081f} )
-list_procs.update( { 'ad20fa29-f130-4a7c-b5b6-05bed429c6f7': procd454043806d1401f87b5ab49f4142f18} )
-list_procs.update( { 'a3765a10-97a2-4e71-b42d-8c528cd2ef6a': proc_expect_user_button_clickd454043806d1401f87b5ab49f4142f18} )
-list_procs.update( { '81057b66-d271-4a20-a5e2-fbfa8c37c5bd': proc_function_expect_user3ec26f31a5dd4ff7a95fc7c612cf273a} )
+list_procs.update( { '971e7aea-ac3d-4b2b-aceb-3a211be3724b': proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea} )
+list_procs.update( { '3462839c-806e-4824-b133-58efad3c6001': proc095761bb67d8455bbf094e32d0e8dc4f} )
+list_procs.update( { '05226dfc-c882-4a09-972b-850fc50b1957': proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f} )
+list_procs.update( { 'c387f767-630a-4288-96ff-4a2336e69091': procf6829c8beb464c618ab63bd31f6bc879} )
+list_procs.update( { 'fd2de31c-e5e9-4d90-9df7-1644e3a28773': proc_expect_comand_userf6829c8beb464c618ab63bd31f6bc879} )
+list_procs.update( { '4f6e8e73-634f-41c7-adce-7f3647246879': proc17c11a9477c8493db93470bdbee77ffc} )
+list_procs.update( { 'fd7819b7-bae8-4458-a4fa-85b8ccd35414': proc_expect_user_button_click17c11a9477c8493db93470bdbee77ffc} )
+list_procs.update( { '87420b18-1227-4cd4-bcc0-ca7cacd60426': proc11fe0cd9823f4515909ff0df1baccf1a} )
+list_procs.update( { '9c995a40-2747-49ec-b65e-269de2c115c1': proc_expect_comand_user11fe0cd9823f4515909ff0df1baccf1a} )
+list_procs.update( { 'fc492283-e51a-4357-9829-4bda97bccce5': procb591e68ff608423c982dd67e280ab1d4} )
+list_procs.update( { '640e4e94-3213-4242-98d7-4b683e78bae8': proc_expect_user_button_clickb591e68ff608423c982dd67e280ab1d4} )
+list_procs.update( { '95414756-7065-4119-93c5-557c9287883e': proce73308888cc644eea230a5c12d47ffd3} )
+list_procs.update( { '0a2a6258-0d61-4ead-8877-0d3d554152ab': proc_expect_comand_usere73308888cc644eea230a5c12d47ffd3} )
+list_procs.update( { 'b8f847a8-e789-47b7-9e05-1e9799e45110': proc317d123326fa48198178c3fa479cd7cc} )
+list_procs.update( { 'd0c5eb67-4e4d-4428-a45c-695034d60752': proc_expect_user_button_click317d123326fa48198178c3fa479cd7cc} )
+list_procs.update( { '637cfc3e-f8a4-4d88-b388-f87e25200947': proc5160f46d71b8466a8b28db1bf17d5392} )
+list_procs.update( { 'e8ff73e4-8daf-4acb-b4dc-baa9f158daec': proc_expect_comand_user5160f46d71b8466a8b28db1bf17d5392} )
+list_procs.update( { '8f416678-2ae3-4284-9043-235fb872e461': procdae1f3640d8a4eb0aed3fc1b63e187aa} )
+list_procs.update( { 'ae8476a3-9ea3-4afb-b4fa-06d102888291': proc_expect_user_button_clickdae1f3640d8a4eb0aed3fc1b63e187aa} )
+list_procs.update( { 'd07802e1-5345-447e-95b1-864828412278': proca22a380f1e104600808c465bd6ab3777} )
+list_procs.update( { 'a938f413-3fb5-4d9b-8eb2-4ddfb6f977e7': proc_expect_user_button_clicka22a380f1e104600808c465bd6ab3777} )
+list_procs.update( { 'b81a92b1-7c8a-4123-a535-b728c6618068': proc_function_expect_userd2aeca9275214a6caa98de3001dd081f} )
+list_procs.update( { '77db62f8-0146-4da4-a57e-0ee4013b5aa8': procd454043806d1401f87b5ab49f4142f18} )
+list_procs.update( { 'a8afc871-ff7e-4648-8910-af703d007637': proc_expect_user_button_clickd454043806d1401f87b5ab49f4142f18} )
+list_procs.update( { '5d95bce7-0448-4c59-adc4-a278fa36a883': proc_function_expect_user3ec26f31a5dd4ff7a95fc7c612cf273a} )
 
 def GoToStateError(sender_id, message, state_id, data, data_user, carousel_id):
     GoToStateByID(sender_id, message, state_id, data, data_user, carousel_id)
@@ -1038,7 +1038,7 @@ def GoToCurrentState(sender_id, message):
     try:
         result_restore, state_id, data, data_user, carousel_id = RestoreState(sender_id)
         if result_restore:
-            GoToStateByID(sender_id, message, state_id, data, data_user, carousel_id)   |
+            GoToStateByID(sender_id, message, state_id, data, data_user, carousel_id)
         else:
             viber.send_messages(sender_id, TextMessage(text=data))
             GoToStateError(sender_id, message, GetIdErrorState(), data, data_user, carousel_id)
