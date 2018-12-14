@@ -82,9 +82,10 @@ def RestoreStateFromPostgress(sender_id):
         # Make the changes to the database persistent
 
         # Close communication with the database
-    except:
+    except Exception as e:
         is_error = True
         restore_ok = False
+        print("Error on restore data:" + e.args[0])
     finally:
         cur.close()
         conn.close()
