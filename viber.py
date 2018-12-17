@@ -225,7 +225,7 @@ def proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message
 def proc_function1b68be2d5a9a4d06adb59b874e1673ea(sender_id, text, data, carousel_id):
     #Ввод секретного кода (функция обработки выбора с клавиатуры)
     print("stack: proc_function1b68be2d5a9a4d06adb59b874e1673ea")
-    if text == "OK@":
+    if not text == "OK@":
         return "1"
     else:
         return "2"
