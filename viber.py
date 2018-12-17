@@ -1,4 +1,4 @@
-import os   
+import os
 from viberbot import Api
 from viberbot.api.bot_configuration import BotConfiguration
 from viberbot.api.messages import VideoMessage
@@ -277,6 +277,7 @@ def proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f(sender_id, mes
     #Выбор действия (Обработчик выбора из подчиненных команд)
     print("stack: proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f")
     command = GetTextCommand(message)
+    print("stack:   " + command)
     if command == "f6829c8b-eb46-4c61-8ab6-3bd31f6bc879":
         procf6829c8beb464c618ab63bd31f6bc879(sender_id, message, data, service_data_bot_need, carousel_id) #Мои обращения
     elif command == "11fe0cd9-823f-4515-909f-f0df1baccf1a":
