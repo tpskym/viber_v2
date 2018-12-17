@@ -204,8 +204,7 @@ def proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_
     #Ввод секретного кода (выбор по результатам ввода с клавиатуры)
     print("stack: proc1b68be2d5a9a4d06adb59b874e1673ea")
     viber.send_messages(sender_id, TextMessage(text="Введите секретный код"))
-    viber.send_messages(sender_id, [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
-"Buttons":[]}), KeyboardMessage( keyboard=text_keyboard, min_api_version=4)])
+    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": []}))
     if not SaveState(sender_id, "b68be2d-5a9a-4d06-adb5-9b874e1673ea1", service_data_bot_need, data, carousel_id): #proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
