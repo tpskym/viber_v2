@@ -195,7 +195,7 @@ def proc02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, service_data_
 def proc_function02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, service_data_bot_need, carousel_id):
     #Приветствие (функция программного выбора)
     print("stack: proc_function02957edd8e984dd4a0aa530f15bba971")
-    if(id != "aq"):
+    if(not id == "aq"):
         return "1"
     else:
         return "2"
