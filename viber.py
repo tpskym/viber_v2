@@ -204,6 +204,8 @@ def proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_
     #Ввод секретного кода (выбор по результатам ввода с клавиатуры)
     print("stack: proc1b68be2d5a9a4d06adb59b874e1673ea")
     viber.send_messages(sender_id, TextMessage(text="Введите секретный код"))
+    viber.send_messages(sender_id, [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
+"Buttons":[]}), KeyboardMessage( keyboard=text_keyboard, min_api_version=4)])
     if not SaveState(sender_id, "b68be2d-5a9a-4d06-adb5-9b874e1673ea1", service_data_bot_need, data, carousel_id): #proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -764,6 +766,8 @@ def procd2aeca9275214a6caa98de3001dd081f(sender_id, message, data, service_data_
     #Указать комментарий (выбор по результатам ввода с клавиатуры)
     print("stack: procd2aeca9275214a6caa98de3001dd081f")
     viber.send_messages(sender_id, TextMessage(text="Укажите комментарий"))
+    viber.send_messages(sender_id, [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
+"Buttons":[]}), KeyboardMessage( keyboard=text_keyboard, min_api_version=4)])
     if not SaveState(sender_id, "2aeca92-7521-4a6c-aa98-de3001dd081fd", service_data_bot_need, data, carousel_id): #proc_function_expect_userd2aeca9275214a6caa98de3001dd081f
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -1038,6 +1042,8 @@ def proc3ec26f31a5dd4ff7a95fc7c612cf273a(sender_id, message, data, service_data_
     #Отклонить (выбор по результатам ввода с клавиатуры)
     print("stack: proc3ec26f31a5dd4ff7a95fc7c612cf273a")
     viber.send_messages(sender_id, TextMessage(text="Введите комментарий"))
+    viber.send_messages(sender_id, [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
+"Buttons":[]}), KeyboardMessage( keyboard=text_keyboard, min_api_version=4)])
     if not SaveState(sender_id, "ec26f31-a5dd-4ff7-a95f-c7c612cf273a3", service_data_bot_need, data, carousel_id): #proc_function_expect_user3ec26f31a5dd4ff7a95fc7c612cf273a
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
