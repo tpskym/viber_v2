@@ -224,7 +224,7 @@ def proc_functionfc4a6135fb2443e8bcb7282f64002b44(sender_id, text, data, carouse
     print("stack: proc_functionfc4a6135fb2443e8bcb7282f64002b44")
     if text == "1":
         return "1"
-    else
+    else:
         return "2"
 
 def proc7cc31168f3d146afbf06b765d0e989d3(sender_id, message, data, service_data_bot_need, carousel_id):
