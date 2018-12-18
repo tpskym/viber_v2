@@ -150,7 +150,7 @@ def ShowCarousel(sender_id, result_list, number_parts):
         text_keyboard = {"Type": "keyboard", "InputFieldState": "hidden"}
         buttons = []
         buttons_keyboard = []
-        for wrapper in result_list:
+        for id_cortage, title_cortage, detail_text_cortage in result_list:
             id = id_cortage
             view = title_cortage
             detail_view = detail_text_cortage
