@@ -128,10 +128,9 @@ def ShowCarousel(sender_id, result_list, number_parts):
         index = 0
         buttons = []
         isEnd = True
-        for id_cortage, title_cortage, detail_text_cortage in result_list:
+        for id_cortage, title_cortage in result_list:
             id = id_cortage
             view = title_cortage
-            detail_view = detail_text_cortage
             if (index > last_number):
                 isEnd = False
                 break
@@ -150,10 +149,9 @@ def ShowCarousel(sender_id, result_list, number_parts):
         text_keyboard = {"Type": "keyboard", "InputFieldState": "hidden"}
         buttons = []
         buttons_keyboard = []
-        for id_cortage, title_cortage, detail_text_cortage in result_list:
+        for id_cortage, title_cortage  in result_list:
             id = id_cortage
             view = title_cortage
-            detail_view = detail_text_cortage
             buttons.append({"TextVAlign": "top", "TextHAlign": "left", "ActionBody": id, "Text": view})
         buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "cancel", "Text": "Отменить"})
         text_keyboard.update({"Buttons": buttons_keyboard})
@@ -310,7 +308,7 @@ def proc0432458f1b34417aa2cc453722d74476(sender_id, message, data, service_data_
 def proc_get_list_corteges0432458f1b34417aa2cc453722d74476(sender_id, data, carousel_id):
     #Карусель 1 - короткая (получение списка кортежей)
     print("stack: proc_get_list_corteges0432458f1b34417aa2cc453722d74476")
-    return [("ID1","ID1Title","ID1DetailText"),("ID2","ID2Title","ID2DetailText"),("ID3","ID3Title","ID3DetailText")]
+    return [("ID1","ID1Title"),("ID2","ID2Title"),("ID3","ID3Title")]
 
 
 def proc_expect_comand_user0432458f1b34417aa2cc453722d74476(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -424,7 +422,7 @@ def proc_get_list_cortegesfb122677b9074763a0b83694f35fcab8(sender_id, data, caro
     print("stack: proc_get_list_cortegesfb122677b9074763a0b83694f35fcab8")
     list = []
     for i in range(1, 100):
-        cortege = ("ID" + str(i),"Title" + str(i) ,"DetailText" + str(i))
+        cortege = ("ID" + str(i),"Title" + str(i) )
         list.append(cortege)
     return list
 
