@@ -199,8 +199,6 @@ def procfc4a6135fb2443e8bcb7282f64002b44(sender_id, message, data, service_data_
     #Состояние обработка ввода с клавиатуры (выбор по результатам ввода с клавиатуры)
     print("stack: procfc4a6135fb2443e8bcb7282f64002b44")
     viber.send_messages(sender_id, TextMessage(text="Введите 1"))
-    viber.send_messages(sender_id, [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
-"Buttons":[]}), KeyboardMessage( keyboard=text_keyboard, min_api_version=4)])
     if not SaveState(sender_id, "c4a6135-fb24-43e8-bcb7-282f64002b44f", service_data_bot_need, data, carousel_id): #proc_function_expect_userfc4a6135fb2443e8bcb7282f64002b44
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -280,7 +278,7 @@ def proc_expect_user_button_click7cc31168f3d146afbf06b765d0e989d3(sender_id, mes
 def proc8e6deb53f558452fa2deaa243228837f(sender_id, message, data, service_data_bot_need, carousel_id):
     #Переход Состояние обработка ввода с клавиатуры
     print("stack: proc8e6deb53f558452fa2deaa243228837f")
-    viber.send_messages(sender_id, TextMessage(text="Вы перенаправлены на "состояние обработка ввода с клавиатуры""))
+    viber.send_messages(sender_id, TextMessage(text="Вы перенаправлены на \"состояние обработка ввода с клавиатуры\""))
     procfc4a6135fb2443e8bcb7282f64002b44(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Состояние обработка ввода с клавиатуры
     return
 
