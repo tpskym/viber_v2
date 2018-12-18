@@ -222,7 +222,7 @@ def proc_function_expect_userfc4a6135fb2443e8bcb7282f64002b44(sender_id, message
 def proc_functionfc4a6135fb2443e8bcb7282f64002b44(sender_id, text, data, carousel_id):
     #Состояние обработка ввода с клавиатуры (функция обработки выбора с клавиатуры)
     print("stack: proc_functionfc4a6135fb2443e8bcb7282f64002b44")
-    if text == "1"
+    if text == "1":
         return "1"
     else
         return "2"
@@ -456,6 +456,7 @@ def proc42a2f751ca6240a8b12e3f62ad73cb46(sender_id, message, data, service_data_
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
+    viber.send_messages(sender_id, TextMessage(text="Команды карусели 2 - длинной"))
     buttons = []
     buttons.append({
         "Columns": 6,
@@ -553,12 +554,13 @@ def proce4e000559b82453e97ee1fb091b22087(sender_id, message, data, service_data_
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
+    viber.send_messages(sender_id, TextMessage(text="Команды карусели 3 - с ошибкой"))
     buttons = []
     buttons.append({
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "a9fa2734-6a2c-4eeb-8a14-105ad7c7c700",
-        "Text": "Команда 1 карусели с ошибкой" })
+        "Text": "Команда  карусели 3 с ошибкой" })
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
     if not SaveState(sender_id, "4e00055-9b82-453e-97ee-1fb091b22087e", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clicke4e000559b82453e97ee1fb091b22087
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
@@ -571,13 +573,13 @@ def proc_expect_user_button_clicke4e000559b82453e97ee1fb091b22087(sender_id, mes
     print("stack: proc_expect_user_button_clicke4e000559b82453e97ee1fb091b22087")
     command = GetTextCommand(message)
     if command == "a9fa2734-6a2c-4eeb-8a14-105ad7c7c700":
-        proca9fa27346a2c4eeb8a14105ad7c7c700(sender_id, message, data, service_data_bot_need, carousel_id) #Команда 1 карусели с ошибкой
+        proca9fa27346a2c4eeb8a14105ad7c7c700(sender_id, message, data, service_data_bot_need, carousel_id) #Команда  карусели 3 с ошибкой
     procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_bot_need, carousel_id) #Ошибка
 
 def proca9fa27346a2c4eeb8a14105ad7c7c700(sender_id, message, data, service_data_bot_need, carousel_id):
-    #Команда 1 карусели с ошибкой
+    #Команда  карусели 3 с ошибкой
     print("stack: proca9fa27346a2c4eeb8a14105ad7c7c700")
-    viber.send_messages(sender_id, TextMessage(text="Команда 1 карусели с ошибкой - сюда попатсть не должно"))
+    viber.send_messages(sender_id, TextMessage(text="Команда карусели 3 с ошибкой - сюда попатсть не должно"))
     proc6dbf09d6a753425e9da0d809dcc4049e(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Цикл окончен
     return
 
