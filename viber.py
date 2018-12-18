@@ -140,6 +140,8 @@ def ShowCarousel(sender_id, result_list, number_parts):
         buttons_keyboard = []
         if (isEnd == False):
             buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "more_data", "Text": "ЕЩЕ"})
+        if (number_parts > 1 ):
+            buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "back_data", "Text": "Назад"})
         buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "cancel", "Text": "Отменить"})
         text_keyboard = {"Type": "keyboard","InputFieldState": "hidden", "Buttons": buttons_keyboard}
         viber.send_messages(sender_id, [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
@@ -180,6 +182,10 @@ def RestoreState(sender_id):
 def proce3cafc7fe33b41c4b38c40b9d62a3e55(sender_id, message, data, service_data_bot_need, carousel_id):
     #Первое состояние (программный выбор)
     print("stack: proce3cafc7fe33b41c4b38c40b9d62a3e55")
+    if GetIdStateForClearData() == "e3cafc7f-e33b-41c4-b38c-40b9d62a3e55":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     viber.send_messages(sender_id, TextMessage(text="Привет!"))
     if not isinstance(data, dict):
         data = {}
@@ -196,6 +202,10 @@ def proc_functione3cafc7fe33b41c4b38c40b9d62a3e55(sender_id, message, data, serv
 def procfc4a6135fb2443e8bcb7282f64002b44(sender_id, message, data, service_data_bot_need, carousel_id):
     #Состояние обработка ввода с клавиатуры (выбор по результатам ввода с клавиатуры)
     print("stack: procfc4a6135fb2443e8bcb7282f64002b44")
+    if GetIdStateForClearData() == "fc4a6135-fb24-43e8-bcb7-282f64002b44":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     viber.send_messages(sender_id, TextMessage(text="Введите 1"))
     if not SaveState(sender_id, "c4a6135-fb24-43e8-bcb7-282f64002b44f", service_data_bot_need, data, carousel_id): #proc_function_expect_userfc4a6135fb2443e8bcb7282f64002b44
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
@@ -226,6 +236,10 @@ def proc_functionfc4a6135fb2443e8bcb7282f64002b44(sender_id, text, data, carouse
 def proc7cc31168f3d146afbf06b765d0e989d3(sender_id, message, data, service_data_bot_need, carousel_id):
     #Выбор из подчиненных команд (выбор из подчиненных команд)
     print("stack: proc7cc31168f3d146afbf06b765d0e989d3")
+    if GetIdStateForClearData() == "7cc31168-f3d1-46af-bf06-b765d0e989d3":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     if not SaveState(sender_id, "7cc31168-f3d1-46af-bf06-b765d0e989d3", service_data_bot_need, data, carousel_id): #proc7cc31168f3d146afbf06b765d0e989d3
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -277,6 +291,10 @@ def proc_expect_user_button_click7cc31168f3d146afbf06b765d0e989d3(sender_id, mes
 def proc8e6deb53f558452fa2deaa243228837f(sender_id, message, data, service_data_bot_need, carousel_id):
     #Переход Состояние обработка ввода с клавиатуры
     print("stack: proc8e6deb53f558452fa2deaa243228837f")
+    if GetIdStateForClearData() == "8e6deb53-f558-452f-a2de-aa243228837f":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     viber.send_messages(sender_id, TextMessage(text="Вы перенаправлены на \"состояние обработка ввода с клавиатуры\""))
     procfc4a6135fb2443e8bcb7282f64002b44(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Состояние обработка ввода с клавиатуры
     return
@@ -284,6 +302,10 @@ def proc8e6deb53f558452fa2deaa243228837f(sender_id, message, data, service_data_
 def proc0432458f1b34417aa2cc453722d74476(sender_id, message, data, service_data_bot_need, carousel_id):
     #Карусель 1 - короткая (Карусель)
     print("stack: proc0432458f1b34417aa2cc453722d74476")
+    if GetIdStateForClearData() == "0432458f-1b34-417a-a2cc-453722d74476":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     if not SaveState(sender_id, "0432458f-1b34-417a-a2cc-453722d74476", service_data_bot_need, data, carousel_id): #proc0432458f1b34417aa2cc453722d74476
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -325,6 +347,14 @@ def proc_expect_comand_user0432458f1b34417aa2cc453722d74476(sender_id, message, 
             number_parts = temp
         service_data_bot_need.update({"number_parts0432458f1b34417aa2cc453722d74476": number_parts + 1})
         proc0432458f1b34417aa2cc453722d74476(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на вывод дополнительных непоместившихся элементов
+    elif id == "back_data":
+
+        number_parts = 1
+        temp = service_data_bot_need.get("number_parts0432458f1b34417aa2cc453722d74476")
+        if not temp == None:
+            number_parts = temp
+        service_data_bot_need.update({"number_parts0432458f1b34417aa2cc453722d74476": number_parts - 1})
+        proc0432458f1b34417aa2cc453722d74476(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на вывод предыдущих элементов
     else:
         carousel_id = id
         proc73c303a0ee5c49b78ded86688f87857a(sender_id, message, data, service_data_bot_need, carousel_id) #Обработчик вывода карусель 1 (Вывод элемента карусели)
@@ -334,6 +364,10 @@ def proc_expect_comand_user0432458f1b34417aa2cc453722d74476(sender_id, message, 
 def proc73c303a0ee5c49b78ded86688f87857a(sender_id, message, data, service_data_bot_need, carousel_id):
     #Обработчик вывода карусель 1
     print("stack: proc73c303a0ee5c49b78ded86688f87857a")
+    if GetIdStateForClearData() == "73c303a0-ee5c-49b7-8ded-86688f87857a":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     viber.send_messages(sender_id, TextMessage(text="Вывод элемента карусели"))
 
     detail_view = proc_get_user_detail_view_by_id73c303a0ee5c49b78ded86688f87857a(sender_id, carousel_id, data)
@@ -349,6 +383,10 @@ def proc_get_user_detail_view_by_id73c303a0ee5c49b78ded86688f87857a(sender_id, e
 def proc98c4ca3dfc2f4acdbf2f4efd2b21b7e0(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команды карусель 1 (команды элемента карусели)
     print("stack: proc98c4ca3dfc2f4acdbf2f4efd2b21b7e0")
+    if GetIdStateForClearData() == "98c4ca3d-fc2f-4acd-bf2f-4efd2b21b7e0":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     if not SaveState(sender_id, "98c4ca3d-fc2f-4acd-bf2f-4efd2b21b7e0", service_data_bot_need, data, carousel_id): #proc98c4ca3dfc2f4acdbf2f4efd2b21b7e0
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -379,6 +417,10 @@ def proc_expect_user_button_click98c4ca3dfc2f4acdbf2f4efd2b21b7e0(sender_id, mes
 def proc7706f046b68a432ebc5574f3fc0344e5(sender_id, message, data, service_data_bot_need, carousel_id):
     #Вывод дополнительных данных (программный выбор)
     print("stack: proc7706f046b68a432ebc5574f3fc0344e5")
+    if GetIdStateForClearData() == "7706f046-b68a-432e-bc55-74f3fc0344e5":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     viber.send_messages(sender_id, TextMessage(text="Вывод дополнительных команд"))
     if not isinstance(data, dict):
         data = {}
@@ -396,6 +438,10 @@ def proc_function7706f046b68a432ebc5574f3fc0344e5(sender_id, message, data, serv
 def procfb122677b9074763a0b83694f35fcab8(sender_id, message, data, service_data_bot_need, carousel_id):
     #Карусель 2 - длинная (Карусель)
     print("stack: procfb122677b9074763a0b83694f35fcab8")
+    if GetIdStateForClearData() == "fb122677-b907-4763-a0b8-3694f35fcab8":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     if not SaveState(sender_id, "fb122677-b907-4763-a0b8-3694f35fcab8", service_data_bot_need, data, carousel_id): #procfb122677b9074763a0b83694f35fcab8
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -441,6 +487,14 @@ def proc_expect_comand_userfb122677b9074763a0b83694f35fcab8(sender_id, message, 
             number_parts = temp
         service_data_bot_need.update({"number_partsfb122677b9074763a0b83694f35fcab8": number_parts + 1})
         procfb122677b9074763a0b83694f35fcab8(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на вывод дополнительных непоместившихся элементов
+    elif id == "back_data":
+
+        number_parts = 1
+        temp = service_data_bot_need.get("number_partsfb122677b9074763a0b83694f35fcab8")
+        if not temp == None:
+            number_parts = temp
+        service_data_bot_need.update({"number_partsfb122677b9074763a0b83694f35fcab8": number_parts - 1})
+        procfb122677b9074763a0b83694f35fcab8(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на вывод предыдущих элементов
     else:
         carousel_id = id
         proc73c303a0ee5c49b78ded86688f87857a(sender_id, message, data, service_data_bot_need, carousel_id) #Обработчик вывода карусель 1 (Вывод элемента карусели)
@@ -450,6 +504,10 @@ def proc_expect_comand_userfb122677b9074763a0b83694f35fcab8(sender_id, message, 
 def proc42a2f751ca6240a8b12e3f62ad73cb46(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команды карусель 2 (команды элемента карусели)
     print("stack: proc42a2f751ca6240a8b12e3f62ad73cb46")
+    if GetIdStateForClearData() == "42a2f751-ca62-40a8-b12e-3f62ad73cb46":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     if not SaveState(sender_id, "42a2f751-ca62-40a8-b12e-3f62ad73cb46", service_data_bot_need, data, carousel_id): #proc42a2f751ca6240a8b12e3f62ad73cb46
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -480,6 +538,10 @@ def proc_expect_user_button_click42a2f751ca6240a8b12e3f62ad73cb46(sender_id, mes
 def proc54ab80486210439ea98f79034ade1265(sender_id, message, data, service_data_bot_need, carousel_id):
     #Вывод выбранного в карусели 2 (программный выбор)
     print("stack: proc54ab80486210439ea98f79034ade1265")
+    if GetIdStateForClearData() == "54ab8048-6210-439e-a98f-79034ade1265":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     viber.send_messages(sender_id, TextMessage(text="Вывод выбранного в карусели 2"))
     if not isinstance(data, dict):
         data = {}
@@ -497,6 +559,10 @@ def proc_function54ab80486210439ea98f79034ade1265(sender_id, message, data, serv
 def proccd6e33ce0e1242dfbf0b3d4b21234ccb(sender_id, message, data, service_data_bot_need, carousel_id):
     #Карусель 3 - с ошибкой (Карусель)
     print("stack: proccd6e33ce0e1242dfbf0b3d4b21234ccb")
+    if GetIdStateForClearData() == "cd6e33ce-0e12-42df-bf0b-3d4b21234ccb":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     if not SaveState(sender_id, "cd6e33ce-0e12-42df-bf0b-3d4b21234ccb", service_data_bot_need, data, carousel_id): #proccd6e33ce0e1242dfbf0b3d4b21234ccb
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -540,6 +606,14 @@ def proc_expect_comand_usercd6e33ce0e1242dfbf0b3d4b21234ccb(sender_id, message, 
             number_parts = temp
         service_data_bot_need.update({"number_partscd6e33ce0e1242dfbf0b3d4b21234ccb": number_parts + 1})
         proccd6e33ce0e1242dfbf0b3d4b21234ccb(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на вывод дополнительных непоместившихся элементов
+    elif id == "back_data":
+
+        number_parts = 1
+        temp = service_data_bot_need.get("number_partscd6e33ce0e1242dfbf0b3d4b21234ccb")
+        if not temp == None:
+            number_parts = temp
+        service_data_bot_need.update({"number_partscd6e33ce0e1242dfbf0b3d4b21234ccb": number_parts - 1})
+        proccd6e33ce0e1242dfbf0b3d4b21234ccb(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на вывод предыдущих элементов
     else:
         carousel_id = id
         proc73c303a0ee5c49b78ded86688f87857a(sender_id, message, data, service_data_bot_need, carousel_id) #Обработчик вывода карусель 1 (Вывод элемента карусели)
@@ -549,6 +623,10 @@ def proc_expect_comand_usercd6e33ce0e1242dfbf0b3d4b21234ccb(sender_id, message, 
 def proce4e000559b82453e97ee1fb091b22087(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команды карусель 3 (команды элемента карусели)
     print("stack: proce4e000559b82453e97ee1fb091b22087")
+    if GetIdStateForClearData() == "e4e00055-9b82-453e-97ee-1fb091b22087":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     if not SaveState(sender_id, "e4e00055-9b82-453e-97ee-1fb091b22087", service_data_bot_need, data, carousel_id): #proce4e000559b82453e97ee1fb091b22087
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -579,6 +657,10 @@ def proc_expect_user_button_clicke4e000559b82453e97ee1fb091b22087(sender_id, mes
 def proca9fa27346a2c4eeb8a14105ad7c7c700(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команда  карусели 3 с ошибкой
     print("stack: proca9fa27346a2c4eeb8a14105ad7c7c700")
+    if GetIdStateForClearData() == "a9fa2734-6a2c-4eeb-8a14-105ad7c7c700":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     viber.send_messages(sender_id, TextMessage(text="Команда карусели 3 с ошибкой - сюда попатсть не должно"))
     proc6dbf09d6a753425e9da0d809dcc4049e(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Цикл окончен
     return
@@ -586,6 +668,10 @@ def proca9fa27346a2c4eeb8a14105ad7c7c700(sender_id, message, data, service_data_
 def proc96cb68c07f0a44f1a585e5965c1fc8da(sender_id, message, data, service_data_bot_need, carousel_id):
     #Обработка ошибки карусель 3
     print("stack: proc96cb68c07f0a44f1a585e5965c1fc8da")
+    if GetIdStateForClearData() == "96cb68c0-7f0a-44f1-a585-e5965c1fc8da":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     viber.send_messages(sender_id, TextMessage(text="Ошибка по карусели 3 - все так и должно быть!"))
     proce3cafc7fe33b41c4b38c40b9d62a3e55(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Первое состояние
     return
@@ -593,6 +679,10 @@ def proc96cb68c07f0a44f1a585e5965c1fc8da(sender_id, message, data, service_data_
 def procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_bot_need, carousel_id):
     #Ошибка
     print("stack: procba08f868ea174d0996e8eb2b9d43be27")
+    if GetIdStateForClearData() == "ba08f868-ea17-4d09-96e8-eb2b9d43be27":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     viber.send_messages(sender_id, TextMessage(text="Ошибка"))
     proce3cafc7fe33b41c4b38c40b9d62a3e55(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Первое состояние
     return
@@ -600,6 +690,10 @@ def procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_
 def proc6dbf09d6a753425e9da0d809dcc4049e(sender_id, message, data, service_data_bot_need, carousel_id):
     #Цикл окончен
     print("stack: proc6dbf09d6a753425e9da0d809dcc4049e")
+    if GetIdStateForClearData() == "6dbf09d6-a753-425e-9da0-d809dcc4049e":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
     viber.send_messages(sender_id, TextMessage(text="Цикл окончен"))
     proce3cafc7fe33b41c4b38c40b9d62a3e55(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Первое состояние
     return
@@ -635,6 +729,10 @@ def GetIdFirstState():
     print("stack: GetIdFirstState")
     return "e3cafc7f-e33b-41c4-b38c-40b9d62a3e55"
 
+def GetIdStateForClearData():
+    print("stack: GetIdStateForClearData")
+    return "fc4a6135-fb24-43e8-bcb7-282f64002b44"
+
 def GoToStateFirst(sender_id, message, state_id, data, data_user, carousel_id):
     print("stack: GoToStateFirst")
     GoToStateByID(sender_id, message, state_id, data, data_user, carousel_id)
@@ -651,7 +749,7 @@ def GoToStateByID(sender_id, message, state_id, service_data_bot_need, data_user
     if not isinstance(service_data_bot_need, dict):
         service_data_bot_need = {}
     if not isinstance(data_user, dict):
-            data_user = {}
+        data_user = {}
     procedure(sender_id, message, data_user, service_data_bot_need, carousel_id)
 
     return
