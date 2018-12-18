@@ -273,7 +273,8 @@ def proc_expect_user_button_click7cc31168f3d146afbf06b765d0e989d3(sender_id, mes
         procfb122677b9074763a0b83694f35fcab8(sender_id, message, data, service_data_bot_need, carousel_id) #Карусель 2 - длинная
     elif command == "cd6e33ce-0e12-42df-bf0b-3d4b21234ccb":
         proccd6e33ce0e1242dfbf0b3d4b21234ccb(sender_id, message, data, service_data_bot_need, carousel_id) #Карусель 3 - с ошибкой
-    procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_bot_need, carousel_id) #Ошибка
+    else:
+        procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_bot_need, carousel_id) #Ошибка
 
 def proc8e6deb53f558452fa2deaa243228837f(sender_id, message, data, service_data_bot_need, carousel_id):
     #Переход Состояние обработка ввода с клавиатуры
@@ -374,7 +375,8 @@ def proc_expect_user_button_click98c4ca3dfc2f4acdbf2f4efd2b21b7e0(sender_id, mes
     command = GetTextCommand(message)
     if command == "7706f046-b68a-432e-bc55-74f3fc0344e5":
         proc7706f046b68a432ebc5574f3fc0344e5(sender_id, message, data, service_data_bot_need, carousel_id) #Вывод дополнительных данных
-    procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_bot_need, carousel_id) #Ошибка
+    else:
+        procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_bot_need, carousel_id) #Ошибка
 
 def proc7706f046b68a432ebc5574f3fc0344e5(sender_id, message, data, service_data_bot_need, carousel_id):
     #Вывод дополнительных данных (программный выбор)
@@ -474,7 +476,8 @@ def proc_expect_user_button_click42a2f751ca6240a8b12e3f62ad73cb46(sender_id, mes
     command = GetTextCommand(message)
     if command == "54ab8048-6210-439e-a98f-79034ade1265":
         proc54ab80486210439ea98f79034ade1265(sender_id, message, data, service_data_bot_need, carousel_id) #Вывод выбранного в карусели 2
-    procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_bot_need, carousel_id) #Ошибка
+    else:
+        procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_bot_need, carousel_id) #Ошибка
 
 def proc54ab80486210439ea98f79034ade1265(sender_id, message, data, service_data_bot_need, carousel_id):
     #Вывод выбранного в карусели 2 (программный выбор)
@@ -572,7 +575,8 @@ def proc_expect_user_button_clicke4e000559b82453e97ee1fb091b22087(sender_id, mes
     command = GetTextCommand(message)
     if command == "a9fa2734-6a2c-4eeb-8a14-105ad7c7c700":
         proca9fa27346a2c4eeb8a14105ad7c7c700(sender_id, message, data, service_data_bot_need, carousel_id) #Команда  карусели 3 с ошибкой
-    procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_bot_need, carousel_id) #Ошибка
+    else:
+        procba08f868ea174d0996e8eb2b9d43be27(sender_id, message, data, service_data_bot_need, carousel_id) #Ошибка
 
 def proca9fa27346a2c4eeb8a14105ad7c7c700(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команда  карусели 3 с ошибкой
