@@ -1405,7 +1405,7 @@ def proc_function_expect_user3ec26f31a5dd4ff7a95fc7c612cf273a(sender_id, message
 def proc_function3ec26f31a5dd4ff7a95fc7c612cf273a(sender_id, text, data, carousel_id):
     #Отклонить (функция обработки выбора с клавиатуры)
     print("stack: proc_function3ec26f31a5dd4ff7a95fc7c612cf273a")
-    is_error, text, state = RequestItilium({"data": {"action": "is_decline_incident", "incident":carousel_id,"comment":text "sender": sender_id}})
+    is_error, text, state = RequestItilium({"data": {"action": "is_decline_incident", "incident":carousel_id,"comment":text, "sender": sender_id}})
     if is_error:
         text_error = text
         viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
