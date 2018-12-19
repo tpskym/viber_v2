@@ -433,7 +433,7 @@ def proc_function91d863c10ff0456bacb086818cac8a03(sender_id, message, data, serv
             if len(list) == 0:
                 viber.send_messages(sender_id, TextMessage(text="У вас нет зарегистрированных открытых обращений"))
                 return "OK"
-            elif len(list) == 1::
+            elif len(list) == 1:
                 viber.send_messages(sender_id, TextMessage(text=list[0].get('detail_view')))
                 carousel_id = list[0].get('id')
                 return "comand_to_selected_incident"
