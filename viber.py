@@ -1942,7 +1942,7 @@ def GetIdFirstState():
     print("stack: GetIdFirstState")
     return "02957edd-8e98-4dd4-a0aa-530f15bba971"
 
-def RequestItilium(dict_data)
+def RequestItilium(dict_data):
     print("stack: RequestItilium")
     try:
        quote = "\""
