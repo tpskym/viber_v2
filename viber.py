@@ -984,7 +984,7 @@ def proc_functionf78d807143864b3f8cd291a0d503f281(sender_id, message, data, serv
     data.update({"rating":1})
     if data.get('one_need_comment'):
         return "need_comment_surely"
-    else
+    else:
         return "need_comment"
 
 def procd2aeca9275214a6caa98de3001dd081f(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -1098,7 +1098,7 @@ def proc_function70a014c3ff72418abb1b94326c535cd6(sender_id, message, data, serv
     data.update({"rating":2})
     if data.get('two_need_comment'):
         return "need_comment_surely"
-    else
+    else:
         return "need_comment"
 
 def proc1c315c3c887a489b95522e1316af7b35(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -1123,7 +1123,7 @@ def proc_function1c315c3c887a489b95522e1316af7b35(sender_id, message, data, serv
     data.update({"rating":3})
     if data.get('three_need_comment'):
         return "need_comment_surely"
-    else
+    else:
         return "need_comment"
 
 def proc12a983c4102340aa85d7d182b9a7e2c5(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -1148,7 +1148,7 @@ def proc_function12a983c4102340aa85d7d182b9a7e2c5(sender_id, message, data, serv
     data.update({"rating":4})
     if data.get('four_need_comment'):
         return "need_comment_surely"
-    else
+    else:
         return "need_comment"
 
 def proc619fd5ff848446fd8f2217bb68bc6a3b(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -1173,7 +1173,7 @@ def proc_function619fd5ff848446fd8f2217bb68bc6a3b(sender_id, message, data, serv
     data.update({"rating":4})
     if data.get('five_need_comment'):
         return "need_comment_surely"
-    else
+    else:
         return "need_comment"
 
 def proce6d53aa2210b4ed38e9f5e6cea9bc777(sender_id, message, data, service_data_bot_need, carousel_id):
