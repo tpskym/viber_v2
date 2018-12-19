@@ -205,7 +205,7 @@ def proc02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, service_data_
         data = {}
     result_programm_select = proc_function02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, service_data_bot_need, carousel_id)
     if result_programm_select == "error":
-        proc02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, service_data_bot_need, carousel_id) #Приветствие
+        proc6cc30e06b21a4176892b507ee382b3e8(sender_id, message, data, service_data_bot_need, carousel_id) #Состояние ошибки при Приветствии
     elif result_programm_select == "0":
         proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Выбор действия
     elif result_programm_select == "1":
@@ -1863,6 +1863,50 @@ def proc542a39f9c5854d3ca9712192a781019f(sender_id, message, data, service_data_
     procf6829c8beb464c618ab63bd31f6bc879(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Получить статус
     return
 
+def proc6cc30e06b21a4176892b507ee382b3e8(sender_id, message, data, service_data_bot_need, carousel_id):
+    #Состояние ошибки при Приветствии (выбор из подчиненных команд)
+    print("stack: proc6cc30e06b21a4176892b507ee382b3e8")
+    if GetIdStateForClearData() == "6cc30e06-b21a-4176-892b-507ee382b3e8":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
+    if not SaveState(sender_id, "6cc30e06-b21a-4176-892b-507ee382b3e8", service_data_bot_need, data, carousel_id): #proc6cc30e06b21a4176892b507ee382b3e8
+        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
+        return
+    viber.send_messages(sender_id, TextMessage(text="Ошибка сети. Нет доступа к Итилиум. Нажмите \"да\", когда Итилиум будет опубликован."))
+    buttons = []
+    buttons.append({
+        "Columns": 6,
+        "Rows": 1,
+        "ActionBody": "5c625ad3-ac90-4009-97e7-d2e0b64d18c3",
+        "Text": "да" })
+    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
+    if not SaveState(sender_id, "cc30e06-b21a-4176-892b-507ee382b3e86", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click6cc30e06b21a4176892b507ee382b3e8
+        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
+        return
+    return
+
+def proc_expect_user_button_click6cc30e06b21a4176892b507ee382b3e8(sender_id, message, data, service_data_bot_need, carousel_id):
+    #Состояние ошибки при Приветствии (Обработчик выбора из подчиненных команд)
+    print("stack: proc_expect_user_button_click6cc30e06b21a4176892b507ee382b3e8")
+    command = GetTextCommand(message)
+    if command == "5c625ad3-ac90-4009-97e7-d2e0b64d18c3":
+        proc5c625ad3ac90400997e7d2e0b64d18c3(sender_id, message, data, service_data_bot_need, carousel_id) #да
+    else:
+        proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Выбор действия
+
+def proc5c625ad3ac90400997e7d2e0b64d18c3(sender_id, message, data, service_data_bot_need, carousel_id):
+    #да
+    print("stack: proc5c625ad3ac90400997e7d2e0b64d18c3")
+    if GetIdStateForClearData() == "5c625ad3-ac90-4009-97e7-d2e0b64d18c3":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
+    proc02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Приветствие
+    return
+
 list_procs = {}
 list_procs.update( { '02957edd-8e98-4dd4-a0aa-530f15bba971': proc02957edd8e984dd4a0aa530f15bba971,'02957edd-8e98-4dd4-a0aa-530f15bba971without_registration': True} )
 list_procs.update( { '1b68be2d-5a9a-4d06-adb5-9b874e1673ea': proc1b68be2d5a9a4d06adb59b874e1673ea,'1b68be2d-5a9a-4d06-adb5-9b874e1673eawithout_registration': True} )
@@ -1937,6 +1981,9 @@ list_procs.update( { 'ea557c1b-bda6-4ec0-a0c7-ad3e4f493afc': procea557c1bbda64ec
 list_procs.update( { '17c11a94-77c8-493d-b934-70bdbee77ffc': proc17c11a9477c8493db93470bdbee77ffc,'17c11a94-77c8-493d-b934-70bdbee77ffcwithout_registration': False} )
 list_procs.update( { '7c11a94-77c8-493d-b934-70bdbee77ffc1': proc_expect_user_button_click17c11a9477c8493db93470bdbee77ffc,'17c11a94-77c8-493d-b934-70bdbee77ffcwithout_registration': False} )
 list_procs.update( { '542a39f9-c585-4d3c-a971-2192a781019f': proc542a39f9c5854d3ca9712192a781019f,'542a39f9-c585-4d3c-a971-2192a781019fwithout_registration': False} )
+list_procs.update( { '6cc30e06-b21a-4176-892b-507ee382b3e8': proc6cc30e06b21a4176892b507ee382b3e8,'6cc30e06-b21a-4176-892b-507ee382b3e8without_registration': False} )
+list_procs.update( { 'cc30e06-b21a-4176-892b-507ee382b3e86': proc_expect_user_button_click6cc30e06b21a4176892b507ee382b3e8,'6cc30e06-b21a-4176-892b-507ee382b3e8without_registration': False} )
+list_procs.update( { '5c625ad3-ac90-4009-97e7-d2e0b64d18c3': proc5c625ad3ac90400997e7d2e0b64d18c3,'5c625ad3-ac90-4009-97e7-d2e0b64d18c3without_registration': False} )
 
 def GetIdFirstState():
     print("stack: GetIdFirstState")
