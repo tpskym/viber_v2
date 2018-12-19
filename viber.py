@@ -1351,7 +1351,7 @@ def proc_function01a9eda608194126be9830251a261e42(sender_id, message, data, serv
     print("stack: proc_function01a9eda608194126be9830251a261e42")
     rating = data.get('rating')
     comment = data.get('comment')
-    is_error, text, state = RequestItilium({"data": {"action": "is_confirm_incident","rating":rating, "comment":comment "incident":carousel_id,"sender": sender_id}})
+    is_error, text, state = RequestItilium({"data": {"action": "is_confirm_incident","rating":rating, "comment":comment, "incident":carousel_id,"sender": sender_id}})
     if is_error:
         text_error = text
         viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
