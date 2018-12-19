@@ -2132,6 +2132,7 @@ def incoming():
         is_registered_user = GetIsRegisteredUser(sender_id)
         GoToCurrentState(sender_id, message, is_registered_user)
 
+
     elif isinstance(viber_request, ViberSubscribedRequest):
         viber.send_messages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
     elif isinstance(viber_request, ViberFailedRequest):
