@@ -2,6 +2,7 @@ import os
 from viberbot import Api
 from viberbot.api.bot_configuration import BotConfiguration
 from viberbot.api.messages import VideoMessage
+from viberbot.api.messages.picture_message import PictureMessage
 from viberbot.api.messages.text_message import TextMessage
 from viberbot.api.messages.keyboard_message import KeyboardMessage
 from viberbot.api.messages.rich_media_message import RichMediaMessage
