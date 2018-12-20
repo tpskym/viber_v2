@@ -1069,6 +1069,7 @@ def proc4f2c3d625e2f4665bf75177d4363273c(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
+    viber.send_messages(sender_id, TextMessage(text="Укажите комментарий"))
     buttons = []
     buttons.append({
         "Columns": 6,
@@ -1205,7 +1206,7 @@ def proc619fd5ff848446fd8f2217bb68bc6a3b(sender_id, message, data, service_data_
 def proc_function619fd5ff848446fd8f2217bb68bc6a3b(sender_id, message, data, service_data_bot_need, carousel_id):
     #5 (функция программного выбора)
     print("stack: proc_function619fd5ff848446fd8f2217bb68bc6a3b")
-    data.update({"rating":4})
+    data.update({"rating":5})
     if data.get('five_need_comment'):
         return "need_comment_surely"
     else:
