@@ -1,4 +1,3 @@
-
 import os
 from viberbot import Api
 from viberbot.api.bot_configuration import BotConfiguration
@@ -273,6 +272,7 @@ def proc_function1b68be2d5a9a4d06adb59b874e1673ea(sender_id, text, data, carouse
             if str(text) == "1":
                 return "0"
             else:
+                viber.send_messages(sender_id, TextMessage(text=text))
                 return "1"
         else:
             text_error = text
@@ -2002,7 +2002,7 @@ def RequestItilium(dict_data):
        if (code == 200):
            return False, description, True
        else:
-           return False, str(code), False
+           return False, str(code) + ' ' + description, False
     except:
        return True, "Ошибка соединения с Итилиум. Обратитесь к администратору.", False
 
