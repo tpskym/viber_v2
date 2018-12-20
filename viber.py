@@ -758,6 +758,8 @@ def proc5160f46d71b8466a8b28db1bf17d5392(sender_id, message, data, service_data_
         proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Выбор действия
     elif result_list == "error_in_itilium":
         proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Выбор действия
+    elif result_list == "no_data":
+        procff766d22eecd4b8a9509ad556751429f(sender_id, message, data, service_data_bot_need, carousel_id) #Нет обращений
     return
 
 def proc_get_list_corteges5160f46d71b8466a8b28db1bf17d5392(sender_id, data, carousel_id):
@@ -772,6 +774,8 @@ def proc_get_list_corteges5160f46d71b8466a8b28db1bf17d5392(sender_id, data, caro
         if state:
             # data.update({'detail_text':text})
             list = json.loads(text)
+            if len(list) == 0:
+                return "no_data"
             list_ret = []
             list_ret_full = []
             for incident in list:
@@ -1524,6 +1528,17 @@ def procffaaa8bf92394b6c9ff547b87743d7df(sender_id, message, data, service_data_
     proc5160f46d71b8466a8b28db1bf17d5392(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Обращения для подтверждения
     return
 
+def procff766d22eecd4b8a9509ad556751429f(sender_id, message, data, service_data_bot_need, carousel_id):
+    #Нет обращений
+    print("stack: procff766d22eecd4b8a9509ad556751429f")
+    if GetIdStateForClearData() == "ff766d22-eecd-4b8a-9509-ad556751429f":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
+    viber.send_messages(sender_id, TextMessage(text="Нет обращений для подтверждения"))
+    proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Выбор действия
+    return
+
 def proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_bot_need, carousel_id):
     #Последние сообщения (Карусель)
     print("stack: proccdab1713d317452bbbdb8a484d513051")
@@ -1998,6 +2013,7 @@ list_procs.update( { 'dbb86b04-001b-4aa5-87bd-0598114130e3': procdbb86b04001b4aa
 list_procs.update( { '7e43a768-6c96-4691-abb1-6ccf4e47e119': proc7e43a7686c964691abb16ccf4e47e119,'7e43a768-6c96-4691-abb1-6ccf4e47e119without_registration': False} )
 list_procs.update( { 'f5a27e79-84da-4e56-81a8-058f67b03c1f': procf5a27e7984da4e5681a8058f67b03c1f,'f5a27e79-84da-4e56-81a8-058f67b03c1fwithout_registration': False} )
 list_procs.update( { 'ffaaa8bf-9239-4b6c-9ff5-47b87743d7df': procffaaa8bf92394b6c9ff547b87743d7df,'ffaaa8bf-9239-4b6c-9ff5-47b87743d7dfwithout_registration': False} )
+list_procs.update( { 'ff766d22-eecd-4b8a-9509-ad556751429f': procff766d22eecd4b8a9509ad556751429f,'ff766d22-eecd-4b8a-9509-ad556751429fwithout_registration': False} )
 list_procs.update( { 'cdab1713-d317-452b-bbdb-8a484d513051': proccdab1713d317452bbbdb8a484d513051,'cdab1713-d317-452b-bbdb-8a484d513051without_registration': False} )
 list_procs.update( { 'dab1713-d317-452b-bbdb-8a484d513051c': proc_expect_comand_usercdab1713d317452bbbdb8a484d513051,'dab1713-d317-452b-bbdb-8a484d513051cwithout_registration': False} )
 list_procs.update( { '9e625d3a-f5e2-46b2-b30e-56242d8be3e5': proc9e625d3af5e246b2b30e56242d8be3e5,'9e625d3a-f5e2-46b2-b30e-56242d8be3e5without_registration': False} )
