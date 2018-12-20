@@ -2260,6 +2260,7 @@ def incoming():
         sender_id = viber_request.sender.id
         message = viber_request.message
         if GetFlagStopQuery(sender_id) == True:
+            print("Повторный запрос")
             return Response(status=200)
         else:
             if SetFlagStartQuery(sender_id) == True:
@@ -2271,6 +2272,7 @@ def incoming():
                 finally:
                     SetFlagStopQuery(sender_id)
             else:
+                print("Повторный запрос")
                 return Response(status=200)
 
     elif isinstance(viber_request, ViberSubscribedRequest):
