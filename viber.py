@@ -524,7 +524,7 @@ def proc84c5c09c78824f2f819bd1eef1b3913e(sender_id, message, data, service_data_
     viber.send_messages(sender_id, TextMessage(text=detail_view))
     return
 
-def proc_get_user_detail_view_by_id84c5c09c78824f2f819bd1eef1b3913e(sender_id, element_id, data):
+def proc_get_user_detail_view_by_id84c5c09c78824f2f819bd1eef1b3913e(sender_id, carousel_id, data):
     #Обработчик вывода (функция получения детального представления выбранного элемента карусели)
     print("stack: proc_get_user_detail_view_by_id84c5c09c78824f2f819bd1eef1b3913e")
     for id, detail_view in data.get('list_open_incidents_full'):
@@ -1463,7 +1463,7 @@ def procdbb86b04001b4aa587bd0598114130e3(sender_id, message, data, service_data_
     viber.send_messages(sender_id, TextMessage(text=detail_view))
     return
 
-def proc_get_user_detail_view_by_iddbb86b04001b4aa587bd0598114130e3(sender_id, element_id, data):
+def proc_get_user_detail_view_by_iddbb86b04001b4aa587bd0598114130e3(sender_id, carousel_id, data):
     #Вывод элемента карусели (функция получения детального представления выбранного элемента карусели)
     print("stack: proc_get_user_detail_view_by_iddbb86b04001b4aa587bd0598114130e3")
     for id, detail_view in data.get('list_open_incidents'):
@@ -1605,7 +1605,7 @@ def proc9e625d3af5e246b2b30e56242d8be3e5(sender_id, message, data, service_data_
     viber.send_messages(sender_id, TextMessage(text=detail_view))
     return
 
-def proc_get_user_detail_view_by_id9e625d3af5e246b2b30e56242d8be3e5(sender_id, element_id, data):
+def proc_get_user_detail_view_by_id9e625d3af5e246b2b30e56242d8be3e5(sender_id, carousel_id, data):
     #Обработчик вывода (функция получения детального представления выбранного элемента карусели)
     print("stack: proc_get_user_detail_view_by_id9e625d3af5e246b2b30e56242d8be3e5")
     for id, detail_view in data.get('list_open_incidents_full'):
@@ -1812,7 +1812,7 @@ def procea557c1bbda64ec0a0c7ad3e4f493afc(sender_id, message, data, service_data_
     viber.send_messages(sender_id, TextMessage(text=detail_view))
     return
 
-def proc_get_user_detail_view_by_idea557c1bbda64ec0a0c7ad3e4f493afc(sender_id, element_id, data):
+def proc_get_user_detail_view_by_idea557c1bbda64ec0a0c7ad3e4f493afc(sender_id, carousel_id, data):
     #Вывод элемента карусели (функция получения детального представления выбранного элемента карусели)
     print("stack: proc_get_user_detail_view_by_idea557c1bbda64ec0a0c7ad3e4f493afc")
     for id, detail_view in data.get('list_open_incidents'):
