@@ -548,7 +548,7 @@ def proced689fd18d5942468b1892b7a2f97292(sender_id, message, data, service_data_
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "bb53668e-eb8e-4153-bdf7-a72781739830",
-        "Text": "Введите уточнение" })
+        "Text": "Ввести уточнение" })
     buttons.append({
         "Columns": 6,
         "Rows": 1,
@@ -566,20 +566,19 @@ def proc_expect_user_button_clicked689fd18d5942468b1892b7a2f97292(sender_id, mes
     print("stack: proc_expect_user_button_clicked689fd18d5942468b1892b7a2f97292")
     command = GetTextCommand(message)
     if command == "bb53668e-eb8e-4153-bdf7-a72781739830":
-        procbb53668eeb8e4153bdf7a72781739830(sender_id, message, data, service_data_bot_need, carousel_id) #Введите уточнение
+        procbb53668eeb8e4153bdf7a72781739830(sender_id, message, data, service_data_bot_need, carousel_id) #Ввести уточнение
     elif command == "2ad315bd-42ff-45b8-85ae-cdc9d04c0a9e":
         proc2ad315bd42ff45b885aecdc9d04c0a9e(sender_id, message, data, service_data_bot_need, carousel_id) #Отмена
     else:
         proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Выбор действия
 
 def procbb53668eeb8e4153bdf7a72781739830(sender_id, message, data, service_data_bot_need, carousel_id):
-    #Введите уточнение (выбор по результатам ввода с клавиатуры)
+    #Ввести уточнение (выбор по результатам ввода с клавиатуры)
     print("stack: procbb53668eeb8e4153bdf7a72781739830")
     if GetIdStateForClearData() == "bb53668e-eb8e-4153-bdf7-a72781739830":
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Введите уточнение"))
     if not SaveState(sender_id, "b53668e-eb8e-4153-bdf7-a72781739830b", service_data_bot_need, data, carousel_id): #proc_function_expect_userbb53668eeb8e4153bdf7a72781739830
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -601,7 +600,7 @@ def proc_function_expect_userbb53668eeb8e4153bdf7a72781739830(sender_id, message
         proca0981bccc8ee486e943257b9de36f2d1(sender_id, message, data, service_data_bot_need, carousel_id) #Уточнения не внесены
 
 def proc_functionbb53668eeb8e4153bdf7a72781739830(sender_id, text, data, carousel_id):
-    #Введите уточнение (функция обработки выбора с клавиатуры)
+    #Ввести уточнение (функция обработки выбора с клавиатуры)
     print("stack: proc_functionbb53668eeb8e4153bdf7a72781739830")
     is_error, text, state = RequestItilium({"data": {"action": "is_add_converstaion","incident" : carousel_id,"text":text,"sender": sender_id}})
     if is_error:
