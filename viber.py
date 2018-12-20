@@ -2357,6 +2357,11 @@ def incoming():
         return Response(status=403)
     viber_request = viber.parse_request(request.get_data())
 
+    if isinstance(message, PictureMessage):
+        print ("picture message")
+        print (message.text)
+        print (message.media)
+
     if isinstance(viber_request, ViberMessageRequest):
         sender_id = viber_request.sender.id
         message = viber_request.message
