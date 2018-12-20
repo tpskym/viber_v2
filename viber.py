@@ -272,8 +272,6 @@ def proc_function1b68be2d5a9a4d06adb59b874e1673ea(sender_id, text, data, carouse
             if str(text) == "1":
                 return "0"
             else:
-                text_error = text
-                viber.send_messages(sender_id, TextMessage(text=str(text_error)))
                 return "1"
         else:
             text_error = text
