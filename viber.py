@@ -1035,7 +1035,7 @@ def procd2aeca9275214a6caa98de3001dd081f(sender_id, message, data, service_data_
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "7e43a768-6c96-4691-abb1-6ccf4e47e119",
-        "Text": "Обращение не подтверждено" })
+        "Text": "Отмена" })
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "2aeca92-7521-4a6c-aa98-de3001dd081fd", service_data_bot_need, data, carousel_id): #proc_function_expect_userd2aeca9275214a6caa98de3001dd081f
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
@@ -1050,7 +1050,7 @@ def proc_function_expect_userd2aeca9275214a6caa98de3001dd081f(sender_id, message
         data = {}
     text = GetTextCommand(message)
     if text == "7e43a768-6c96-4691-abb1-6ccf4e47e119":
-        proc7e43a7686c964691abb16ccf4e47e119(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Обращение не подтверждено
+        proc7e43a7686c964691abb16ccf4e47e119(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Отмена
         return
     result_programm_select = proc_functiond2aeca9275214a6caa98de3001dd081f(sender_id, text, data, carousel_id)
     if result_programm_select == "save":
@@ -1525,7 +1525,7 @@ def proc_get_user_detail_view_by_iddbb86b04001b4aa587bd0598114130e3(sender_id, c
     return "Не найдено обращение"
 
 def proc7e43a7686c964691abb16ccf4e47e119(sender_id, message, data, service_data_bot_need, carousel_id):
-    #Обращение не подтверждено
+    #Отмена
     print("stack: proc7e43a7686c964691abb16ccf4e47e119")
     if GetIdStateForClearData() == "7e43a768-6c96-4691-abb1-6ccf4e47e119":
         service_data_bot_need = {}
