@@ -177,6 +177,8 @@ def ShowCarousel(sender_id, result_list, number_parts):
 
 def SaveState(sender_id, state_id, data, data_user, carousel_id):
     print("stack: SaveState")
+    print(" state_id" + state_id)
+    print(" sender_id" + sender_id)
     if SaveStateToPostgress(sender_id, state_id, carousel_id, data_user, data):
         return True
     else:
@@ -2032,13 +2034,14 @@ def GoToCurrentState(sender_id, message, is_registered_user):
     try:
         result_restore, is_error, state_id, data, data_user, carousel_id = RestoreState(sender_id)
         if result_restore:
-            print("stack: before GoToStateByID: " + state_id)
             if is_registered_user == False:
                 if list_procs.get(state_id + 'without_registration') == True:
+                    print("stack: before GoToStateByID: " + state_id)
                     GoToStateByID(sender_id, message, state_id, data, data_user, carousel_id)
                 else:
                     GoToStateFirst(sender_id, message, GetIdFirstState(), data, data_user, carousel_id)
             else:
+                print("stack: before GoToStateByID: " + state_id)
                 GoToStateByID(sender_id, message, state_id, data, data_user, carousel_id)
         else:
             if is_error:
