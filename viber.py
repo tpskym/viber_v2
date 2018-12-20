@@ -1265,6 +1265,11 @@ def procd454043806d1401f87b5ab49f4142f18(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "45188a2f-e76f-463d-a930-4c5a53876d70",
         "Text": "Пропустить" })
+    buttons.append({
+        "Columns": 6,
+        "Rows": 1,
+        "ActionBody": "c937a519-2897-450e-bc6b-ca9aa2c743e2",
+        "Text": "Отменить" })
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "4540438-06d1-401f-87b5-ab49f4142f18d", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clickd454043806d1401f87b5ab49f4142f18
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
@@ -1288,6 +1293,8 @@ def proc_expect_user_button_clickd454043806d1401f87b5ab49f4142f18(sender_id, mes
         procea302a5cac3d477b8fd268a66fb56264(sender_id, message, data, service_data_bot_need, carousel_id) #5
     elif command == "45188a2f-e76f-463d-a930-4c5a53876d70":
         proc45188a2fe76f463da9304c5a53876d70(sender_id, message, data, service_data_bot_need, carousel_id) #Пропустить
+    elif command == "c937a519-2897-450e-bc6b-ca9aa2c743e2":
+        procc937a5192897450ebc6bca9aa2c743e2(sender_id, message, data, service_data_bot_need, carousel_id) #Отменить
     else:
         proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Выбор действия
 
@@ -1359,9 +1366,20 @@ def proc_function45188a2fe76f463da9304c5a53876d70(sender_id, message, data, serv
     #Пропустить (функция программного выбора)
     print("stack: proc_function45188a2fe76f463da9304c5a53876d70")
     data.update({"rating":-1})
-    data.update({"comment": text})
+    data.update({"comment": ""})
     return "save"
 
+
+def procc937a5192897450ebc6bca9aa2c743e2(sender_id, message, data, service_data_bot_need, carousel_id):
+    #Отменить
+    print("stack: procc937a5192897450ebc6bca9aa2c743e2")
+    if GetIdStateForClearData() == "c937a519-2897-450e-bc6b-ca9aa2c743e2":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
+    viber.send_messages(sender_id, TextMessage(text="Подтверждение не выполнено"))
+    proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Выбор действия
+    return
 
 def proc01a9eda608194126be9830251a261e42(sender_id, message, data, service_data_bot_need, carousel_id):
     #Подтвердить общая (программный выбор)
@@ -2026,6 +2044,7 @@ list_procs.update( { 'b63c3343-a6f0-42f9-bd5f-575fdbe43d20': procb63c3343a6f042f
 list_procs.update( { '8ce4471c-310e-49c4-bad6-2b82996d23e8': proc8ce4471c310e49c4bad62b82996d23e8,'8ce4471c-310e-49c4-bad6-2b82996d23e8without_registration': False} )
 list_procs.update( { 'ea302a5c-ac3d-477b-8fd2-68a66fb56264': procea302a5cac3d477b8fd268a66fb56264,'ea302a5c-ac3d-477b-8fd2-68a66fb56264without_registration': False} )
 list_procs.update( { '45188a2f-e76f-463d-a930-4c5a53876d70': proc45188a2fe76f463da9304c5a53876d70,'45188a2f-e76f-463d-a930-4c5a53876d70without_registration': False} )
+list_procs.update( { 'c937a519-2897-450e-bc6b-ca9aa2c743e2': procc937a5192897450ebc6bca9aa2c743e2,'c937a519-2897-450e-bc6b-ca9aa2c743e2without_registration': False} )
 list_procs.update( { '01a9eda6-0819-4126-be98-30251a261e42': proc01a9eda608194126be9830251a261e42,'01a9eda6-0819-4126-be98-30251a261e42without_registration': False} )
 list_procs.update( { '3ec26f31-a5dd-4ff7-a95f-c7c612cf273a': proc3ec26f31a5dd4ff7a95fc7c612cf273a,'3ec26f31-a5dd-4ff7-a95f-c7c612cf273awithout_registration': False} )
 list_procs.update( { 'ec26f31-a5dd-4ff7-a95f-c7c612cf273a3': proc_function_expect_user3ec26f31a5dd4ff7a95fc7c612cf273a,'ec26f31-a5dd-4ff7-a95f-c7c612cf273a3without_registration': False} )
