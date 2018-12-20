@@ -218,7 +218,6 @@ def proc_function02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, serv
     is_error, text, state = RequestItilium({"data": {"action": "is_not_registered","sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
@@ -228,7 +227,6 @@ def proc_function02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, serv
                 return "1"
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text="error with code:" + str(text_error)))
             return "error" # В процедуре обработке надо направить на нужное состояние
 
 def proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_bot_need, carousel_id):
