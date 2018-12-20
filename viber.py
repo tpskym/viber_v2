@@ -239,7 +239,7 @@ def proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     viber.send_messages(sender_id, TextMessage(text="Введите идентификатор подписчика"))
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": []}))
+    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard"}))
     if not SaveState(sender_id, "b68be2d-5a9a-4d06-adb5-9b874e1673ea1", service_data_bot_need, data, carousel_id): #proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -361,7 +361,7 @@ def proc76456fc5a5d34b5481dcb15c34787790(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     viber.send_messages(sender_id, TextMessage(text="Опишите вашу проблему."))
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": []}))
+    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard"}))
     if not SaveState(sender_id, "6456fc5-a5d3-4b54-81dc-b15c347877907", service_data_bot_need, data, carousel_id): #proc_function_expect_user76456fc5a5d34b5481dcb15c34787790
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -582,7 +582,7 @@ def procbb53668eeb8e4153bdf7a72781739830(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     viber.send_messages(sender_id, TextMessage(text="Укажите текст"))
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": []}))
+    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard"}))
     if not SaveState(sender_id, "b53668e-eb8e-4153-bdf7-a72781739830b", service_data_bot_need, data, carousel_id): #proc_function_expect_userbb53668eeb8e4153bdf7a72781739830
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
