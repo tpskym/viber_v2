@@ -2059,7 +2059,7 @@ def SetFlagStartQuery(sender_id):
                 need_new_string = True
         else: #вскинем флаг и вернем True
             need_new_string = True
-        if need_new_string = True:
+        if need_new_string == True:
             # Pass data to fill a query placeholders and let Psycopg perform
             # the correct conversion (no more SQL injections!)
             cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",
