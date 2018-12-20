@@ -1691,7 +1691,7 @@ def proc_function_expect_userf7dc6d456b094b7c8dff0942edf2acb5(sender_id, message
     elif result_programm_select == "error_network":
         proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_bot_need, carousel_id) #Последние сообщения
     elif result_programm_select == "OK":
-        proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_bot_need, carousel_id) #Последние сообщения
+        proc3fb889f893ef403ebaaf6b4e49bb4dd8(sender_id, message, data, service_data_bot_need, carousel_id) #Сообщение добавлено
 
 def proc_functionf7dc6d456b094b7c8dff0942edf2acb5(sender_id, text, data, carousel_id):
     #Ответить (функция обработки выбора с клавиатуры)
@@ -1716,6 +1716,17 @@ def proc11c2842261c54d9f863ba2457b97e4ae(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
+    proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Последние сообщения
+    return
+
+def proc3fb889f893ef403ebaaf6b4e49bb4dd8(sender_id, message, data, service_data_bot_need, carousel_id):
+    #Сообщение добавлено
+    print("stack: proc3fb889f893ef403ebaaf6b4e49bb4dd8")
+    if GetIdStateForClearData() == "3fb889f8-93ef-403e-baaf-6b4e49bb4dd8":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
+    viber.send_messages(sender_id, TextMessage(text="Сообщение добавлено"))
     proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Последние сообщения
     return
 
@@ -1978,6 +1989,7 @@ list_procs.update( { '263c108-cd64-43a2-b367-8ab97a445fc76': proc_expect_user_bu
 list_procs.update( { 'f7dc6d45-6b09-4b7c-8dff-0942edf2acb5': procf7dc6d456b094b7c8dff0942edf2acb5,'f7dc6d45-6b09-4b7c-8dff-0942edf2acb5without_registration': False} )
 list_procs.update( { '7dc6d45-6b09-4b7c-8dff-0942edf2acb5f': proc_function_expect_userf7dc6d456b094b7c8dff0942edf2acb5,'7dc6d45-6b09-4b7c-8dff-0942edf2acb5fwithout_registration': False} )
 list_procs.update( { '11c28422-61c5-4d9f-863b-a2457b97e4ae': proc11c2842261c54d9f863ba2457b97e4ae,'11c28422-61c5-4d9f-863b-a2457b97e4aewithout_registration': False} )
+list_procs.update( { '3fb889f8-93ef-403e-baaf-6b4e49bb4dd8': proc3fb889f893ef403ebaaf6b4e49bb4dd8,'3fb889f8-93ef-403e-baaf-6b4e49bb4dd8without_registration': False} )
 list_procs.update( { 'f6829c8b-eb46-4c61-8ab6-3bd31f6bc879': procf6829c8beb464c618ab63bd31f6bc879,'f6829c8b-eb46-4c61-8ab6-3bd31f6bc879without_registration': False} )
 list_procs.update( { '6829c8b-eb46-4c61-8ab6-3bd31f6bc879f': proc_expect_comand_userf6829c8beb464c618ab63bd31f6bc879,'6829c8b-eb46-4c61-8ab6-3bd31f6bc879fwithout_registration': False} )
 list_procs.update( { 'ea557c1b-bda6-4ec0-a0c7-ad3e4f493afc': procea557c1bbda64ec0a0c7ad3e4f493afc,'ea557c1b-bda6-4ec0-a0c7-ad3e4f493afcwithout_registration': False} )
