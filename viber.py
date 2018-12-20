@@ -579,6 +579,7 @@ def procbb53668eeb8e4153bdf7a72781739830(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
+    viber.send_messages(sender_id, TextMessage(text="Укажите текст"))
     if not SaveState(sender_id, "b53668e-eb8e-4153-bdf7-a72781739830b", service_data_bot_need, data, carousel_id): #proc_function_expect_userbb53668eeb8e4153bdf7a72781739830
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
