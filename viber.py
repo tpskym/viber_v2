@@ -1675,7 +1675,7 @@ def proc6263c108cd6443a2b3678ab97a445fc7(sender_id, message, data, service_data_
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "f7dc6d45-6b09-4b7c-8dff-0942edf2acb5",
-        "Text": "Ответить" })
+        "Text": "Новое сообщение" })
     buttons.append({
         "Columns": 6,
         "Rows": 1,
@@ -1693,14 +1693,14 @@ def proc_expect_user_button_click6263c108cd6443a2b3678ab97a445fc7(sender_id, mes
     print("stack: proc_expect_user_button_click6263c108cd6443a2b3678ab97a445fc7")
     command = GetTextCommand(message)
     if command == "f7dc6d45-6b09-4b7c-8dff-0942edf2acb5":
-        procf7dc6d456b094b7c8dff0942edf2acb5(sender_id, message, data, service_data_bot_need, carousel_id) #Ответить
+        procf7dc6d456b094b7c8dff0942edf2acb5(sender_id, message, data, service_data_bot_need, carousel_id) #Новое сообщение
     elif command == "11c28422-61c5-4d9f-863b-a2457b97e4ae":
         proc11c2842261c54d9f863ba2457b97e4ae(sender_id, message, data, service_data_bot_need, carousel_id) #Отмена
     else:
         proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Выбор действия
 
 def procf7dc6d456b094b7c8dff0942edf2acb5(sender_id, message, data, service_data_bot_need, carousel_id):
-    #Ответить (выбор по результатам ввода с клавиатуры)
+    #Новое сообщение (выбор по результатам ввода с клавиатуры)
     print("stack: procf7dc6d456b094b7c8dff0942edf2acb5")
     if GetIdStateForClearData() == "f7dc6d45-6b09-4b7c-8dff-0942edf2acb5":
         service_data_bot_need = {}
@@ -1710,8 +1710,8 @@ def procf7dc6d456b094b7c8dff0942edf2acb5(sender_id, message, data, service_data_
     buttons.append({
         "Columns": 6,
         "Rows": 1,
-        "ActionBody": "cdab1713-d317-452b-bbdb-8a484d513051",
-        "Text": "Последние сообщения" })
+        "ActionBody": "44188e7a-8866-457a-8033-cc9e23b1a1ff",
+        "Text": "Сообщение не добавлено" })
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "7dc6d45-6b09-4b7c-8dff-0942edf2acb5f", service_data_bot_need, data, carousel_id): #proc_function_expect_userf7dc6d456b094b7c8dff0942edf2acb5
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
@@ -1725,8 +1725,8 @@ def proc_function_expect_userf7dc6d456b094b7c8dff0942edf2acb5(sender_id, message
     if not isinstance(data, dict):
         data = {}
     text = GetTextCommand(message)
-    if text == "cdab1713-d317-452b-bbdb-8a484d513051":
-        proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Последние сообщения
+    if text == "44188e7a-8866-457a-8033-cc9e23b1a1ff":
+        proc44188e7a8866457a8033cc9e23b1a1ff(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Сообщение не добавлено
         return
     result_programm_select = proc_functionf7dc6d456b094b7c8dff0942edf2acb5(sender_id, text, data, carousel_id)
     if result_programm_select == "error_in_itilium":
@@ -1737,7 +1737,7 @@ def proc_function_expect_userf7dc6d456b094b7c8dff0942edf2acb5(sender_id, message
         proc3fb889f893ef403ebaaf6b4e49bb4dd8(sender_id, message, data, service_data_bot_need, carousel_id) #Сообщение добавлено
 
 def proc_functionf7dc6d456b094b7c8dff0942edf2acb5(sender_id, text, data, carousel_id):
-    #Ответить (функция обработки выбора с клавиатуры)
+    #Новое сообщение (функция обработки выбора с клавиатуры)
     print("stack: proc_functionf7dc6d456b094b7c8dff0942edf2acb5")
     is_error, text, state = RequestItilium({"data": {"action": "is_add_converstaion","incident" : carousel_id,"text":text,"sender": sender_id}})
     if is_error:
@@ -1770,6 +1770,17 @@ def proc3fb889f893ef403ebaaf6b4e49bb4dd8(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     viber.send_messages(sender_id, TextMessage(text="Сообщение добавлено"))
+    proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Последние сообщения
+    return
+
+def proc44188e7a8866457a8033cc9e23b1a1ff(sender_id, message, data, service_data_bot_need, carousel_id):
+    #Сообщение не добавлено
+    print("stack: proc44188e7a8866457a8033cc9e23b1a1ff")
+    if GetIdStateForClearData() == "44188e7a-8866-457a-8033-cc9e23b1a1ff":
+        service_data_bot_need = {}
+        carousel_id = ''
+        data = {}
+    viber.send_messages(sender_id, TextMessage(text="Сообщение не добавлено"))
     proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Последние сообщения
     return
 
@@ -2035,6 +2046,7 @@ list_procs.update( { 'f7dc6d45-6b09-4b7c-8dff-0942edf2acb5': procf7dc6d456b094b7
 list_procs.update( { '7dc6d45-6b09-4b7c-8dff-0942edf2acb5f': proc_function_expect_userf7dc6d456b094b7c8dff0942edf2acb5,'7dc6d45-6b09-4b7c-8dff-0942edf2acb5fwithout_registration': False} )
 list_procs.update( { '11c28422-61c5-4d9f-863b-a2457b97e4ae': proc11c2842261c54d9f863ba2457b97e4ae,'11c28422-61c5-4d9f-863b-a2457b97e4aewithout_registration': False} )
 list_procs.update( { '3fb889f8-93ef-403e-baaf-6b4e49bb4dd8': proc3fb889f893ef403ebaaf6b4e49bb4dd8,'3fb889f8-93ef-403e-baaf-6b4e49bb4dd8without_registration': False} )
+list_procs.update( { '44188e7a-8866-457a-8033-cc9e23b1a1ff': proc44188e7a8866457a8033cc9e23b1a1ff,'44188e7a-8866-457a-8033-cc9e23b1a1ffwithout_registration': False} )
 list_procs.update( { 'f6829c8b-eb46-4c61-8ab6-3bd31f6bc879': procf6829c8beb464c618ab63bd31f6bc879,'f6829c8b-eb46-4c61-8ab6-3bd31f6bc879without_registration': False} )
 list_procs.update( { '6829c8b-eb46-4c61-8ab6-3bd31f6bc879f': proc_expect_comand_userf6829c8beb464c618ab63bd31f6bc879,'6829c8b-eb46-4c61-8ab6-3bd31f6bc879fwithout_registration': False} )
 list_procs.update( { 'ea557c1b-bda6-4ec0-a0c7-ad3e4f493afc': procea557c1bbda64ec0a0c7ad3e4f493afc,'ea557c1b-bda6-4ec0-a0c7-ad3e4f493afcwithout_registration': False} )
