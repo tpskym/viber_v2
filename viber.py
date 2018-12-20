@@ -1997,7 +1997,7 @@ def RequestItilium(dict_data):
                             auth=(login_itilium, password_itilium))
        code = response.status_code
        description = response.text
-       print("  code: " + code)
+       print("  code: " + str(code))
        print("  description: " + description)
        if (code == 200):
            return False, description, True
