@@ -2007,7 +2007,7 @@ def SetFlagStopQuery(sender_id):
         if need_stop_check:
             return True
         else:
-            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
             if cur.rowcount > 0:
                 result_query = cur.fetchone()
                 if result_query[1] == "1": #Удалим флаг
@@ -2024,7 +2024,7 @@ def SetFlagStopQuery(sender_id):
         return True
         # Close communication with the database
     except Exception as e:
-        print "Error on SetFlagStopQuery:" + e.args[0]
+        print("Error on SetFlagStopQuery:" + e.args[0])
         return False
     finally:
         cur.close()
@@ -2047,7 +2047,7 @@ def SetFlagStartQuery(sender_id):
 
         need_new_string = False
         if need_stop_check:
-            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
             if cur.rowcount > 0:
                 result_query = cur.fetchone()
                 if result_query[1] == "1": #Запрос задан - мы просто ждем
@@ -2069,7 +2069,7 @@ def SetFlagStartQuery(sender_id):
         return True
         # Close communication with the database
     except Exception as e:
-        print "Error on SetFlagStartQuery:" + e.args[0]
+        print("Error on SetFlagStartQuery:" + e.args[0])
         return True
     finally:
         cur.close()
@@ -2094,7 +2094,7 @@ def GetFlagStopQuery(sender_id):
         if need_stop_check:
             return False
         else:
-            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
             if cur.rowcount > 0:
                 result_query = cur.fetchone()
                 if result_query[1] == "1": #Запрос задан - мы просто ждем
@@ -2110,7 +2110,7 @@ def GetFlagStopQuery(sender_id):
         return False
         # Close communication with the database
     except Exception as e:
-        print "Error on GetFlagStopQuery:" + e.args[0]
+        print("Error on GetFlagStopQuery:" + e.args[0])
         return False
     finally:
         cur.close()
