@@ -1989,6 +1989,133 @@ def GetIdFirstState():
     print("stack: GetIdFirstState")
     return "02957edd-8e98-4dd4-a0aa-530f15bba971"
 
+def SetFlagStopQuery(sender_id):
+    print("stack: SetFlagStopQuery")
+    try:
+        DATABASE_URL = os.environ['DATABASE_URL']
+        # Connect to an existing database
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_flags_user',))
+        need_stop_check = False
+        if(cur.rowcount == 0):
+            # Execute a command: this creates a new table
+            cur.execute("CREATE TABLE data_flags_user (id serial PRIMARY KEY, sender_id varchar(50), flag_id varchar(36) );")
+            need_stop_check = True
+
+        if need_stop_check:
+            return True
+        else:
+            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+            if cur.rowcount > 0:
+                result_query = cur.fetchone()
+                if result_query[1] == "1": #Удалим флаг
+                    cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+                    return True
+                else:
+                    cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+                    return True
+            else:
+                return True
+
+       # Make the changes to the database persistent
+        conn.commit()
+        return True
+        # Close communication with the database
+    except Exception as e:
+        print "Error on SetFlagStopQuery:" + e.args[0]
+        return False
+    finally:
+        cur.close()
+        conn.close()
+
+def SetFlagStartQuery(sender_id):
+    print("stack: SetFlagStartQuery")
+    try:
+        DATABASE_URL = os.environ['DATABASE_URL']
+        # Connect to an existing database
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_flags_user',))
+        need_stop_check = True
+        if(cur.rowcount == 0):
+            # Execute a command: this creates a new table
+            cur.execute("CREATE TABLE data_flags_user (id serial PRIMARY KEY, sender_id varchar(50), flag_id varchar(36) );")
+            need_stop_check = False
+
+        need_new_string = False
+        if need_stop_check:
+            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+            if cur.rowcount > 0:
+                result_query = cur.fetchone()
+                if result_query[1] == "1": #Запрос задан - мы просто ждем
+                    return False
+                else: # удалим строку и вскинем флаг и вернем True
+                    cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+                    need_new_string = True
+            else: #вскинем флаг и вернем True
+                need_new_string = True
+        else: #вскинем флаг и вернем True
+            need_new_string = True
+        if need_new_string = True:
+            # Pass data to fill a query placeholders and let Psycopg perform
+            # the correct conversion (no more SQL injections!)
+            cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",
+                (sender_id, "1"))
+       # Make the changes to the database persistent
+        conn.commit()
+        return True
+        # Close communication with the database
+    except Exception as e:
+        print "Error on SetFlagStartQuery:" + e.args[0]
+        return True
+    finally:
+        cur.close()
+        conn.close()
+
+def GetFlagStopQuery(sender_id):
+    print("stack: GetFlagStopQuery")
+    try:
+        DATABASE_URL = os.environ['DATABASE_URL']
+        # Connect to an existing database
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_flags_user',))
+        need_stop_check = False
+        if(cur.rowcount == 0):
+            # Execute a command: this creates a new table
+            cur.execute("CREATE TABLE data_flags_user (id serial PRIMARY KEY, sender_id varchar(50), flag_id varchar(36) );")
+            need_stop_check = True
+
+
+        if need_stop_check:
+            return False
+        else:
+            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+            if cur.rowcount > 0:
+                result_query = cur.fetchone()
+                if result_query[1] == "1": #Запрос задан - мы просто ждем
+                    return True
+                else:
+                    cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+                    return False
+            else:
+                return False
+
+       # Make the changes to the database persistent
+        conn.commit()
+        return False
+        # Close communication with the database
+    except Exception as e:
+        print "Error on GetFlagStopQuery:" + e.args[0]
+        return False
+    finally:
+        cur.close()
+        conn.close()
+
 def RequestItilium(dict_data):
     print("stack: RequestItilium")
     try:
@@ -2132,8 +2259,19 @@ def incoming():
     if isinstance(viber_request, ViberMessageRequest):
         sender_id = viber_request.sender.id
         message = viber_request.message
-        is_registered_user = GetIsRegisteredUser(sender_id)
-        GoToCurrentState(sender_id, message, is_registered_user)
+        if GetFlagStopQuery(sender_id) == True:
+            return Response(status=200)
+        else:
+            if SetFlagStartQuery(sender_id) == True:
+                try:
+                    is_registered_user = GetIsRegisteredUser(sender_id)
+                    GoToCurrentState(sender_id, message, is_registered_user)
+                except Exception as e:
+                    print ("Error:"+ e.args[0])
+                finally:
+                    SetFlagStopQuery(sender_id)
+            else:
+                return Response(status=200)
 
     elif isinstance(viber_request, ViberSubscribedRequest):
         viber.send_messages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
