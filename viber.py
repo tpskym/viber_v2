@@ -1465,7 +1465,7 @@ def proc3acf9e3b54a5487191e24a5de6948277(sender_id, message, data, service_data_
     return
 
 def proccfbbb503f7b94287b6219ec07cbe0afa(sender_id, message, data, service_data_bot_need, carousel_id):
-    #Не удалось отклонить
+    #Отмена
     print("stack: proccfbbb503f7b94287b6219ec07cbe0afa")
     if GetIdStateForClearData() == "cfbbb503-f7b9-4287-b621-9ec07cbe0afa":
         service_data_bot_need = {}
