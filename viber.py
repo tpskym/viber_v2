@@ -2358,12 +2358,13 @@ def incoming():
         return Response(status=403)
     viber_request = viber.parse_request(request.get_data())
 
-    if isinstance(viber_request.message, PictureMessage):
-        print ("picture message")
-        print (viber_request.message.text)
-        print (viber_request.message.media)
+
 
     if isinstance(viber_request, ViberMessageRequest):
+        if isinstance(viber_request.message, PictureMessage):
+            print ("picture message")
+            print (viber_request.message.text)
+            print (viber_request.message.media)
         sender_id = viber_request.sender.id
         message = viber_request.message
         if GetFlagStopQuery(sender_id) == True:
