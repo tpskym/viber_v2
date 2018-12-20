@@ -2359,8 +2359,8 @@ def incoming():
 
     if isinstance(message, PictureMessage):
         print ("picture message")
-        print (message.text)
-        print (message.media)
+        print (viber_request.message.text)
+        print (viber_request.message.media)
 
     if isinstance(viber_request, ViberMessageRequest):
         sender_id = viber_request.sender.id
