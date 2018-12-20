@@ -1412,7 +1412,7 @@ def proc3ec26f31a5dd4ff7a95fc7c612cf273a(sender_id, message, data, service_data_
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "cfbbb503-f7b9-4287-b621-9ec07cbe0afa",
-        "Text": "Не удалось отклонить" })
+        "Text": "Отмена" })
     viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "ec26f31-a5dd-4ff7-a95f-c7c612cf273a3", service_data_bot_need, data, carousel_id): #proc_function_expect_user3ec26f31a5dd4ff7a95fc7c612cf273a
         viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
@@ -1427,7 +1427,7 @@ def proc_function_expect_user3ec26f31a5dd4ff7a95fc7c612cf273a(sender_id, message
         data = {}
     text = GetTextCommand(message)
     if text == "cfbbb503-f7b9-4287-b621-9ec07cbe0afa":
-        proccfbbb503f7b94287b6219ec07cbe0afa(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Не удалось отклонить
+        proccfbbb503f7b94287b6219ec07cbe0afa(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Отмена
         return
     result_programm_select = proc_function3ec26f31a5dd4ff7a95fc7c612cf273a(sender_id, text, data, carousel_id)
     if result_programm_select == "error_network":
