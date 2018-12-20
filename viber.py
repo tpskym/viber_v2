@@ -1557,7 +1557,7 @@ def proc_get_list_cortegescdab1713d317452bbbdb8a484d513051(sender_id, data, caro
             for incident in list:
                 list_ret.append((incident.get('id'),incident.get('view')))
                 list_ret_full.append((incident.get('id'),incident.get('detail_view')))
-            data.update({'list_open_incidents':list_ret_full })
+            data.update({'list_open_incidents_full':list_ret_full,"list_open_incidents": list_ret})
             return list_ret # В процедуре обработке надо направить на нужное состояние, если требуется
         else:
             text_error = text
