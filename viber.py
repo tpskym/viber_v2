@@ -2357,7 +2357,7 @@ def incoming():
         return Response(status=403)
     viber_request = viber.parse_request(request.get_data())
 
-    if isinstance(message, PictureMessage):
+    if isinstance(viber_request.message, PictureMessage):
         print ("picture message")
         print (viber_request.message.text)
         print (viber_request.message.media)
