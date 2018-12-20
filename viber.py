@@ -530,7 +530,7 @@ def proc_get_user_detail_view_by_id84c5c09c78824f2f819bd1eef1b3913e(sender_id, c
     for id, detail_view in data.get('list_open_incidents_full'):
         if id == carousel_id:
             return detail_view
-        return "Не найден"
+    return "Не найден"
 
 def proced689fd18d5942468b1892b7a2f97292(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команды карусели (команды элемента карусели)
@@ -1469,7 +1469,7 @@ def proc_get_user_detail_view_by_iddbb86b04001b4aa587bd0598114130e3(sender_id, c
     for id, detail_view in data.get('list_open_incidents'):
         if id == carousel_id:
             return detail_view
-        return "Не найдено обращение"
+    return "Не найдено обращение"
 
 def proc7e43a7686c964691abb16ccf4e47e119(sender_id, message, data, service_data_bot_need, carousel_id):
     #Обращение не подтверждено
@@ -1611,7 +1611,7 @@ def proc_get_user_detail_view_by_id9e625d3af5e246b2b30e56242d8be3e5(sender_id, c
     for id, detail_view in data.get('list_open_incidents_full'):
         if id == carousel_id:
             return detail_view
-        return "Не найден"
+    return "Не найден"
 
 def proc6263c108cd6443a2b3678ab97a445fc7(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команды элемента (команды элемента карусели)
@@ -1818,7 +1818,7 @@ def proc_get_user_detail_view_by_idea557c1bbda64ec0a0c7ad3e4f493afc(sender_id, c
     for id, detail_view in data.get('list_open_incidents'):
         if id == carousel_id:
             return detail_view
-        return "Не найден"
+    return "Не найден"
 
 def proc17c11a9477c8493db93470bdbee77ffc(sender_id, message, data, service_data_bot_need, carousel_id):
     #Команды карусели (команды элемента карусели)
