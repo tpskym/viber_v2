@@ -114,7 +114,7 @@ def GetIsRegisteredUser(sender_id):
     is_error, text, state = RequestItilium({"data": {"action": "is_not_registered","sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        viber.send_messages(sender_id, TextMessage(text="Ошибка работы сети. Проверьте доступность сети:" + text_error))
         return False
     else:
         if state:
@@ -124,7 +124,7 @@ def GetIsRegisteredUser(sender_id):
                 return False
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text="error with code:" + str(text_error)))
+            viber.send_messages(sender_id, TextMessage(text="Ошибка при проверке регистрации, проверьте доступность Основной базы:" + str(text_error)))
             return False
 
 def GetIdErrorState():
@@ -2131,7 +2131,6 @@ def incoming():
         message = viber_request.message
         is_registered_user = GetIsRegisteredUser(sender_id)
         GoToCurrentState(sender_id, message, is_registered_user)
-
 
     elif isinstance(viber_request, ViberSubscribedRequest):
         viber.send_messages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
