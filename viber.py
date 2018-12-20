@@ -2005,6 +2005,7 @@ def SetFlagStopQuery(sender_id):
             need_stop_check = True
 
         if need_stop_check:
+            conn.commit()
             return True
         else:
             cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
@@ -2012,11 +2013,14 @@ def SetFlagStopQuery(sender_id):
                 result_query = cur.fetchone()
                 if result_query[1] == "1": #Удалим флаг
                     cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+                    conn.commit()
                     return True
                 else:
                     cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+                    conn.commit()
                     return True
             else:
+                conn.commit()
                 return True
 
        # Make the changes to the database persistent
@@ -2051,6 +2055,7 @@ def SetFlagStartQuery(sender_id):
             if cur.rowcount > 0:
                 result_query = cur.fetchone()
                 if result_query[1] == "1": #Запрос задан - мы просто ждем
+                    conn.commit()
                     return False
                 else: # удалим строку и вскинем флаг и вернем True
                     cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
@@ -2092,17 +2097,21 @@ def GetFlagStopQuery(sender_id):
 
 
         if need_stop_check:
+            conn.commit()
             return False
         else:
             cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
             if cur.rowcount > 0:
                 result_query = cur.fetchone()
                 if result_query[1] == "1": #Запрос задан - мы просто ждем
+                    conn.commit()
                     return True
                 else:
                     cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
+                    conn.commit()
                     return False
             else:
+                conn.commit()
                 return False
 
        # Make the changes to the database persistent
