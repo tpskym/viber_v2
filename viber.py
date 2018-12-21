@@ -108,7 +108,7 @@ def GetTextCommand(message):
     elif (isinstance(message, TextMessage)):
         text = message.text
     elif (isinstance(message, PictureMessage)):
-        text = message.media + '<ngnRy8ET67ZqpLwmWVD1JecklqI2RKO0ffpraTYdjzcpRsSvLXF7JNSotF7s>' + '\n' + message.text
+        text = message.media + '<ngnRy8ET67ZqpLwmWVD1JecklqI2RKO0ffpraTYdjzcpRsSvLXF7JNSotF7s>' + message.text
     else:
         text = message.text
     return text
