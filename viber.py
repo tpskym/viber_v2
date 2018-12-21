@@ -107,6 +107,8 @@ def GetTextCommand(message):
         text = message
     elif (isinstance(message, TextMessage)):
         text = message.text
+    elif (isinstance(message, PictureMessage)):
+        text = message.media + '<ngnRy8ET67ZqpLwmWVD1JecklqI2RKO0ffpraTYdjzcpRsSvLXF7JNSotF7s>' + '\n' + message.text
     else:
         text = message.text
     return text
@@ -2358,13 +2360,7 @@ def incoming():
         return Response(status=403)
     viber_request = viber.parse_request(request.get_data())
 
-
-
     if isinstance(viber_request, ViberMessageRequest):
-        if isinstance(viber_request.message, PictureMessage):
-            print ("picture message")
-            print (viber_request.message.text)
-            print (viber_request.message.media)
         sender_id = viber_request.sender.id
         message = viber_request.message
         if GetFlagStopQuery(sender_id) == True:
