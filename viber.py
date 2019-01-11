@@ -15,6 +15,8 @@ from viberbot.api.viber_requests import ViberFailedRequest
 from viberbot.api.viber_requests import ViberMessageRequest
 from viberbot.api.viber_requests import ViberSubscribedRequest
 from viberbot.api.viber_requests import ViberUnsubscribedRequest
+from viberbot.api.viber_requests import ViberDeliveredRequest
+
 import json
 
 
