@@ -2391,7 +2391,7 @@ def incoming():
     elif isinstance(viber_request, ViberDeliveredRequest):
         print(viber_request)
         try:
-            print("Доставлено сообщение  " + viber_request['message_token'] + " " + " для пользователя " + viber_request.user_id  )
+            print("Доставлено сообщение  " + viber_request.message.id + " " + " для пользователя " + viber_request.sender.id  )
         except Exception as e:
             print ("Error:"+ e.args[0])
 
