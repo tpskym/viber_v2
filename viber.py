@@ -19,6 +19,136 @@ from viberbot.api.viber_requests import ViberDeliveredRequest
 
 import json
 
+def ViberSendMessages(to, messages):
+    print("stack: ViberSendMessages")
+    SaveIdSendetCommand(viber.send_messages(to, messages), to)
+
+def SaveIdSendetCommand(list_tokens, sender_id):
+    print("stack: SaveIdSendetCommand")
+    #Сохранить в базу отправленные команды
+    try:
+        DATABASE_URL = os.environ['DATABASE_URL']
+        # Connect to an existing database
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_undelivered_send_messages',))
+        if(cur.rowcount == 0):
+            # Execute a command: this creates a new table
+            cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
+        # Pass data to fill a query placeholders and let Psycopg perform
+        # the correct conversion (no more SQL injections!)
+        for message_id in list_tokens:
+            cur.execute("INSERT INTO data_undelivered_send_messages (sender_id, message_id) VALUES (%s, %s)",
+              (sender_id, str(message_id)))
+
+       # Make the changes to the database persistent
+        conn.commit()
+        # Close communication with the database
+    except Exception as e:
+        print("Error on SaveIdSendetCommand" + e.args[0])
+    finally:
+        cur.close()
+        conn.close()
+
+
+def ExistNotDeliveredCommands(sender_id):
+    print("stack: ExistNotDeliveredCommands")
+    #Есть недоставленые команды, отправленные ботом пользователю
+    exist_records = False
+    try:
+        DATABASE_URL = os.environ['DATABASE_URL']
+        # Connect to an existing database
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+        need_query = True
+
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_undelivered_send_messages',))
+        if(cur.rowcount == 0):
+            # Execute a command: this creates a new table
+            cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
+            need_query = False
+
+        if need_query:
+            cur.execute("select * from data_undelivered_send_messages where sender_id=%s", (sender_id,))
+            if(cur.rowcount > 0):
+                exist_records = True
+       # Make the changes to the database persistent
+        conn.commit()
+        # Close communication with the database
+    except Exception as e:
+        print("Error on ExistNotDeliveredCommands" + e.args[0])
+        return False
+    finally:
+        cur.close()
+        conn.close()
+    return exist_records
+
+
+def onFailedDeliveredMessage(message_id, sender_id):
+    print("stack: onFailedDeliveredMessage")
+    # Ошибка при доставке команды, отправленной ботом пользователю - удалим все
+    # команды, сохраненные у пользователя и перейдем на состояние ошибки
+    # тут надо не зациклиться, нельзя пользователю посылать в этом состоянии
+    # команды.
+    try:
+        DATABASE_URL = os.environ['DATABASE_URL']
+        # Connect to an existing database
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+        need_drop = True
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_undelivered_send_messages',))
+        if(cur.rowcount == 0):
+            # Execute a command: this creates a new table
+            cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
+            need_drop = False
+
+        if need_drop:
+            cur.execute("DELETE FROM data_undelivered_send_messages WHERE sender_id = %s", (sender_id, ));
+
+       # Make the changes to the database persistent
+        conn.commit()
+        # Close communication with the database
+    except Exception as e:
+        print("Error on onFailedDeliveredMessage" + e.args[0])
+    finally:
+        cur.close()
+        conn.close()
+
+
+
+def onDeliveredMessage(message_id, user_id):
+    print("stack: onDeliveredMessage")
+    #доставка команды пользователю - надо удалить из списка сохраненных команд
+    # эту команду
+    try:
+        DATABASE_URL = os.environ['DATABASE_URL']
+        # Connect to an existing database
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+        need_drop = True
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_undelivered_send_messages',))
+        if(cur.rowcount == 0):
+            # Execute a command: this creates a new table
+            cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
+            need_drop = False
+
+        if need_drop:
+            cur.execute("DELETE FROM data_undelivered_send_messages WHERE sender_id = %s and message_id = %s", (sender_id, str(message_id)));
+
+       # Make the changes to the database persistent
+        conn.commit()
+        # Close communication with the database
+    except Exception as e:
+        print("Error on onDeliveredMessage" + e.args[0])
+    finally:
+        cur.close()
+        conn.close()
+
+
 
 def SaveStateToPostgress(sender_id, state_id, carousel_id, data_user, data):
     print("stack: SaveStateToPostgress")
@@ -119,7 +249,7 @@ def GetIsRegisteredUser(sender_id):
     is_error, text, state = RequestItilium({"data": {"action": "is_not_registered","sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка работы сети. Проверьте доступность сети:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка работы сети. Проверьте доступность сети:" + text_error))
         return False
     else:
         if state:
@@ -129,7 +259,7 @@ def GetIsRegisteredUser(sender_id):
                 return False
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text="Ошибка при проверке регистрации, проверьте доступность Основной базы:" + str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text="Ошибка при проверке регистрации, проверьте доступность Основной базы:" + str(text_error)))
             return False
 
 def GetIdErrorState():
@@ -163,7 +293,7 @@ def ShowCarousel(sender_id, result_list, number_parts):
             buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "back_data", "Text": "Назад"})
         buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "cancel", "Text": "Отменить"})
         text_keyboard = {"Type": "keyboard","InputFieldState": "hidden", "Buttons": buttons_keyboard}
-        viber.send_messages(sender_id, [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
+        ViberSendMessages(sender_id, [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
                                                           "Buttons":buttons}), KeyboardMessage(
                                                                    keyboard=text_keyboard, min_api_version=4)])
     else:
@@ -176,7 +306,7 @@ def ShowCarousel(sender_id, result_list, number_parts):
             buttons.append({"TextVAlign": "top", "TextHAlign": "left", "ActionBody": id, "Text": view})
         buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "cancel", "Text": "Отменить"})
         text_keyboard.update({"Buttons": buttons_keyboard})
-        viber.send_messages(sender_id, [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
+        ViberSendMessages(sender_id, [RichMediaMessage(min_api_version=4, rich_media={"Type": "rich_media", "BgColor": "#FFFFFF",
                                                             "Buttons":buttons}), KeyboardMessage(
                                                                      keyboard=text_keyboard, min_api_version=4)])
 
@@ -207,7 +337,7 @@ def proc02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Добрый день!"))
+    ViberSendMessages(sender_id, TextMessage(text="Добрый день!"))
     if not isinstance(data, dict):
         data = {}
     result_programm_select = proc_function02957edd8e984dd4a0aa530f15bba971(sender_id, message, data, service_data_bot_need, carousel_id)
@@ -243,9 +373,9 @@ def proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Введите идентификатор подписчика"))
+    ViberSendMessages(sender_id, TextMessage(text="Введите идентификатор подписчика"))
     if not SaveState(sender_id, "b68be2d-5a9a-4d06-adb5-9b874e1673ea1", service_data_bot_need, data, carousel_id): #proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -270,18 +400,18 @@ def proc_function1b68be2d5a9a4d06adb59b874e1673ea(sender_id, text, data, carouse
     is_error, text, state = RequestItilium({"data": {"action": "is_valid_code", "phone":text,"sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
             if str(text) == "1":
                 return "0"
             else:
-                viber.send_messages(sender_id, TextMessage(text=text))
+                ViberSendMessages(sender_id, TextMessage(text=text))
                 return "1"
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text="error with code:" + str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text="error with code:" + str(text_error)))
             return "error" # В процедуре обработке надо направить на нужное состояние
 
 def proc2b3f0bd4eef0409c9ffb14ffb0d21861(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -291,7 +421,7 @@ def proc2b3f0bd4eef0409c9ffb14ffb0d21861(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Секретный код неверный!"))
+    ViberSendMessages(sender_id, TextMessage(text="Секретный код неверный!"))
     proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Ввод секретного кода
     return
 
@@ -303,10 +433,10 @@ def proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "095761bb-67d8-455b-bf09-4e32d0e8dc4f", service_data_bot_need, data, carousel_id): #proc095761bb67d8455bbf094e32d0e8dc4f
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
-    viber.send_messages(sender_id, TextMessage(text="Выберите действие"))
+    ViberSendMessages(sender_id, TextMessage(text="Выберите действие"))
     buttons = []
     buttons.append({
         "Columns": 6,
@@ -333,9 +463,9 @@ def proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "f6829c8b-eb46-4c61-8ab6-3bd31f6bc879",
         "Text": "Получить статус" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "95761bb-67d8-455b-bf09-4e32d0e8dc4f0", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -364,16 +494,16 @@ def proc76456fc5a5d34b5481dcb15c34787790(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Опишите вашу проблему."))
+    ViberSendMessages(sender_id, TextMessage(text="Опишите вашу проблему."))
     buttons = []
     buttons.append({
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "6cc42644-4b07-4aa8-88dc-eecf90f5260a",
         "Text": "Отмена" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "6456fc5-a5d3-4b54-81dc-b15c347877907", service_data_bot_need, data, carousel_id): #proc_function_expect_user76456fc5a5d34b5481dcb15c34787790
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -401,15 +531,15 @@ def proc_function76456fc5a5d34b5481dcb15c34787790(sender_id, text, data, carouse
     is_error, text, state = RequestItilium({"data": {"action": "is_registration","text": text, "sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error_network" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
-            viber.send_messages(sender_id, TextMessage(text=str("Зарегистрирован документ:" + str(text))))
+            ViberSendMessages(sender_id, TextMessage(text=str("Зарегистрирован документ:" + str(text))))
             return "OK" # В процедуре обработке надо направить на нужное состояние, если требуется
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text=str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text=str(text_error)))
             return "error_in_itilium" # В процедуре обработке надо направить на нужное состояние
 
 def proc6cc426444b074aa888dceecf90f5260a(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -419,7 +549,7 @@ def proc6cc426444b074aa888dceecf90f5260a(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Обращение не зарегистрировано"))
+    ViberSendMessages(sender_id, TextMessage(text="Обращение не зарегистрировано"))
     proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Выбор действия
     return
 
@@ -451,16 +581,16 @@ def proc_function91d863c10ff0456bacb086818cac8a03(sender_id, message, data, serv
     is_error, text, state = RequestItilium({"data": {"action": "is_list_open_incidents","sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error_network" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
             list = json.loads(text)
             if len(list) == 0:
-                viber.send_messages(sender_id, TextMessage(text="У вас нет зарегистрированных открытых обращений"))
+                ViberSendMessages(sender_id, TextMessage(text="У вас нет зарегистрированных открытых обращений"))
                 return "OK"
             elif len(list) == 1:
-                viber.send_messages(sender_id, TextMessage(text=list[0].get('detail_view')))
+                ViberSendMessages(sender_id, TextMessage(text=list[0].get('detail_view')))
                 carousel_id = list[0].get('id')
                 return "comand_to_selected_incident"
             else:
@@ -473,7 +603,7 @@ def proc_function91d863c10ff0456bacb086818cac8a03(sender_id, message, data, serv
                 return "confirm_incidents_carousel"
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text=str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text=str(text_error)))
             return "error_in_itilium" # В процедуре обработке надо направить на нужное состояние
 
 def proc1252095275704b2a907cb2e089e0ed77(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -484,7 +614,7 @@ def proc1252095275704b2a907cb2e089e0ed77(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "12520952-7570-4b2a-907c-b2e089e0ed77", service_data_bot_need, data, carousel_id): #proc1252095275704b2a907cb2e089e0ed77
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
 
@@ -498,7 +628,7 @@ def proc1252095275704b2a907cb2e089e0ed77(sender_id, message, data, service_data_
         ShowCarousel(sender_id, result_list, number_parts)
         service_data_bot_need.update({"number_parts1252095275704b2a907cb2e089e0ed77":number_parts})
         if not SaveState(sender_id, "2520952-7570-4b2a-907c-b2e089e0ed771", service_data_bot_need, data, carousel_id): #proc_expect_comand_user1252095275704b2a907cb2e089e0ed77
-            viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+            ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
             GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
             return
     return
@@ -544,10 +674,10 @@ def proc84c5c09c78824f2f819bd1eef1b3913e(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Выбранное обращение"))
+    ViberSendMessages(sender_id, TextMessage(text="Выбранное обращение"))
 
     detail_view = proc_get_user_detail_view_by_id84c5c09c78824f2f819bd1eef1b3913e(sender_id, carousel_id, data)
-    viber.send_messages(sender_id, TextMessage(text=detail_view))
+    ViberSendMessages(sender_id, TextMessage(text=detail_view))
     return
 
 def proc_get_user_detail_view_by_id84c5c09c78824f2f819bd1eef1b3913e(sender_id, carousel_id, data):
@@ -566,7 +696,7 @@ def proced689fd18d5942468b1892b7a2f97292(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "ed689fd1-8d59-4246-8b18-92b7a2f97292", service_data_bot_need, data, carousel_id): #proced689fd18d5942468b1892b7a2f97292
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     buttons = []
@@ -580,9 +710,9 @@ def proced689fd18d5942468b1892b7a2f97292(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "2ad315bd-42ff-45b8-85ae-cdc9d04c0a9e",
         "Text": "Отмена" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
     if not SaveState(sender_id, "d689fd1-8d59-4246-8b18-92b7a2f97292e", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clicked689fd18d5942468b1892b7a2f97292
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -605,16 +735,16 @@ def procbb53668eeb8e4153bdf7a72781739830(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Укажите текст"))
+    ViberSendMessages(sender_id, TextMessage(text="Укажите текст"))
     buttons = []
     buttons.append({
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "29615d83-6647-459d-ac36-095a2b7287cc",
         "Text": "Отмена" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "b53668e-eb8e-4153-bdf7-a72781739830b", service_data_bot_need, data, carousel_id): #proc_function_expect_userbb53668eeb8e4153bdf7a72781739830
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -642,14 +772,14 @@ def proc_functionbb53668eeb8e4153bdf7a72781739830(sender_id, text, data, carouse
     is_error, text, state = RequestItilium({"data": {"action": "is_add_converstaion","incident" : carousel_id,"text":text,"sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error_network" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
             return "OK" # В процедуре обработке надо направить на нужное состояние, если требуется
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text=str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text=str(text_error)))
             return "error_in_itilium" # В процедуре обработке надо направить на нужное состояние
 
 def proc2ad315bd42ff45b885aecdc9d04c0a9e(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -669,7 +799,7 @@ def proca0981bccc8ee486e943257b9de36f2d1(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Уточнения не внесены"))
+    ViberSendMessages(sender_id, TextMessage(text="Уточнения не внесены"))
     proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Выбор действия
     return
 
@@ -680,7 +810,7 @@ def proce022f99d4b914e8a8469546d143ff4e5(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Уточнения внесены"))
+    ViberSendMessages(sender_id, TextMessage(text="Уточнения внесены"))
     proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Выбор действия
     return
 
@@ -692,7 +822,7 @@ def proc4cca60de6e5643a0a27b251f132fafac(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "4cca60de-6e56-43a0-a27b-251f132fafac", service_data_bot_need, data, carousel_id): #proc4cca60de6e5643a0a27b251f132fafac
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     buttons = []
@@ -706,9 +836,9 @@ def proc4cca60de6e5643a0a27b251f132fafac(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "29615d83-6647-459d-ac36-095a2b7287cc",
         "Text": "Отмена" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "cca60de-6e56-43a0-a27b-251f132fafac4", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click4cca60de6e5643a0a27b251f132fafac
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -752,10 +882,10 @@ def proc5160f46d71b8466a8b28db1bf17d5392(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "5160f46d-71b8-466a-8b28-db1bf17d5392", service_data_bot_need, data, carousel_id): #proc5160f46d71b8466a8b28db1bf17d5392
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
-    viber.send_messages(sender_id, TextMessage(text="Обращения для подтверждения"))
+    ViberSendMessages(sender_id, TextMessage(text="Обращения для подтверждения"))
 
     number_parts = 1;
     temp = service_data_bot_need.get("number_parts5160f46d71b8466a8b28db1bf17d5392")
@@ -767,7 +897,7 @@ def proc5160f46d71b8466a8b28db1bf17d5392(sender_id, message, data, service_data_
         ShowCarousel(sender_id, result_list, number_parts)
         service_data_bot_need.update({"number_parts5160f46d71b8466a8b28db1bf17d5392":number_parts})
         if not SaveState(sender_id, "160f46d-71b8-466a-8b28-db1bf17d53925", service_data_bot_need, data, carousel_id): #proc_expect_comand_user5160f46d71b8466a8b28db1bf17d5392
-            viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+            ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
             GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
             return
     elif result_list == "error_network":
@@ -784,7 +914,7 @@ def proc_get_list_corteges5160f46d71b8466a8b28db1bf17d5392(sender_id, data, caro
     is_error, text, state = RequestItilium({"data": {"action": "is_list_need_confirmed_incidents","sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error_network" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
@@ -801,7 +931,7 @@ def proc_get_list_corteges5160f46d71b8466a8b28db1bf17d5392(sender_id, data, caro
             return list_ret # В процедуре обработке надо направить на нужное состояние, если требуется
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text=str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text=str(text_error)))
             return "error_in_itilium" # В процедуре обработке надо направить на нужное состояние
 
 
@@ -841,7 +971,7 @@ def procdae1f3640d8a4eb0aed3fc1b63e187aa(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "dae1f364-0d8a-4eb0-aed3-fc1b63e187aa", service_data_bot_need, data, carousel_id): #procdae1f3640d8a4eb0aed3fc1b63e187aa
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     buttons = []
@@ -860,9 +990,9 @@ def procdae1f3640d8a4eb0aed3fc1b63e187aa(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "42747c5a-b756-49b0-b830-bcf82d3dca9c",
         "Text": "Назад" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
     if not SaveState(sender_id, "ae1f364-0d8a-4eb0-aed3-fc1b63e187aad", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clickdae1f3640d8a4eb0aed3fc1b63e187aa
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -908,7 +1038,7 @@ def proc_function5ba6c9fdcb214aa2972c4020574f3157(sender_id, message, data, serv
     is_error, text, state = RequestItilium({"data": {"action": "is_get_rating_for_incidents_confirmation", "incident":carousel_id,"sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error_network" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
@@ -930,7 +1060,7 @@ def proc_function5ba6c9fdcb214aa2972c4020574f3157(sender_id, message, data, serv
                 return "confirm"
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text=str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text=str(text_error)))
             return "error_in_itilium" # В процедуре обработке надо направить на нужное состояние
 
 def proca22a380f1e104600808c465bd6ab3777(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -941,10 +1071,10 @@ def proca22a380f1e104600808c465bd6ab3777(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "a22a380f-1e10-4600-808c-465bd6ab3777", service_data_bot_need, data, carousel_id): #proca22a380f1e104600808c465bd6ab3777
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
-    viber.send_messages(sender_id, TextMessage(text="Оцените выполнение обращения"))
+    ViberSendMessages(sender_id, TextMessage(text="Оцените выполнение обращения"))
     buttons = []
     buttons.append({
         "Columns": 6,
@@ -976,9 +1106,9 @@ def proca22a380f1e104600808c465bd6ab3777(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "e6d53aa2-210b-4ed3-8e9f-5e6cea9bc777",
         "Text": "Отменить" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "22a380f-1e10-4600-808c-465bd6ab3777a", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clicka22a380f1e104600808c465bd6ab3777
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -1034,16 +1164,16 @@ def procd2aeca9275214a6caa98de3001dd081f(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Укажите комментарий"))
+    ViberSendMessages(sender_id, TextMessage(text="Укажите комментарий"))
     buttons = []
     buttons.append({
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "7e43a768-6c96-4691-abb1-6ccf4e47e119",
         "Text": "Отмена" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "2aeca92-7521-4a6c-aa98-de3001dd081fd", service_data_bot_need, data, carousel_id): #proc_function_expect_userd2aeca9275214a6caa98de3001dd081f
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -1074,16 +1204,16 @@ def proc4f2c3d625e2f4665bf75177d4363273c(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Укажите комментарий"))
+    ViberSendMessages(sender_id, TextMessage(text="Укажите комментарий"))
     buttons = []
     buttons.append({
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "f8baff8b-ac01-4776-849f-f22db27006da",
         "Text": "Пропустить" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "f2c3d62-5e2f-4665-bf75-177d4363273c4", service_data_bot_need, data, carousel_id): #proc_function_expect_user4f2c3d625e2f4665bf75177d4363273c
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -1224,7 +1354,7 @@ def proce6d53aa2210b4ed38e9f5e6cea9bc777(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Подтверждение не выполнено"))
+    ViberSendMessages(sender_id, TextMessage(text="Подтверждение не выполнено"))
     proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Выбор действия
     return
 
@@ -1236,10 +1366,10 @@ def procd454043806d1401f87b5ab49f4142f18(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "d4540438-06d1-401f-87b5-ab49f4142f18", service_data_bot_need, data, carousel_id): #procd454043806d1401f87b5ab49f4142f18
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
-    viber.send_messages(sender_id, TextMessage(text="Оцените выполнение обращения"))
+    ViberSendMessages(sender_id, TextMessage(text="Оцените выполнение обращения"))
     buttons = []
     buttons.append({
         "Columns": 6,
@@ -1276,9 +1406,9 @@ def procd454043806d1401f87b5ab49f4142f18(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "c937a519-2897-450e-bc6b-ca9aa2c743e2",
         "Text": "Отменить" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "4540438-06d1-401f-87b5-ab49f4142f18d", service_data_bot_need, data, carousel_id): #proc_expect_user_button_clickd454043806d1401f87b5ab49f4142f18
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -1383,7 +1513,7 @@ def procc937a5192897450ebc6bca9aa2c743e2(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Подтверждение не выполнено"))
+    ViberSendMessages(sender_id, TextMessage(text="Подтверждение не выполнено"))
     proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Выбор действия
     return
 
@@ -1413,14 +1543,14 @@ def proc_function01a9eda608194126be9830251a261e42(sender_id, message, data, serv
     is_error, text, state = RequestItilium({"data": {"action": "is_confirm_incident","rating":rating, "comment":comment, "incident":carousel_id,"sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error_network" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
             return "OK" # В процедуре обработке надо направить на нужное состояние, если требуется
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text=str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text=str(text_error)))
             return "error_in_itilium" # В процедуре обработке надо направить на нужное состояние
 
 def proc3ec26f31a5dd4ff7a95fc7c612cf273a(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -1430,16 +1560,16 @@ def proc3ec26f31a5dd4ff7a95fc7c612cf273a(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Введите комментарий"))
+    ViberSendMessages(sender_id, TextMessage(text="Введите комментарий"))
     buttons = []
     buttons.append({
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "cfbbb503-f7b9-4287-b621-9ec07cbe0afa",
         "Text": "Отмена" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "ec26f31-a5dd-4ff7-a95f-c7c612cf273a3", service_data_bot_need, data, carousel_id): #proc_function_expect_user3ec26f31a5dd4ff7a95fc7c612cf273a
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -1467,14 +1597,14 @@ def proc_function3ec26f31a5dd4ff7a95fc7c612cf273a(sender_id, text, data, carouse
     is_error, text, state = RequestItilium({"data": {"action": "is_decline_incident", "incident":carousel_id,"comment":text, "sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error_network" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
             return "OK" # В процедуре обработке надо направить на нужное состояние, если требуется
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text=str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text=str(text_error)))
             return "error_in_itilium" # В процедуре обработке надо направить на нужное состояние
 
 def proc3acf9e3b54a5487191e24a5de6948277(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -1484,7 +1614,7 @@ def proc3acf9e3b54a5487191e24a5de6948277(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Обращение оклонено"))
+    ViberSendMessages(sender_id, TextMessage(text="Обращение оклонено"))
     proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Выбор действия
     return
 
@@ -1495,7 +1625,7 @@ def proccfbbb503f7b94287b6219ec07cbe0afa(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Не удалось отклонить обращение"))
+    ViberSendMessages(sender_id, TextMessage(text="Не удалось отклонить обращение"))
     proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Выбор действия
     return
 
@@ -1516,10 +1646,10 @@ def procdbb86b04001b4aa587bd0598114130e3(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Выбранное обращение"))
+    ViberSendMessages(sender_id, TextMessage(text="Выбранное обращение"))
 
     detail_view = proc_get_user_detail_view_by_iddbb86b04001b4aa587bd0598114130e3(sender_id, carousel_id, data)
-    viber.send_messages(sender_id, TextMessage(text=detail_view))
+    ViberSendMessages(sender_id, TextMessage(text=detail_view))
     return
 
 def proc_get_user_detail_view_by_iddbb86b04001b4aa587bd0598114130e3(sender_id, carousel_id, data):
@@ -1537,7 +1667,7 @@ def proc7e43a7686c964691abb16ccf4e47e119(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Обращение не подтверждено"))
+    ViberSendMessages(sender_id, TextMessage(text="Обращение не подтверждено"))
     proc5160f46d71b8466a8b28db1bf17d5392(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Обращения для подтверждения
     return
 
@@ -1548,7 +1678,7 @@ def procf5a27e7984da4e5681a8058f67b03c1f(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Обращение подтверждено"))
+    ViberSendMessages(sender_id, TextMessage(text="Обращение подтверждено"))
     proc5160f46d71b8466a8b28db1bf17d5392(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Обращения для подтверждения
     return
 
@@ -1559,7 +1689,7 @@ def procffaaa8bf92394b6c9ff547b87743d7df(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Обращение отклонено"))
+    ViberSendMessages(sender_id, TextMessage(text="Обращение отклонено"))
     proc5160f46d71b8466a8b28db1bf17d5392(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Обращения для подтверждения
     return
 
@@ -1570,7 +1700,7 @@ def procff766d22eecd4b8a9509ad556751429f(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Нет обращений для подтверждения"))
+    ViberSendMessages(sender_id, TextMessage(text="Нет обращений для подтверждения"))
     proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Выбор действия
     return
 
@@ -1582,7 +1712,7 @@ def proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "cdab1713-d317-452b-bbdb-8a484d513051", service_data_bot_need, data, carousel_id): #proccdab1713d317452bbbdb8a484d513051
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
 
@@ -1596,7 +1726,7 @@ def proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_
         ShowCarousel(sender_id, result_list, number_parts)
         service_data_bot_need.update({"number_partscdab1713d317452bbbdb8a484d513051":number_parts})
         if not SaveState(sender_id, "dab1713-d317-452b-bbdb-8a484d513051c", service_data_bot_need, data, carousel_id): #proc_expect_comand_usercdab1713d317452bbbdb8a484d513051
-            viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+            ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
             GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
             return
     elif result_list == "error_network":
@@ -1613,7 +1743,7 @@ def proc_get_list_cortegescdab1713d317452bbbdb8a484d513051(sender_id, data, caro
     is_error, text, state = RequestItilium({"data": {"action": "is_get_last_conversations","sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error_network" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
@@ -1622,7 +1752,7 @@ def proc_get_list_cortegescdab1713d317452bbbdb8a484d513051(sender_id, data, caro
             list_ret = []
             list_ret_full = []
             if len(list) == 0:
-                viber.send_messages(sender_id, TextMessage(text="Нет сообщений за последние 5 дней"))
+                ViberSendMessages(sender_id, TextMessage(text="Нет сообщений за последние 5 дней"))
                 return "OK"
             for incident in list:
                 list_ret.append((incident.get('id'),incident.get('view')))
@@ -1631,7 +1761,7 @@ def proc_get_list_cortegescdab1713d317452bbbdb8a484d513051(sender_id, data, caro
             return list_ret # В процедуре обработке надо направить на нужное состояние, если требуется
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text=str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text=str(text_error)))
             return "error_in_itilium" # В процедуре обработке надо направить на нужное состояние
 
 
@@ -1672,7 +1802,7 @@ def proc9e625d3af5e246b2b30e56242d8be3e5(sender_id, message, data, service_data_
         data = {}
 
     detail_view = proc_get_user_detail_view_by_id9e625d3af5e246b2b30e56242d8be3e5(sender_id, carousel_id, data)
-    viber.send_messages(sender_id, TextMessage(text=detail_view))
+    ViberSendMessages(sender_id, TextMessage(text=detail_view))
     return
 
 def proc_get_user_detail_view_by_id9e625d3af5e246b2b30e56242d8be3e5(sender_id, carousel_id, data):
@@ -1691,7 +1821,7 @@ def proc6263c108cd6443a2b3678ab97a445fc7(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "6263c108-cd64-43a2-b367-8ab97a445fc7", service_data_bot_need, data, carousel_id): #proc6263c108cd6443a2b3678ab97a445fc7
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     buttons = []
@@ -1705,9 +1835,9 @@ def proc6263c108cd6443a2b3678ab97a445fc7(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "11c28422-61c5-4d9f-863b-a2457b97e4ae",
         "Text": "Отмена" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
     if not SaveState(sender_id, "263c108-cd64-43a2-b367-8ab97a445fc76", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click6263c108cd6443a2b3678ab97a445fc7
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -1736,9 +1866,9 @@ def procf7dc6d456b094b7c8dff0942edf2acb5(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "44188e7a-8866-457a-8033-cc9e23b1a1ff",
         "Text": "Сообщение не добавлено" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "regular", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "7dc6d45-6b09-4b7c-8dff-0942edf2acb5f", service_data_bot_need, data, carousel_id): #proc_function_expect_userf7dc6d456b094b7c8dff0942edf2acb5
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -1766,14 +1896,14 @@ def proc_functionf7dc6d456b094b7c8dff0942edf2acb5(sender_id, text, data, carouse
     is_error, text, state = RequestItilium({"data": {"action": "is_add_converstaion","incident" : carousel_id,"text":text,"sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error_network" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
             return "OK" # В процедуре обработке надо направить на нужное состояние, если требуется
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text=str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text=str(text_error)))
             return "error_in_itilium" # В процедуре обработке надо направить на нужное состояние
 
 def proc11c2842261c54d9f863ba2457b97e4ae(sender_id, message, data, service_data_bot_need, carousel_id):
@@ -1793,7 +1923,7 @@ def proc3fb889f893ef403ebaaf6b4e49bb4dd8(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Сообщение добавлено"))
+    ViberSendMessages(sender_id, TextMessage(text="Сообщение добавлено"))
     proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Последние сообщения
     return
 
@@ -1804,7 +1934,7 @@ def proc44188e7a8866457a8033cc9e23b1a1ff(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    viber.send_messages(sender_id, TextMessage(text="Сообщение не добавлено"))
+    ViberSendMessages(sender_id, TextMessage(text="Сообщение не добавлено"))
     proccdab1713d317452bbbdb8a484d513051(sender_id, message, data, service_data_bot_need, carousel_id) #Переход на Последние сообщения
     return
 
@@ -1816,7 +1946,7 @@ def procf6829c8beb464c618ab63bd31f6bc879(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "f6829c8b-eb46-4c61-8ab6-3bd31f6bc879", service_data_bot_need, data, carousel_id): #procf6829c8beb464c618ab63bd31f6bc879
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
 
@@ -1830,7 +1960,7 @@ def procf6829c8beb464c618ab63bd31f6bc879(sender_id, message, data, service_data_
         ShowCarousel(sender_id, result_list, number_parts)
         service_data_bot_need.update({"number_partsf6829c8beb464c618ab63bd31f6bc879":number_parts})
         if not SaveState(sender_id, "6829c8b-eb46-4c61-8ab6-3bd31f6bc879f", service_data_bot_need, data, carousel_id): #proc_expect_comand_userf6829c8beb464c618ab63bd31f6bc879
-            viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+            ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
             GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
             return
     elif result_list == "error_network":
@@ -1845,7 +1975,7 @@ def proc_get_list_cortegesf6829c8beb464c618ab63bd31f6bc879(sender_id, data, caro
     is_error, text, state = RequestItilium({"data": {"action": "is_list_open_incidents","sender": sender_id}})
     if is_error:
         text_error = text
-        viber.send_messages(sender_id, TextMessage(text="Ошибка:" + text_error))
+        ViberSendMessages(sender_id, TextMessage(text="Ошибка:" + text_error))
         return "error_network" # В процедуре обработке надо направить на нужное состояние
     else:
         if state:
@@ -1860,7 +1990,7 @@ def proc_get_list_cortegesf6829c8beb464c618ab63bd31f6bc879(sender_id, data, caro
             return list_ret # В процедуре обработке надо направить на нужное состояние, если требуется
         else:
             text_error = text
-            viber.send_messages(sender_id, TextMessage(text=str(text_error)))
+            ViberSendMessages(sender_id, TextMessage(text=str(text_error)))
             return "error_in_itilium" # В процедуре обработке надо направить на нужное состояние
 
 
@@ -1901,7 +2031,7 @@ def procea557c1bbda64ec0a0c7ad3e4f493afc(sender_id, message, data, service_data_
         data = {}
 
     detail_view = proc_get_user_detail_view_by_idea557c1bbda64ec0a0c7ad3e4f493afc(sender_id, carousel_id, data)
-    viber.send_messages(sender_id, TextMessage(text=detail_view))
+    ViberSendMessages(sender_id, TextMessage(text=detail_view))
     return
 
 def proc_get_user_detail_view_by_idea557c1bbda64ec0a0c7ad3e4f493afc(sender_id, carousel_id, data):
@@ -1920,7 +2050,7 @@ def proc17c11a9477c8493db93470bdbee77ffc(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "17c11a94-77c8-493d-b934-70bdbee77ffc", service_data_bot_need, data, carousel_id): #proc17c11a9477c8493db93470bdbee77ffc
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     buttons = []
@@ -1929,9 +2059,9 @@ def proc17c11a9477c8493db93470bdbee77ffc(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "542a39f9-c585-4d3c-a971-2192a781019f",
         "Text": "Закрыть" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons":buttons}))
     if not SaveState(sender_id, "7c11a94-77c8-493d-b934-70bdbee77ffc1", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click17c11a9477c8493db93470bdbee77ffc
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -1963,19 +2093,19 @@ def proc6cc30e06b21a4176892b507ee382b3e8(sender_id, message, data, service_data_
         carousel_id = ''
         data = {}
     if not SaveState(sender_id, "6cc30e06-b21a-4176-892b-507ee382b3e8", service_data_bot_need, data, carousel_id): #proc6cc30e06b21a4176892b507ee382b3e8
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
-    viber.send_messages(sender_id, TextMessage(text="Ошибка сети. Нет доступа к Итилиум. Нажмите \"да\", когда Итилиум будет опубликован."))
+    ViberSendMessages(sender_id, TextMessage(text="Ошибка сети. Нет доступа к Итилиум. Нажмите \"да\", когда Итилиум будет опубликован."))
     buttons = []
     buttons.append({
         "Columns": 6,
         "Rows": 1,
         "ActionBody": "5c625ad3-ac90-4009-97e7-d2e0b64d18c3",
         "Text": "да" })
-    viber.send_messages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
+    ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "cc30e06-b21a-4176-892b-507ee382b3e86", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click6cc30e06b21a4176892b507ee382b3e8
-        viber.send_messages(sender_id, TextMessage(text="ERROR SAVE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
         return
     return
@@ -2280,13 +2410,13 @@ def GoToCurrentState(sender_id, message, is_registered_user):
                 GoToStateByID(sender_id, message, state_id, data, data_user, carousel_id)
         else:
             if is_error:
-                viber.send_messages(sender_id, TextMessage(text="ERROR RESTORE STATE"))
+                ViberSendMessages(sender_id, TextMessage(text="ERROR RESTORE STATE"))
                 GoToStateError(sender_id, message, GetIdErrorState(), data, data_user, carousel_id)
             else:
                 GoToStateFirst(sender_id, message, GetIdFirstState(), data, data_user, carousel_id)
     except Exception as e:
         print("Ошибка при GoToCurrentState: " + e.args[0])
-        viber.send_messages(sender_id, TextMessage(text="ERROR RESTORE STATE"))
+        ViberSendMessages(sender_id, TextMessage(text="ERROR RESTORE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
     return
 
@@ -2361,9 +2491,13 @@ def incoming():
     if not viber.verify_signature(request.get_data(), request.headers.get('X-Viber-Content-Signature')):
         return Response(status=403)
     viber_request = viber.parse_request(request.get_data())
+
     if isinstance(viber_request, ViberMessageRequest):
         sender_id = viber_request.sender.id
         message = viber_request.message
+        if ExistNotDeliveredCommands(sender_id):
+            print("Есть недоставленные сообщения от бота для пользователя. Не обрабатываем")
+            return Response(status=200)
         if GetFlagStopQuery(sender_id) == True:
             print("Повторный запрос")
             return Response(status=200)
@@ -2381,20 +2515,12 @@ def incoming():
                 return Response(status=200)
 
     elif isinstance(viber_request, ViberSubscribedRequest):
-        viber.send_messages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
+        ViberSendMessages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
     elif isinstance(viber_request, ViberFailedRequest):
-        viber.send_messages(viber_request.sender.id, TextMessage(text="Сообщение не отправлено"))
-        #тут стоп ожидания сообщений от пользователя
-    elif isinstance(viber_request, ViberConversationStartedRequest) :
-        viber.send_messages(viber_request.sender.id, [TextMessage(text="Добрый день. Вы подписались на бота Итилиум")])
+        onFailedDeliveredMessage(viber_request._message_token, viber_request._user_id)
     elif isinstance(viber_request, ViberDeliveredRequest):
-        print(viber_request)
-        # for att in dir(viber_request):
-        #     print (att, getattr(viber_request,att))
-        try:
-            print("Доставлено сообщение  " + str(viber_request._message_token) + " " + " для пользователя " + str(viber_request._user_id)  )
-        except Exception as e:
-            print ("Error:"+ e.args[0])
-
+        onDeliveredMessage(viber_request._message_token, viber_request._user_id)
+    elif isinstance(viber_request, ViberConversationStartedRequest) :
+        ViberSendMessages(viber_request.sender.id, [TextMessage(text="Добрый день. Вы подписались на бота Итилиум")])
 
     return Response(status=200)
