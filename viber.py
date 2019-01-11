@@ -2392,7 +2392,7 @@ def incoming():
         # for att in dir(viber_request):
         #     print (att, getattr(viber_request,att))
         try:
-            print("Доставлено сообщение  " + viber_request._message_token + " " + " для пользователя " + viber_request._user_id  )
+            print("Доставлено сообщение  " + str(viber_request._message_token) + " " + " для пользователя " + str(viber_request._user_id)  )
         except Exception as e:
             print ("Error:"+ e.args[0])
 
