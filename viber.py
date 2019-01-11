@@ -2361,7 +2361,7 @@ def incoming():
     if not viber.verify_signature(request.get_data(), request.headers.get('X-Viber-Content-Signature')):
         return Response(status=403)
     viber_request = viber.parse_request(request.get_data())
-
+    print(viber_request)
     if isinstance(viber_request, ViberMessageRequest):
         sender_id = viber_request.sender.id
         message = viber_request.message
@@ -2389,10 +2389,8 @@ def incoming():
     elif isinstance(viber_request, ViberConversationStartedRequest) :
         viber.send_messages(viber_request.sender.id, [TextMessage(text="Добрый день. Вы подписались на бота Итилиум")])
     elif isinstance(viber_request, ViberDeliveredRequest):
-        print(viber_request)
+
         try:
-            print(viber_request.message_token)
-            print(viber_request.user_id)
             print("Доставлено сообщение  " + viber_request.message_token + " " + " для пользователя " + viber_request.user_id  )
         except Exception as e:
             print ("Error:"+ e.args[0])
