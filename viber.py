@@ -119,7 +119,7 @@ def onFailedDeliveredMessage(message_id, sender_id):
 
 
 
-def onDeliveredMessage(message_id, user_id):
+def onDeliveredMessage(message_id, sender_id):
     print("stack: onDeliveredMessage")
     #доставка команды пользователю - надо удалить из списка сохраненных команд
     # эту команду
@@ -143,7 +143,7 @@ def onDeliveredMessage(message_id, user_id):
         conn.commit()
         # Close communication with the database
     except Exception as e:
-        print("Error on onDeliveredMessage" + e.args[0])
+        print("Error on onDeliveredMessage " + e.args[0])
     finally:
         cur.close()
         conn.close()
@@ -2518,10 +2518,10 @@ def incoming():
         ViberSendMessages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
     elif isinstance(viber_request, ViberFailedRequest):
         onFailedDeliveredMessage(viber_request._message_token, viber_request._user_id)
-        print("НЕ Доставлено " + viber_request._message_token)
+        print("НЕ Доставлено " + str(viber_request._message_token))
     elif isinstance(viber_request, ViberDeliveredRequest):
         onDeliveredMessage(viber_request._message_token, viber_request._user_id)
-        print("Доставлено " + viber_request._message_token)
+        print("Доставлено " + str(viber_request._message_token))
     elif isinstance(viber_request, ViberConversationStartedRequest) :
         ViberSendMessages(viber_request.sender.id, [TextMessage(text="Добрый день. Вы подписались на бота Итилиум")])
 
