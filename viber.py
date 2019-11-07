@@ -2506,17 +2506,17 @@ def incoming():
             print("Есть недоставленные сообщения от бота для пользователя. Не обрабатываем")
             return Response(status=200)
       
-		if SetFlagStartQuery(sender_id) == True:
-			try:
-				is_registered_user = GetIsRegisteredUser(sender_id)
-				GoToCurrentState(sender_id, message, is_registered_user)
-			except Exception as e:
-				print ("Error:"+ e.args[0])
-			finally:
-				SetFlagStopQuery(sender_id)
-		else:
-			print("Повторный запрос")
-			return Response(status=200)
+        if SetFlagStartQuery(sender_id) == True:
+            try:
+                is_registered_user = GetIsRegisteredUser(sender_id)
+                GoToCurrentState(sender_id, message, is_registered_user)
+            except Exception as e:
+                print ("Error:"+ e.args[0]) 
+            finally:
+                SetFlagStopQuery(sender_id)
+        else:
+            print("Повторный запрос")
+            return Response(status=200)
 
     elif isinstance(viber_request, ViberSubscribedRequest):
         ViberSendMessages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
