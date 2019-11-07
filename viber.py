@@ -2463,6 +2463,7 @@ def incoming():
 
     if isinstance(viber_request, ViberMessageRequest):
         print("Новое сообщение от пользователя " + str(viber_request.timestamp))
+        print("viber_request.timestamp:" + str(viber_request.timestamp))
         print("Отправлено: " + datetime.datetime.fromtimestamp(viber_request.timestamp).strftime('%Y-%m-%d %H:%M:%S'))
         print("Тек время:" + time.ctime())
         sender_id = viber_request.sender.id
