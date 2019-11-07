@@ -23,7 +23,7 @@ def ViberSendMessages(to, messages):
     print("stack: ViberSendMessages")
     list_tokens = viber.send_messages(to, messages)
     for message_id in list_tokens:
-        print("Сообщение отправлено: " + message_id)   
+        print("Сообщение отправлено: " +str(message_id))   
     SaveIdSendetCommand(list_tokens, to)
 
 def SaveIdSendetCommand(list_tokens, sender_id):
