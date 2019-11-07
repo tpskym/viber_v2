@@ -2256,7 +2256,7 @@ def SetFlagStopQuery(sender_id):
 def CreateCurrentUserRecord(sender_id, cur):
     #Заблокируем таблицу
     cur.execute("LOCK TABLE data_flags_user IN SHARE ROW EXCLUSIVE MODE")
-    cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
+    cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s FOR UPDATE", (sender_id,))
     #Вставим строку текущего пользователя
     if cur.rowcount == 0:				
         cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",(sender_id, "1"))		
@@ -2288,7 +2288,7 @@ def SetFlagStartQuery(sender_id):
             any_blocks_exist = False
         state = False
         if any_blocks_exist:			
-            cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))           
+            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s FOR UPDATE", (sender_id,))           
             if cur.rowcount > 0:	
                 state = SetFlagId(sender_id, flag_id, cur)			                
             else: 
