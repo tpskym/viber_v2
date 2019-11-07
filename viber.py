@@ -2236,16 +2236,8 @@ def SetFlagStopQuery(sender_id):
             return True
         else:
             cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
-            if cur.rowcount > 0:
-                result_query = cur.fetchone()
-                if result_query[1] == "1": #Удалим флаг
-                    cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
-                    conn.commit()
-                    return True
-                else:
-                    cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
-                    conn.commit()
-                    return True
+            if cur.rowcount > 0:                                
+                cur.execute("UPDATE data_flags_user SET flag_id = %s WHERE sender_id = %s", ("0",sender_id));                
             else:
                 conn.commit()
                 return True
@@ -2261,6 +2253,25 @@ def SetFlagStopQuery(sender_id):
         cur.close()
         conn.close()
 
+def CreateCurrentUserRecord(sender_id, cur):
+	#Заблокируем таблицу
+	cur.execute("LOCK TABLE data_flags_user IN SHARE ROW EXCLUSIVE MODE")
+	cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
+	#Вставим строку текущего пользователя
+	if cur.rowcount == 0:				
+		cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",(sender_id, "1"))		
+		return True
+	else:
+		return False
+
+def SetFlagId(sender_id, flag_id, cur):
+	result_query = cur.fetchone()
+	if result_query[1] == "1": #Запрос задан - мы просто ждем		
+		return False
+	else: # удалим строку и вскинем флаг и вернем True
+		cur.execute("UPDATE data_flags_user SET flag_id = %s WHERE sender_id = %s", (flag_id, sender_id));		
+		return True                    
+		
 def SetFlagStartQuery(sender_id):
     print("stack: SetFlagStartQuery")
     try:
@@ -2270,35 +2281,33 @@ def SetFlagStartQuery(sender_id):
         # Open a cursor to perform database operations
         cur = conn.cursor()
         cur.execute("select * from information_schema.tables where table_name=%s", ('data_flags_user',))
-        need_stop_check = True
+        any_blocks_exist = True
         if(cur.rowcount == 0):
             # Execute a command: this creates a new table
             cur.execute("CREATE TABLE data_flags_user (id serial PRIMARY KEY, sender_id varchar(50), flag_id varchar(36) );")
-            need_stop_check = False
+            any_blocks_exist = False
 
-        need_new_string = False
-        if need_stop_check:
-            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
-            if cur.rowcount > 0:
-                result_query = cur.fetchone()
-                if result_query[1] == "1": #Запрос задан - мы просто ждем
-                    conn.commit()
-                    return False
-                else: # удалим строку и вскинем флаг и вернем True
-                    cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
-                    need_new_string = True
-            else: #вскинем флаг и вернем True
-                need_new_string = True
-        else: #вскинем флаг и вернем True
-            need_new_string = True
-        if need_new_string == True:
-            # Pass data to fill a query placeholders and let Psycopg perform
-            # the correct conversion (no more SQL injections!)
-            cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",
-                (sender_id, "1"))
+		state = False
+        if any_blocks_exist:			
+            cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))            
+			if cur.rowcount > 0:	
+				state = SetFlagId(sender_id, flag_id, cur)			                
+            else: 
+                if CreateCurrentUserRecord(sender_id, cur) :
+					state = True
+				else:
+					state = SetFlagId(sender_id, flag_id, cur)			
+				
+        else:
+			if CreateCurrentUserRecord(sender_id, cur) :			
+				state = True
+			else:	
+				cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))            
+				state = SetFlagId(sender_id, "1", cur)			
+		
        # Make the changes to the database persistent
         conn.commit()
-        return True
+        return state
         # Close communication with the database
     except Exception as e:
         print("Error on SetFlagStartQuery:" + e.args[0])
@@ -2498,21 +2507,18 @@ def incoming():
         if ExistNotDeliveredCommands(sender_id):
             print("Есть недоставленные сообщения от бота для пользователя. Не обрабатываем")
             return Response(status=200)
-        if GetFlagStopQuery(sender_id) == True:
-            print("Повторный запрос")
-            return Response(status=200)
-        else:
-            if SetFlagStartQuery(sender_id) == True:
-                try:
-                    is_registered_user = GetIsRegisteredUser(sender_id)
-                    GoToCurrentState(sender_id, message, is_registered_user)
-                except Exception as e:
-                    print ("Error:"+ e.args[0])
-                finally:
-                    SetFlagStopQuery(sender_id)
-            else:
-                print("Повторный запрос")
-                return Response(status=200)
+      
+		if SetFlagStartQuery(sender_id) == True:
+			try:
+				is_registered_user = GetIsRegisteredUser(sender_id)
+				GoToCurrentState(sender_id, message, is_registered_user)
+			except Exception as e:
+				print ("Error:"+ e.args[0])
+			finally:
+				SetFlagStopQuery(sender_id)
+		else:
+			print("Повторный запрос")
+			return Response(status=200)
 
     elif isinstance(viber_request, ViberSubscribedRequest):
         ViberSendMessages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
