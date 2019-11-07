@@ -2287,6 +2287,7 @@ def SetFlagStartQuery(sender_id):
             cur.execute("CREATE TABLE data_flags_user (id serial PRIMARY KEY, sender_id varchar(50), flag_id varchar(36) );")
             any_blocks_exist = False
         state = False
+        flag_id = "1"
         if any_blocks_exist:			
             cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s FOR UPDATE", (sender_id,))           
             if cur.rowcount > 0:	
@@ -2301,7 +2302,7 @@ def SetFlagStartQuery(sender_id):
                 state = True
             else:	
                 cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))            
-                state = SetFlagId(sender_id, "1", cur)			
+                state = SetFlagId(sender_id, flag_id, cur)			
 		
        # Make the changes to the database persistent
         conn.commit()
