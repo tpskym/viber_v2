@@ -21,7 +21,10 @@ import json
 
 def ViberSendMessages(to, messages):
     print("stack: ViberSendMessages")
-    SaveIdSendetCommand(viber.send_messages(to, messages), to)
+    list_tokens = viber.send_messages(to, messages)
+    for message_id in list_tokens:
+        print("Сообщение отправлено: " + message_id)   
+    SaveIdSendetCommand(list_tokens, to)
 
 def SaveIdSendetCommand(list_tokens, sender_id):
     print("stack: SaveIdSendetCommand")
@@ -40,7 +43,7 @@ def SaveIdSendetCommand(list_tokens, sender_id):
         # the correct conversion (no more SQL injections!)
         for message_id in list_tokens:
             cur.execute("INSERT INTO data_undelivered_send_messages (sender_id, message_id) VALUES (%s, %s)",
-              (sender_id, str(message_id)))
+              (sender_id, str(message_id)))              
 
        # Make the changes to the database persistent
         conn.commit()
@@ -2315,50 +2318,7 @@ def SetFlagStartQuery(sender_id):
         cur.close()
         conn.close()
 
-def GetFlagStopQuery(sender_id):
-    print("stack: GetFlagStopQuery")
-    try:
-        DATABASE_URL = os.environ['DATABASE_URL']
-        # Connect to an existing database
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        # Open a cursor to perform database operations
-        cur = conn.cursor()
-        cur.execute("select * from information_schema.tables where table_name=%s", ('data_flags_user',))
-        need_stop_check = False
-        if(cur.rowcount == 0):
-            # Execute a command: this creates a new table
-            cur.execute("CREATE TABLE data_flags_user (id serial PRIMARY KEY, sender_id varchar(50), flag_id varchar(36) );")
-            need_stop_check = True
 
-
-        if need_stop_check:
-            conn.commit()
-            return False
-        else:
-            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
-            if cur.rowcount > 0:
-                result_query = cur.fetchone()
-                if result_query[1] == "1": #Запрос задан - мы просто ждем
-                    conn.commit()
-                    return True
-                else:
-                    cur.execute("DELETE FROM data_flags_user WHERE sender_id = %s", (sender_id,));
-                    conn.commit()
-                    return False
-            else:
-                conn.commit()
-                return False
-
-       # Make the changes to the database persistent
-        conn.commit()
-        return False
-        # Close communication with the database
-    except Exception as e:
-        print("Error on GetFlagStopQuery:" + e.args[0])
-        return False
-    finally:
-        cur.close()
-        conn.close()
 
 def RequestItilium(dict_data):
     print("stack: RequestItilium")
