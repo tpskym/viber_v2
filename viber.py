@@ -2490,7 +2490,7 @@ def incoming():
     elif isinstance(viber_request, ViberDeliveredRequest):
         onDeliveredMessage(viber_request._message_token, viber_request._user_id)
         print("Доставлено " + str(viber_request._message_token))
-        print("viber_request.timestamp:" + str(viber_request.timestamp))        
+        print("Доставлено viber_request.timestamp:" + str(viber_request.timestamp))        
     elif isinstance(viber_request, ViberConversationStartedRequest) :
         ViberSendMessages(viber_request.sender.id, [TextMessage(text="Добрый день. Вы подписались на бота Итилиум")])
 
