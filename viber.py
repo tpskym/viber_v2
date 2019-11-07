@@ -2461,6 +2461,9 @@ def incoming():
     viber_request = viber.parse_request(request.get_data())
 
     if isinstance(viber_request, ViberMessageRequest):
+        print("Новое сообщение от пользователя " + str(viber_request.timestamp))
+        print("Отправлено: " + datetime.datetime.fromtimestamp(viber_request.timestamp).strftime('%Y-%m-%d %H:%M:%S'))
+        print("Тек время:" + time.ctime())
         sender_id = viber_request.sender.id
         message = viber_request.message
         if ExistNotDeliveredCommands(sender_id):
