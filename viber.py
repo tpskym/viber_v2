@@ -2254,23 +2254,23 @@ def SetFlagStopQuery(sender_id):
         conn.close()
 
 def CreateCurrentUserRecord(sender_id, cur):
-	#Заблокируем таблицу
-	cur.execute("LOCK TABLE data_flags_user IN SHARE ROW EXCLUSIVE MODE")
-	cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
-	#Вставим строку текущего пользователя
-	if cur.rowcount == 0:				
-		cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",(sender_id, "1"))		
-		return True
-	else:
-		return False
+    #Заблокируем таблицу
+    cur.execute("LOCK TABLE data_flags_user IN SHARE ROW EXCLUSIVE MODE")
+    cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
+    #Вставим строку текущего пользователя
+    if cur.rowcount == 0:				
+        cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",(sender_id, "1"))		
+        return True
+    else:
+        return False
 
 def SetFlagId(sender_id, flag_id, cur):
-	result_query = cur.fetchone()
-	if result_query[1] == "1": #Запрос задан - мы просто ждем		
-		return False
-	else: # удалим строку и вскинем флаг и вернем True
-		cur.execute("UPDATE data_flags_user SET flag_id = %s WHERE sender_id = %s", (flag_id, sender_id));		
-		return True                    
+    result_query = cur.fetchone()
+    if result_query[1] == "1": #Запрос задан - мы просто ждем		
+        return False
+    else: # удалим строку и вскинем флаг и вернем True
+        cur.execute("UPDATE data_flags_user SET flag_id = %s WHERE sender_id = %s", (flag_id, sender_id));		
+        return True                    
 		
 def SetFlagStartQuery(sender_id):
     print("stack: SetFlagStartQuery")
@@ -2286,24 +2286,22 @@ def SetFlagStartQuery(sender_id):
             # Execute a command: this creates a new table
             cur.execute("CREATE TABLE data_flags_user (id serial PRIMARY KEY, sender_id varchar(50), flag_id varchar(36) );")
             any_blocks_exist = False
-
-		state = False
+        state = False
         if any_blocks_exist:			
-            cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))            
-			if cur.rowcount > 0:	
-				state = SetFlagId(sender_id, flag_id, cur)			                
+            cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))           
+            if cur.rowcount > 0:	
+                state = SetFlagId(sender_id, flag_id, cur)			                
             else: 
                 if CreateCurrentUserRecord(sender_id, cur) :
-					state = True
-				else:
-					state = SetFlagId(sender_id, flag_id, cur)			
-				
+                    state = True
+                else:
+                    state = SetFlagId(sender_id, flag_id, cur)							
         else:
-			if CreateCurrentUserRecord(sender_id, cur) :			
-				state = True
-			else:	
-				cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))            
-				state = SetFlagId(sender_id, "1", cur)			
+            if CreateCurrentUserRecord(sender_id, cur) :			
+                state = True
+            else:	
+                cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))            
+                state = SetFlagId(sender_id, "1", cur)			
 		
        # Make the changes to the database persistent
         conn.commit()
