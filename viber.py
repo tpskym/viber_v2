@@ -2523,9 +2523,10 @@ viber = Api(BotConfiguration(
 
 
         
-@app.route('/clearBlocks/*',  methods=['GET'])
+@app.route('/clearBlocks/<path>',  methods=['GET'])
 def IncomingGetClear():
     print("stack: IncomingGetClear")
+    return request.path
     try:
         text = ""
         DATABASE_URL = os.environ['DATABASE_URL']
