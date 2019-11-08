@@ -39,11 +39,13 @@ def SaveIdSendetCommand(list_tokens, sender_id):
         cur.execute("select * from information_schema.tables where table_name=%s", ('data_undelivered_send_messages',))
         if(cur.rowcount == 0):
             # Execute a command: this creates a new table
+            print("Первый запуск. Создание таблиц data_undelivered_send_messages и data_undelivered_messages_time_stamp")
             cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
             cur.execute("CREATE TABLE data_undelivered_messages_time_stamp (id serial PRIMARY KEY, sender_id varchar(50), timestamp_message varchar(50) );")
         # Pass data to fill a query placeholders and let Psycopg perform
         # the correct conversion (no more SQL injections!)
         for message_id in list_tokens:
+            print("Сохраняем отпавленное сообщение " + str(message_id))
             cur.execute("INSERT INTO data_undelivered_send_messages (sender_id, message_id) VALUES (%s, %s)",
               (sender_id, str(message_id)))              
 
@@ -166,22 +168,34 @@ def onDeliveredMessage(message_id, sender_id, timestamp_message):
         need_drop = True
         cur.execute("select * from information_schema.tables where table_name=%s", ('data_undelivered_send_messages',))
         if(cur.rowcount == 0):
+            print("Первый запуск. Создание таблиц data_undelivered_send_messages и data_undelivered_messages_time_stamp")
             # Execute a command: this creates a new table
             cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
             cur.execute("CREATE TABLE data_undelivered_messages_time_stamp (id serial PRIMARY KEY, sender_id varchar(50), timestamp_message varchar(50) );")
+            print("Не нужно ничего очищать, потому что данных для очистки еще нет")
             need_drop = False
 
         if need_drop:
-            cur.execute("SELECT sender_id, timestamp_message FROM data_undelivered_messages_time_stamp WHERE sender_id = %s FOR UPDATE" , (sender_id,))
+            cur.execute("SELECT sender_id, timestamp_message FROM data_undelivered_messages_time_stamp WHERE sender_id = %s FOR UPDATE" , (sender_id,))            
             if(cur.rowcount == 0):
+                print("Нет данных о пользователе " + sender_id)
                 cur.execute("LOCK TABLE data_undelivered_messages_time_stamp IN SHARE ROW EXCLUSIVE MODE")
                 cur.execute("SELECT sender_id, timestamp_message FROM data_undelivered_messages_time_stamp WHERE sender_id = %s FOR UPDATE" , (sender_id,))
                 if cur.rowcount == 0:
+                    print("Созданим запись с данными о пользователе " + sender_id + " в таблице времени последнего доставленного data_undelivered_messages_time_stamp")
                     cur.execute("INSERT INTO data_undelivered_messages_time_stamp (timestamp_message, sender_id) VALUES (%s, %s)", ( str(timestamp_message), sender_id));
                 else:
+                    print("Есть данных о пользователе " + sender_id)
+                    print("Параллельная транзакция добавила данные о пользователе " + sender_id)
+                    print("Обновим дату доставки последнего сообщения " + sender_id)
+                    print("Дата доставки : " + str(timestamp_message) + " у пользователя " + sender_id)
                     cur.execute("UPDATE data_undelivered_messages_time_stamp SET  timestamp_message = %s WHERE sender_id = %s", ( str(timestamp_message), sender_id));
             else:                
-                cur.execute("UPDATE data_undelivered_messages_time_stamp SET  timestamp_message = %s WHERE sender_id = %s", ( str(timestamp_message), sender_id));
+                print("Есть данных о пользователе " + sender_id)
+                print("Обновим дату доставки последнего сообщения " + sender_id)
+                print("Дата доставки : " + str(timestamp_message) + " у пользователя " + sender_id)
+                cur.execute("UPDATE data_undelivered_messages_time_stamp SET  timestamp_message = %s WHERE sender_id = %s", ( str(timestamp_message), sender_id))
+            print("Удалим информацию об отправленном сообщении у пользвателя " + sender_id + ". Сообшение с токеном " + str(message_id))
             cur.execute("DELETE FROM data_undelivered_send_messages WHERE sender_id = %s and message_id = %s", (sender_id, str(message_id)));
             
        # Make the changes to the database persistent
@@ -2272,18 +2286,22 @@ def SetFlagStopQuery(sender_id):
         cur.execute("select * from information_schema.tables where table_name=%s", ('data_flags_user',))
         need_stop_check = False
         if(cur.rowcount == 0):
+            print("Первый запуск. Создание таблицы data_flags_user")
             # Execute a command: this creates a new table
             cur.execute("CREATE TABLE data_flags_user (id serial PRIMARY KEY, sender_id varchar(50), flag_id varchar(36) );")
             need_stop_check = True
 
         if need_stop_check:
+            print("Первый запуск. Не нужно ничего очищать")
             conn.commit()
             return True
-        else:
+        else:            
             cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s FOR UPDATE", (sender_id,))
             if cur.rowcount > 0:                                
+                print("Есть данные о текущем пользователе. Снимем блокировку")
                 cur.execute("UPDATE data_flags_user SET flag_id = %s WHERE sender_id = %s", ("0",sender_id));                
             else:
+                print("Нет данных о текущем пользователе. Нет блокировок для снятия.")
                 conn.commit()
                 return True
 
