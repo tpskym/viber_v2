@@ -85,7 +85,7 @@ def ExistNotDeliveredCommands(sender_id, timestamp):
                 print("Есть недоставленные сообщения у пользователя " + sender_id)
                 exist_records = True                
             else:
-                print("нет недоставленных сообщений у пользователя " + sender_id)
+                print("Нет недоставленных сообщений у пользователя " + sender_id)
                 print("Проверяем, что дата нового сообщения больше даты последнего доставленного у пользователя " + sender_id)
                 cur.execute("SELECT  timestamp_message from data_undelivered_messages_time_stamp where sender_id=%s", (sender_id,))
                 if cur.rowcount > 0:
@@ -2325,7 +2325,9 @@ def SetFlagId(sender_id, flag_id, cur):
 def SetFlagIdNeed(not_need, sender_id, flag_id, cur ):
     if not_need:
         state = False
+        print("Не нужно пытаться установить блокировку")
     else:    
+        print("Попытаемся установить блокировку")
         state = SetFlagId(sender_id, flag_id, cur)
     return state
         
