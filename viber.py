@@ -2523,10 +2523,13 @@ viber = Api(BotConfiguration(
 
 
         
-@app.route('/clearBlocks/<path>',  methods=['GET'])
+@app.route('/clearBlocks',  methods=['GET'])
 def IncomingGetClear():
     print("stack: IncomingGetClear")
-    return request.path
+    key = request.args.get("key")
+    if(not key == os.environ['CLEAR_KEY'])
+        return "Неправильный ключ. Используйте запрос вида https://<servername>/clearBlocks?key=<your_key_from_admin_panel>
+    
     try:
         text = ""
         DATABASE_URL = os.environ['DATABASE_URL']
