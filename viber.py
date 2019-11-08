@@ -2527,7 +2527,7 @@ viber = Api(BotConfiguration(
 def IncomingGetClear():
     print("stack: IncomingGetClear")
     key = request.args.get("key")
-    if(not key == os.environ['CLEAR_KEY'])
+    if(not key == os.environ['CLEAR_KEY']):
         return "Неправильный ключ. Используйте запрос вида https://<servername>/clearBlocks?key=<your_key_from_admin_panel>
     
     try:
