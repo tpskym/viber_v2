@@ -40,6 +40,7 @@ def SaveIdSendetCommand(list_tokens, sender_id):
         if(cur.rowcount == 0):
             # Execute a command: this creates a new table
             cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
+            cur.execute("CREATE TABLE data_undelivered_messages_time_stamp (id serial PRIMARY KEY, sender_id varchar(50), timestamp_message varchar(50) );")
         # Pass data to fill a query placeholders and let Psycopg perform
         # the correct conversion (no more SQL injections!)
         for message_id in list_tokens:
@@ -56,7 +57,7 @@ def SaveIdSendetCommand(list_tokens, sender_id):
         conn.close()
 
 
-def ExistNotDeliveredCommands(sender_id):
+def ExistNotDeliveredCommands(sender_id, timestamp):
     print("stack: ExistNotDeliveredCommands")
     #Есть недоставленые команды, отправленные ботом пользователю
     exist_records = False
@@ -72,12 +73,25 @@ def ExistNotDeliveredCommands(sender_id):
         if(cur.rowcount == 0):
             # Execute a command: this creates a new table
             cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
+            cur.execute("CREATE TABLE data_undelivered_messages_time_stamp (id serial PRIMARY KEY, sender_id varchar(50), timestamp_message varchar(50) );")
             need_query = False
 
-        if need_query:
-            cur.execute("select * from data_undelivered_send_messages where sender_id=%s", (sender_id,))
+        if need_query:                
+            cur.execute("SELECT * from data_undelivered_send_messages where sender_id=%s", (sender_id,))
             if(cur.rowcount > 0):
-                exist_records = True
+                exist_records = True                
+            else:
+                cur.execute("SELECT  timestamp_message from data_undelivered_messages_time_stamp where sender_id=%s", (sender_id,))
+                if cur.rowcount > 0:
+                    result_query = cur.fetchone()                    
+                    try:
+                        if timestamp <= int(result_query[0])
+                            exist_records = True
+                    except Exception as e:
+                       print("Error on get timestamp message from postgress " + e.args[0])
+                    
+                
+                    
        # Make the changes to the database persistent
         conn.commit()
         # Close communication with the database
@@ -107,6 +121,7 @@ def onFailedDeliveredMessage(message_id, sender_id):
         if(cur.rowcount == 0):
             # Execute a command: this creates a new table
             cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
+            cur.execute("CREATE TABLE data_undelivered_messages_time_stamp (id serial PRIMARY KEY, sender_id varchar(50), timestamp_message varchar(50) );")
             need_drop = False
 
         if need_drop:
@@ -123,7 +138,7 @@ def onFailedDeliveredMessage(message_id, sender_id):
 
 
 
-def onDeliveredMessage(message_id, sender_id):
+def onDeliveredMessage(message_id, sender_id, timestamp_message):
     print("stack: onDeliveredMessage")
     #доставка команды пользователю - надо удалить из списка сохраненных команд
     # эту команду
@@ -138,11 +153,22 @@ def onDeliveredMessage(message_id, sender_id):
         if(cur.rowcount == 0):
             # Execute a command: this creates a new table
             cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
+            cur.execute("CREATE TABLE data_undelivered_messages_time_stamp (id serial PRIMARY KEY, sender_id varchar(50), timestamp_message varchar(50) );")
             need_drop = False
 
         if need_drop:
+            cur.execute("SELECT sender_id, timestamp_message FROM data_undelivered_messages_time_stamp WHERE sender_id = %s FOR UPDATE" , (sender_id,))
+            if(cur.rowcount == 0):
+                cur.execute("LOCK TABLE data_undelivered_messages_time_stamp IN SHARE ROW EXCLUSIVE MODE")
+                cur.execute("SELECT sender_id, timestamp_message FROM data_undelivered_messages_time_stamp WHERE sender_id = %s FOR UPDATE" , (sender_id,))
+                if cur.rowcount == 0:
+                    cur.execute("INSERT INTO data_undelivered_messages_time_stamp (timestamp_message, sender_id) VALUES (%s, %s)", ( str(timestamp_message), sender_id));
+                else:
+                    cur.execute("UPDATE data_undelivered_messages_time_stamp SET  timestamp_message = %s WHERE sender_id = %s", ( str(timestamp_message), sender_id));
+            else:                
+                cur.execute("UPDATE data_undelivered_messages_time_stamp SET  timestamp_message = %s WHERE sender_id = %s", ( str(timestamp_message), sender_id));
             cur.execute("DELETE FROM data_undelivered_send_messages WHERE sender_id = %s and message_id = %s", (sender_id, str(message_id)));
-
+            
        # Make the changes to the database persistent
         conn.commit()
         # Close communication with the database
@@ -2239,7 +2265,7 @@ def SetFlagStopQuery(sender_id):
             conn.commit()
             return True
         else:
-            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))
+            cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s FOR UPDATE", (sender_id,))
             if cur.rowcount > 0:                                
                 cur.execute("UPDATE data_flags_user SET flag_id = %s WHERE sender_id = %s", ("0",sender_id));                
             else:
@@ -2258,25 +2284,37 @@ def SetFlagStopQuery(sender_id):
         conn.close()
 
 def CreateCurrentUserRecord(sender_id, cur):
+    print("Создание записи о пользователе " + sender_id + " в таблице data_flags_user")
     #Заблокируем таблицу
     cur.execute("LOCK TABLE data_flags_user IN SHARE ROW EXCLUSIVE MODE")
     cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s FOR UPDATE", (sender_id,))
     #Вставим строку текущего пользователя
     if cur.rowcount == 0:				
         cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",(sender_id, "1"))		
+        print("Запись создана")
         return True
     else:
+        print("Запись НЕ создана. Создана ранее другой транзакцией")
         return False
 
 def SetFlagId(sender_id, flag_id, cur):
     result_query = cur.fetchone()
     if result_query[1] == "1": #Запрос задан - мы просто ждем		
+        print("Работа пользователя заблокирована ранее. Ничего не делаем: " + sender_id)
         return False
     else: # удалим строку и вскинем флаг и вернем True
         cur.execute("UPDATE data_flags_user SET flag_id = %s WHERE sender_id = %s", (flag_id, sender_id));		
+        print("Устанавливаем флаг блокировки работы пользователя " + sender_id)
         return True                    
 		
-def SetFlagStartQuery(sender_id):
+def SetFlagIdNeed(not_need, sender_id, flag_id, cur ):
+    if not_need:
+        state = False
+    else:    
+        state = SetFlagId(sender_id, flag_id, cur)
+    return state
+        
+def SetFlagStartQuery(sender_id, timestamp_message):
     print("stack: SetFlagStartQuery")
     try:
         DATABASE_URL = os.environ['DATABASE_URL']
@@ -2293,20 +2331,24 @@ def SetFlagStartQuery(sender_id):
         state = False
         flag_id = "1"
         if any_blocks_exist:			
+            print("Таблица data_flags_user создана ранее")
             cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s FOR UPDATE", (sender_id,))           
             if cur.rowcount > 0:	
-                state = SetFlagId(sender_id, flag_id, cur)			                
+                print("Есть запись с пользователем " + sender_id)
+                SetFlagIdNeed(ExistNotDeliveredCommands(sender_id, timestamp_message),  sender_id, flag_id, cur )                
             else: 
+                print("Нет записи с пользователем " + sender_id)
                 if CreateCurrentUserRecord(sender_id, cur) :
                     state = True
                 else:
-                    state = SetFlagId(sender_id, flag_id, cur)							
+                    SetFlagIdNeed(ExistNotDeliveredCommands(sender_id, timestamp_message),  sender_id, flag_id, cur )                                    
         else:
+            print("Первый вызов - создание таблицы data_flags_user")
             if CreateCurrentUserRecord(sender_id, cur) :			
                 state = True
             else:	
                 cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))            
-                state = SetFlagId(sender_id, flag_id, cur)			
+                SetFlagIdNeed(ExistNotDeliveredCommands(sender_id, timestamp_message),  sender_id, flag_id, cur )                                    
 		
        # Make the changes to the database persistent
         conn.commit()
@@ -2444,6 +2486,9 @@ viber = Api(BotConfiguration(
     auth_token=auth_token_out
 ))
 
+
+        
+
 @app.route('/',  methods=['GET'])
 def IncomingGet():
     state, need_hook, error = SetHooksIfNeed()
@@ -2466,11 +2511,8 @@ def incoming():
         print("viber_request.timestamp:" + str(viber_request.timestamp))        
         sender_id = viber_request.sender.id
         message = viber_request.message
-        if ExistNotDeliveredCommands(sender_id):
-            print("Есть недоставленные сообщения от бота для пользователя. Не обрабатываем")
-            return Response(status=200)
-      
-        if SetFlagStartQuery(sender_id) == True:
+        
+        if SetFlagStartQuery(sender_id, viber_request.timestamp):
             try:
                 is_registered_user = GetIsRegisteredUser(sender_id)
                 GoToCurrentState(sender_id, message, is_registered_user)
@@ -2479,16 +2521,16 @@ def incoming():
             finally:
                 SetFlagStopQuery(sender_id)
         else:
-            print("Повторный запрос")
-            return Response(status=200)
-
+            print("Ничего не делаем. Причина выше в логах")
+            return Response(status=200)                
+        
     elif isinstance(viber_request, ViberSubscribedRequest):
         ViberSendMessages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
     elif isinstance(viber_request, ViberFailedRequest):
         onFailedDeliveredMessage(viber_request._message_token, viber_request._user_id)
         print("НЕ Доставлено " + str(viber_request._message_token))
     elif isinstance(viber_request, ViberDeliveredRequest):
-        onDeliveredMessage(viber_request._message_token, viber_request._user_id)
+        onDeliveredMessage(viber_request._message_token, viber_request._user_id, viber_request.timestamp)
         print("Доставлено " + str(viber_request._message_token))
         print("Доставлено viber_request.timestamp:" + str(viber_request.timestamp))        
     elif isinstance(viber_request, ViberConversationStartedRequest) :
