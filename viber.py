@@ -2370,20 +2370,20 @@ def SetFlagStartQuery(sender_id, timestamp_message):
             cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s FOR UPDATE", (sender_id,))           
             if cur.rowcount > 0:	
                 print("Есть запись с пользователем " + sender_id)
-                SetFlagIdNeed(ExistNotDeliveredCommands(sender_id, timestamp_message),  sender_id, flag_id, cur )                
+                state = SetFlagIdNeed(ExistNotDeliveredCommands(sender_id, timestamp_message),  sender_id, flag_id, cur )                
             else: 
                 print("Нет записи с пользователем " + sender_id)
                 if CreateCurrentUserRecord(sender_id, cur) :
                     state = True
                 else:
-                    SetFlagIdNeed(ExistNotDeliveredCommands(sender_id, timestamp_message),  sender_id, flag_id, cur )                                    
+                    state = SetFlagIdNeed(ExistNotDeliveredCommands(sender_id, timestamp_message),  sender_id, flag_id, cur )                                    
         else:
             print("Первый вызов - создание таблицы data_flags_user")
             if CreateCurrentUserRecord(sender_id, cur) :			
                 state = True
             else:	
                 cur.execute("SELECT FOR UPDATE sender_id, flag_id FROM data_flags_user WHERE sender_id = %s", (sender_id,))            
-                SetFlagIdNeed(ExistNotDeliveredCommands(sender_id, timestamp_message),  sender_id, flag_id, cur )                                    
+                state = SetFlagIdNeed(ExistNotDeliveredCommands(sender_id, timestamp_message),  sender_id, flag_id, cur )                                    
 		
        # Make the changes to the database persistent
         conn.commit()
@@ -2523,6 +2523,51 @@ viber = Api(BotConfiguration(
 
 
         
+@app.route('/clearBlocks',  methods=['GET'])
+def IncomingGetClear():
+    print("stack: IncomingGetClear")
+    try:
+        text = ""
+        DATABASE_URL = os.environ['DATABASE_URL']
+        # Connect to an existing database
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_flags_user',))        
+        if(cur.rowcount == 0):
+            print("Нет таблицы data_flags_user. Ее не очищаем")        
+            text += "Нет таблицы data_flags_user. Ее не очищаем\n"
+        else:                        
+            cur.execute("TRUNCATE data_flags_user");
+            text += "Таблица data_flags_user Очищена\n"
+            
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_undelivered_send_messages',))        
+        if(cur.rowcount == 0):
+            print("Нет таблицы data_undelivered_send_messages. Ее не очищаем")        
+            text += "Нет таблицы data_undelivered_send_messages. Ее не очищаем\n"
+        else:                        
+            cur.execute("TRUNCATE data_undelivered_send_messages");
+            text += "Таблица data_undelivered_send_messages Очищена\n"
+            
+        cur.execute("select * from information_schema.tables where table_name=%s", ('data_undelivered_messages_time_stamp',))        
+        if(cur.rowcount == 0):
+            print("Нет таблицы data_undelivered_messages_time_stamp. Ее не очищаем")        
+            text += "Нет таблицы data_undelivered_messages_time_stamp. Ее не очищаем\n"
+        else:                        
+            cur.execute("TRUNCATE data_undelivered_messages_time_stamp");
+            text += "Таблица data_undelivered_messages_time_stamp Очищена\n"
+
+       # Make the changes to the database persistent
+        conn.commit()
+        return text
+        # Close communication with the database
+    except Exception as e:
+        print("Error on SetFlagStopQuery:" + e.args[0])
+        text += Error on SetFlagStopQuery:" + e.args[0]
+        return text
+    finally:
+        cur.close()
+        conn.close()
 
 @app.route('/',  methods=['GET'])
 def IncomingGet():
@@ -2542,7 +2587,7 @@ def incoming():
     viber_request = viber.parse_request(request.get_data())
 
     if isinstance(viber_request, ViberMessageRequest):
-        print("Новое сообщение от пользователя " + str(viber_request.timestamp))
+        print("Новое сообщение от пользователя " + str(viber_request.timestamp) + " " + viber_request.message)
         print("viber_request.timestamp:" + str(viber_request.timestamp))        
         sender_id = viber_request.sender.id
         message = viber_request.message
