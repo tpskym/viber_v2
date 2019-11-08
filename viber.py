@@ -2563,7 +2563,7 @@ def IncomingGetClear():
         # Close communication with the database
     except Exception as e:
         print("Error on SetFlagStopQuery:" + e.args[0])
-        text += Error on SetFlagStopQuery:" + e.args[0]
+        text += "Error on SetFlagStopQuery:" + e.args[0]
         return text
     finally:
         cur.close()
