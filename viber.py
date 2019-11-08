@@ -2591,7 +2591,7 @@ def incoming():
     viber_request = viber.parse_request(request.get_data())
 
     if isinstance(viber_request, ViberMessageRequest):
-        print("Новое сообщение от пользователя " + str(viber_request.timestamp) + " " + viber_request.message)
+        print("Новое сообщение от пользователя " + str(viber_request.timestamp) + " " + str(viber_request.message))
         print("viber_request.timestamp:" + str(viber_request.timestamp))        
         sender_id = viber_request.sender.id
         message = viber_request.message
