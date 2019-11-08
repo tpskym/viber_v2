@@ -85,7 +85,7 @@ def ExistNotDeliveredCommands(sender_id, timestamp):
                 if cur.rowcount > 0:
                     result_query = cur.fetchone()                    
                     try:
-                        if timestamp <= int(result_query[0])
+                        if timestamp <= int(result_query[0]):
                             exist_records = True
                     except Exception as e:
                        print("Error on get timestamp message from postgress " + e.args[0])
