@@ -2523,7 +2523,7 @@ viber = Api(BotConfiguration(
 
 
         
-@app.route('/clearBlocks',  methods=['GET'])
+@app.route('/clearBlocks/*',  methods=['GET'])
 def IncomingGetClear():
     print("stack: IncomingGetClear")
     try:
@@ -2552,7 +2552,7 @@ def IncomingGetClear():
         cur.execute("select * from information_schema.tables where table_name=%s", ('data_undelivered_messages_time_stamp',))        
         if(cur.rowcount == 0):
             print("Нет таблицы data_undelivered_messages_time_stamp. Ее не очищаем")        
-            text += "Нет таблицы data_undelivered_messages_time_stamp. Ее не очищаем\n"
+            text += "Нет таблицы data_undelivered_messages_time_stamp. Ее не очищаем<br>"
         else:                        
             cur.execute("TRUNCATE data_undelivered_messages_time_stamp");
             text += "Таблица data_undelivered_messages_time_stamp Очищена\n"
