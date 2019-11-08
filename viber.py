@@ -71,24 +71,39 @@ def ExistNotDeliveredCommands(sender_id, timestamp):
 
         cur.execute("select * from information_schema.tables where table_name=%s", ('data_undelivered_send_messages',))
         if(cur.rowcount == 0):
+            print("Первый вызов. Создаем таблицы data_undelivered_send_messages и data_undelivered_messages_time_stamp")
+            print("Нет отправленных сообщений вообще")
             # Execute a command: this creates a new table
             cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
             cur.execute("CREATE TABLE data_undelivered_messages_time_stamp (id serial PRIMARY KEY, sender_id varchar(50), timestamp_message varchar(50) );")
             need_query = False
 
         if need_query:                
+            print("Таблицы data_undelivered_send_messages и data_undelivered_messages_time_stamp созданы ранее")
             cur.execute("SELECT * from data_undelivered_send_messages where sender_id=%s", (sender_id,))
             if(cur.rowcount > 0):
+                print("Есть недоставленные сообщения у пользователя " + sender_id)
                 exist_records = True                
             else:
+                print("нет недоставленных сообщений у пользователя " + sender_id)
+                print("Проверяем, что дата нового сообщения больше даты последнего доставленного у пользователя " + sender_id)
                 cur.execute("SELECT  timestamp_message from data_undelivered_messages_time_stamp where sender_id=%s", (sender_id,))
                 if cur.rowcount > 0:
                     result_query = cur.fetchone()                    
-                    try:
+                    try:                        
                         if timestamp <= int(result_query[0]):
                             exist_records = True
+                            print("Время нового сообщения меньше времени последнего доставленного ")
+                            print("Время нового сообщения: " + str(timestamp))
+                            print("Время последнего доставленного сообщения: " + str(result_query[0]))
+                        else:
+                            print("Время нового сообщения больше времени последнего доставленного")
+                            print("Время нового сообщения: " + str(timestamp))
+                            print("Время последнего доставленного сообщения: " + str(result_query[0]))
                     except Exception as e:
                        print("Error on get timestamp message from postgress " + e.args[0])
+                else:
+                    print("Нет данных о времени доставки последнего сообщения")
                     
                 
                     
