@@ -2556,7 +2556,7 @@ def IncomingGetClear():
             text += "Нет таблицы data_undelivered_messages_time_stamp. Ее не очищаем<br>"
         else:                        
             cur.execute("TRUNCATE data_undelivered_messages_time_stamp");
-            text += "Таблица data_undelivered_messages_time_stamp Очищена\n"
+            text += "Таблица data_undelivered_messages_time_stamp Очищена<br>"
 
        # Make the changes to the database persistent
         conn.commit()
