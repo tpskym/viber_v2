@@ -1,4 +1,5 @@
 import os
+import random
 import datetime
 from viberbot import Api
 from viberbot.api.bot_configuration import BotConfiguration
@@ -45,7 +46,7 @@ def SaveIdSendetCommand(list_tokens, sender_id):
         # Pass data to fill a query placeholders and let Psycopg perform
         # the correct conversion (no more SQL injections!)
         for message_id in list_tokens:
-            print("Сохраняем отпавленное сообщение " + str(message_id))
+            print("Сохраняем отправленное сообщение " + str(message_id))
             cur.execute("INSERT INTO data_undelivered_send_messages (sender_id, message_id) VALUES (%s, %s)",
               (sender_id, str(message_id)))
 
@@ -195,7 +196,7 @@ def onDeliveredMessage(message_id, sender_id, timestamp_message):
                 print("Обновим дату доставки последнего сообщения " + sender_id)
                 print("Дата доставки : " + str(timestamp_message) + " у пользователя " + sender_id)
                 cur.execute("UPDATE data_undelivered_messages_time_stamp SET  timestamp_message = %s WHERE sender_id = %s", ( str(timestamp_message), sender_id))
-            print("Удалим информацию об отправленном сообщении у пользвателя " + sender_id + ". Сообшение с токеном " + str(message_id))
+            print("Удалим информацию об отправленном сообщении у пользователя " + sender_id + ". Сообшение с токеном " + str(message_id))
             cur.execute("DELETE FROM data_undelivered_send_messages WHERE sender_id = %s and message_id = %s", (sender_id, str(message_id)));
 
        # Make the changes to the database persistent
@@ -291,6 +292,8 @@ login_itilium = os.environ['LoginItilium']
 password_itilium = os.environ['PasswordItilium']
 auth_token_out = os.environ['AuthToken']
 
+current_thread = {'id': 0}
+
 def GetTextCommand(message):
     text = ""
     print("stack: GetTextCommand")
@@ -305,6 +308,7 @@ def GetTextCommand(message):
     return text
 
 def GetIsRegisteredUser(sender_id):
+    print("stack: GetIsRegisteredUser")
     is_error, text, state = RequestItilium({"data": {"action": "is_not_registered","sender": sender_id}})
     if is_error:
         text_error = text
@@ -2603,6 +2607,8 @@ def IncomingGet():
 
 @app.route('/',  methods=['POST'])
 def incoming():
+    random.seed()
+    current_thread.update{'id': random.randint(1,1000)}
     if not viber.verify_signature(request.get_data(), request.headers.get('X-Viber-Content-Signature')):
         return Response(status=403)
     viber_request = viber.parse_request(request.get_data())
