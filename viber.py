@@ -294,6 +294,9 @@ auth_token_out = os.environ['AuthToken']
 
 current_thread = {'id': 0}
 
+def GetCurrentThread():
+    return str(current_thread.get('id'))
+
 def GetTextCommand(message):
     text = ""
     print("stack: GetTextCommand")
