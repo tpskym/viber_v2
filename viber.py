@@ -364,6 +364,8 @@ def ShowCarousel(sender_id, result_list, number_parts):
         for id_cortage, title_cortage  in result_list:
             id = id_cortage
             view = title_cortage
+            if len(view) > 300:
+                view = view[:300]
             buttons.append({"TextVAlign": "top", "TextHAlign": "left", "ActionBody": id, "Text": view})
         buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "cancel", "Text": "Отменить"})
         text_keyboard.update({"Buttons": buttons_keyboard})
