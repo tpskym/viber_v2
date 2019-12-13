@@ -2614,6 +2614,7 @@ def incoming():
     current_thread.update({'id': random.randint(1,1000)})
     if not viber.verify_signature(request.get_data(), request.headers.get('X-Viber-Content-Signature')):
         return Response(status=403)
+    print("thread:" + GetCurrentThread() + " START. SetFlagStopQuery")
     viber_request = viber.parse_request(request.get_data())
 
     if isinstance(viber_request, ViberMessageRequest):
@@ -2626,9 +2627,11 @@ def incoming():
             try:
                 is_registered_user = GetIsRegisteredUser(sender_id)
                 GoToCurrentState(sender_id, message, is_registered_user)
+                print("thread:" + GetCurrentThread() + " After GoToCurrentState")
             except Exception as e:
-                print ("Error:"+ e.args[0])
+                print("thread:" + GetCurrentThread() + "Error:"+ e.args[0])
             finally:
+                print("thread:" + GetCurrentThread() + " FINALLY. SetFlagStopQuery")
                 SetFlagStopQuery(sender_id)
         else:
             print("thread:" + GetCurrentThread() + " Ничего не делаем. Причина выше в логах")
