@@ -2351,7 +2351,7 @@ def CreateCurrentUserRecord(sender_id, cur):
     #Вставим строку текущего пользователя
     if cur.rowcount == 0:
         #Текущее время в миллисекундах
-        millis = str(int(round(time.time() * 1000)))) #Текущее время в миллисекундах
+        millis = str(int(round(time.time() * 1000))) #Текущее время в миллисекундах
         cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",(sender_id, millis))
         print("thread:" + GetCurrentThread() + " Запись создана")
         return True
