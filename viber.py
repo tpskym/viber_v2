@@ -2611,7 +2611,7 @@ def IncomingGet():
 @app.route('/',  methods=['POST'])
 def incoming():
     random.seed()
-    current_thread.update{'id': random.randint(1,1000)}
+    current_thread.update({'id': random.randint(1,1000)})
     if not viber.verify_signature(request.get_data(), request.headers.get('X-Viber-Content-Signature')):
         return Response(status=403)
     viber_request = viber.parse_request(request.get_data())
