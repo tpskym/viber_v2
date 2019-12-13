@@ -2461,7 +2461,6 @@ def GoToStateByID(sender_id, message, state_id, service_data_bot_need, data_user
     if not isinstance(data_user, dict):
         data_user = {}
     procedure(sender_id, message, data_user, service_data_bot_need, carousel_id)
-
     return
 
 def GoToCurrentState(sender_id, message, is_registered_user):
@@ -2625,6 +2624,7 @@ def incoming():
 
         if SetFlagStartQuery(sender_id, viber_request.timestamp):
             try:
+                print("thread:" + GetCurrentThread() + " Current user blocked. Need Stop block on end thread")
                 is_registered_user = GetIsRegisteredUser(sender_id)
                 GoToCurrentState(sender_id, message, is_registered_user)
                 print("thread:" + GetCurrentThread() + " After GoToCurrentState")
