@@ -1,4 +1,5 @@
 import os
+import time
 import random
 import datetime
 from viberbot import Api
@@ -2349,7 +2350,9 @@ def CreateCurrentUserRecord(sender_id, cur):
     cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s FOR UPDATE", (sender_id,))
     #Вставим строку текущего пользователя
     if cur.rowcount == 0:
-        cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",(sender_id, "1"))
+        #Текущее время в миллисекундах
+        millis = str(int(round(time.time() * 1000)))) #Текущее время в миллисекундах
+        cur.execute("INSERT INTO data_flags_user (sender_id, flag_id) VALUES (%s, %s)",(sender_id, millis))
         print("thread:" + GetCurrentThread() + " Запись создана")
         return True
     else:
@@ -2358,8 +2361,11 @@ def CreateCurrentUserRecord(sender_id, cur):
 
 def SetFlagId(sender_id, flag_id, cur):
     result_query = cur.fetchone()
-    if result_query[1] == "1": #Запрос задан - мы просто ждем
+    str_time_start_block = result_query[1]
+    delta = flag_id - int(str_time_start_block) #разница текущего времени и времени блокировки
+    if delta < 10000  : # меньше 10 секунд
         print("thread:" + GetCurrentThread() + " Работа пользователя заблокирована ранее. Ничего не делаем: " + sender_id)
+        print("thread:" + GetCurrentThread() + " С начала блокировки прошло: " + (delta // 1000) + " секунд")
         return False
     else: # удалим строку и вскинем флаг и вернем True
         cur.execute("UPDATE data_flags_user SET flag_id = %s WHERE sender_id = %s", (flag_id, sender_id));
@@ -2390,7 +2396,7 @@ def SetFlagStartQuery(sender_id, timestamp_message):
             cur.execute("CREATE TABLE data_flags_user (id serial PRIMARY KEY, sender_id varchar(50), flag_id varchar(36) );")
             any_blocks_exist = False
         state = False
-        flag_id = "1"
+        flag_id = str(int(round(time.time() * 1000))) #Текущее время в миллисекундах
         if any_blocks_exist:
             print("thread:" + GetCurrentThread() + " Таблица data_flags_user создана ранее")
             cur.execute("SELECT sender_id, flag_id FROM data_flags_user WHERE sender_id = %s FOR UPDATE", (sender_id,))
