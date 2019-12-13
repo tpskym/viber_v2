@@ -2362,7 +2362,7 @@ def CreateCurrentUserRecord(sender_id, cur):
 def SetFlagId(sender_id, flag_id, cur):
     result_query = cur.fetchone()
     str_time_start_block = result_query[1]
-    delta = flag_id - int(str_time_start_block) #разница текущего времени и времени блокировки
+    delta = int(flag_id) - int(str_time_start_block) #разница текущего времени и времени блокировки
     if delta < 10000  : # меньше 10 секунд
         print("thread:" + GetCurrentThread() + " Работа пользователя заблокирована ранее. Ничего не делаем: " + sender_id)
         print("thread:" + GetCurrentThread() + " С начала блокировки прошло: " + (delta // 1000) + " секунд")
