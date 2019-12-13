@@ -347,8 +347,8 @@ def ShowCarousel(sender_id, result_list, number_parts):
         for id_cortage, title_cortage in result_list:
             id = id_cortage
             view = title_cortage
-            if len(view) > 700:
-                view = view[:700]
+            if len(view) > 350:
+                view = view[:350]
             if (index > last_number):
                 isEnd = False
                 break
@@ -372,8 +372,8 @@ def ShowCarousel(sender_id, result_list, number_parts):
         for id_cortage, title_cortage  in result_list:
             id = id_cortage
             view = title_cortage
-            if len(view) > 700:
-                view = view[:700]
+            if len(view) > 350:
+                view = view[:350]
             buttons.append({"TextVAlign": "top", "TextHAlign": "left", "ActionBody": id, "Silent": True, "Text": view})
         buttons_keyboard.append({"Columns": 6, "Rows": 1, "ActionBody": "cancel", "Text": "Отменить"})
         text_keyboard.update({"Buttons": buttons_keyboard})
