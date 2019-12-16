@@ -41,9 +41,9 @@ def SaveIdSendetCommand(messages, sender_id):
             print("thread:" + GetCurrentThread() + " Первый запуск. Создание таблиц data_undelivered_send_messages и data_undelivered_messages_time_stamp")
             cur.execute("CREATE TABLE data_undelivered_send_messages (id serial PRIMARY KEY, sender_id varchar(50), message_id text );")
             cur.execute("CREATE TABLE data_undelivered_messages_time_stamp (id serial PRIMARY KEY, sender_id varchar(50), timestamp_message varchar(50) );")
-        print("thread:" + GetCurrentThread() + " Блокируем таблицу data_undelivered_messages_time_stamp по пользователю: " +str(message_id))
+        print("thread:" + GetCurrentThread() + " Блокируем таблицу data_undelivered_messages_time_stamp по пользователю: " +str(sender_id))
         cur.execute("SELECT sender_id, timestamp_message FROM data_undelivered_messages_time_stamp WHERE sender_id = %s FOR UPDATE" , (sender_id,))
-        print("thread:" + GetCurrentThread() + " заблокировали таблицу data_undelivered_messages_time_stamp по пользователю: " +str(message_id))
+        print("thread:" + GetCurrentThread() + " заблокировали таблицу data_undelivered_messages_time_stamp по пользователю: " +str(sender_id))
         list_tokens = viber.send_messages(to, messages)
         for message_id in list_tokens:
             print("thread:" + GetCurrentThread() + " Сообщение отправлено: " +str(message_id))
@@ -59,7 +59,7 @@ def SaveIdSendetCommand(messages, sender_id):
         conn.commit()
         # Close communication with the database
     except Exception as e:
-        print("thread:" + GetCurrentThread() + " Error on SaveIdSendetCommand" + e.args[0])
+        print("thread:" + GetCurrentThread() + " Error on SaveIdSendetCommand " + e.args[0])
     finally:
         cur.close()
         conn.close()
@@ -148,9 +148,9 @@ def onFailedDeliveredMessage(message_id, sender_id):
             need_drop = False
 
         if need_drop:
-            print("thread:" + GetCurrentThread() + " блокируем таблицу data_undelivered_messages_time_stamp по пользователю: " +str(message_id))
+            print("thread:" + GetCurrentThread() + " блокируем таблицу data_undelivered_messages_time_stamp по пользователю: " +str(sender_id))
             cur.execute("SELECT sender_id, timestamp_message FROM data_undelivered_messages_time_stamp WHERE sender_id = %s FOR UPDATE" , (sender_id,))
-            print("thread:" + GetCurrentThread() + " заблокировали таблицу data_undelivered_messages_time_stamp по пользователю: " +str(message_id))
+            print("thread:" + GetCurrentThread() + " заблокировали таблицу data_undelivered_messages_time_stamp по пользователю: " +str(sender_id))
             cur.execute("DELETE FROM data_undelivered_send_messages WHERE sender_id = %s and message_id = %s", (sender_id, str(message_id) ))
 
        # Make the changes to the database persistent
@@ -185,9 +185,9 @@ def onDeliveredMessage(message_id, sender_id, timestamp_message):
             need_drop = False
 
         if need_drop:
-            print("thread:" + GetCurrentThread() + " блокируем таблицу data_undelivered_messages_time_stamp по пользователю: " +str(message_id))
+            print("thread:" + GetCurrentThread() + " блокируем таблицу data_undelivered_messages_time_stamp по пользователю: " +str(sender_id))
             cur.execute("SELECT sender_id, timestamp_message FROM data_undelivered_messages_time_stamp WHERE sender_id = %s FOR UPDATE" , (sender_id,))
-            print("thread:" + GetCurrentThread() + " заблокировали таблицу data_undelivered_messages_time_stamp по пользователю: " +str(message_id))
+            print("thread:" + GetCurrentThread() + " заблокировали таблицу data_undelivered_messages_time_stamp по пользователю: " +str(sender_id))
             if(cur.rowcount == 0):
                 print("thread:" + GetCurrentThread() + " Нет данных о пользователе " + sender_id)
                 cur.execute("LOCK TABLE data_undelivered_messages_time_stamp IN SHARE ROW EXCLUSIVE MODE")
