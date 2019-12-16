@@ -659,11 +659,7 @@ def proc_function91d863c10ff0456bacb086818cac8a03(sender_id, message, data, serv
             list = json.loads(text)
             if len(list) == 0:
                 ViberSendMessages(sender_id, TextMessage(text="У вас нет зарегистрированных открытых обращений"))
-                return "OK"
-            elif len(list) >= 1:#Для теста
-                ViberSendMessages(sender_id, TextMessage(text=list[0].get('detail_view')))
-                data.update({'id_incident':list[0].get('id')})
-                return "comand_to_selected_incident"
+                return "OK"            
             else:
                 list_ret = []
                 list_ret_full = []
@@ -840,11 +836,7 @@ def proc_function_expect_userbb53668eeb8e4153bdf7a72781739830(sender_id, message
 def proc_functionbb53668eeb8e4153bdf7a72781739830(sender_id, text, data, carousel_id):
     #Ввести уточнение (функция обработки выбора с клавиатуры)
     print("thread:" + GetCurrentThread() + " stack: proc_functionbb53668eeb8e4153bdf7a72781739830")
-    id_incident = data.get('id_incident', -1)
-    if  id_incident == -1:
-        id_incident = carousel_id
-    data.pop('id_incident', 1)
-    is_error, text, state = RequestItilium({"data": {"action": "is_add_converstaion","incident" : id_incident,"text":text,"sender": sender_id}})
+    is_error, text, state = RequestItilium({"data": {"action": "is_add_converstaion","incident" : carousel_id,"text":text,"sender": sender_id}})
 
     if is_error:
         text_error = text
@@ -957,7 +949,6 @@ def proc29615d836647459dac36095a2b7287cc(sender_id, message, data, service_data_
 def proc_function29615d836647459dac36095a2b7287cc(sender_id, message, data, service_data_bot_need, carousel_id):
     #Отмена (функция программного выбора)
     print("thread:" + GetCurrentThread() + " stack: proc_function29615d836647459dac36095a2b7287cc")
-    data.pop('id_incident', 1)
     return "1"
 
 def proc5160f46d71b8466a8b28db1bf17d5392(sender_id, message, data, service_data_bot_need, carousel_id):
