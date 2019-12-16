@@ -531,7 +531,7 @@ def proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_
         "Text": "Последние сообщения" })
     buttons.append({
         "Columns": 6,
-        "Rows": 1,        
+        "Rows": 1,
         "ActionBody": "f6829c8b-eb46-4c61-8ab6-3bd31f6bc879",
         "Text": "Получить статус" })
     ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
@@ -660,7 +660,7 @@ def proc_function91d863c10ff0456bacb086818cac8a03(sender_id, message, data, serv
             if len(list) == 0:
                 ViberSendMessages(sender_id, TextMessage(text="У вас нет зарегистрированных открытых обращений"))
                 return "OK"
-            elif len(list) == 1:
+            elif len(list) >= 1:#Для теста
                 ViberSendMessages(sender_id, TextMessage(text=list[0].get('detail_view')))
                 data.update({'id_incident':list[0].get('id')})
                 return "comand_to_selected_incident"
