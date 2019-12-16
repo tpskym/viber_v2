@@ -44,7 +44,7 @@ def SaveIdSendetCommand(messages, sender_id):
         print("thread:" + GetCurrentThread() + " Блокируем таблицу data_undelivered_messages_time_stamp по пользователю: " +str(sender_id))
         cur.execute("SELECT sender_id, timestamp_message FROM data_undelivered_messages_time_stamp WHERE sender_id = %s FOR UPDATE" , (sender_id,))
         print("thread:" + GetCurrentThread() + " заблокировали таблицу data_undelivered_messages_time_stamp по пользователю: " +str(sender_id))
-        list_tokens = viber.send_messages(to, messages)
+        list_tokens = viber.send_messages(sender_id, messages)
         for message_id in list_tokens:
             print("thread:" + GetCurrentThread() + " Сообщение отправлено: " +str(message_id))
 
